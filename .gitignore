@@ -2,6 +2,9 @@
 Debug/
 Release/
 
+*.opensdf
+*.sdf
+
 # Prerequisites
 *.d
 

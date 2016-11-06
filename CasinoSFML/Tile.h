@@ -21,10 +21,13 @@ public:
 		NOT_USED	// Poza gra
 	};
 
-	Tile(TileType _type, int _number) : type{ _type }, number{ _number } {};
-	Tile() : type{ NOT_USED }, number{ 0 } {};
+	Tile(TileType _type, unsigned int _number);
+	Tile();
 
 	~Tile();
+
+	// Get type of hex
+	TileType getType();
 
 	// Acces sourondings 
 	bool addRoad( Road* _road);
