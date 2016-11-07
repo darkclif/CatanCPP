@@ -2,7 +2,8 @@
 #include "Place.h"
 
 #include <vector>
-#include "Location.h"
+
+class Location;
 
 class Road : public Place
 {

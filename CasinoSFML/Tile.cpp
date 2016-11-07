@@ -15,6 +15,16 @@ Tile::TileType Tile::getType() {
 	return type;
 }
 
+void Tile::setType(TileType _type)
+{
+	type = _type;
+}
+
+std::string Tile::getTextureName()
+{
+	return arrTileToTexture[ (int)(this->type) ];
+}
+
 bool Tile::addRoad(Road * _road)
 {
 	for (std::vector<Road*>::iterator it = arrRoads.begin(); it != arrRoads.end(); it++ ) {

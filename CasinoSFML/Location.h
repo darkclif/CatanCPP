@@ -1,7 +1,9 @@
 #pragma once
 #include "Place.h"
 
-#include "Road.h"
+#include <vector>
+
+class Road;
 
 class Location : public Place
 {

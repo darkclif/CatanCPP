@@ -4,9 +4,14 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "Map.h"
+
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 800), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(1024, 800), "SFML works!");
+	window.setFramerateLimit(30);
+
+	Map lMap;
 
 	while (window.isOpen())
 	{
@@ -20,8 +25,7 @@ int main()
 		window.clear();
 
 		//Draw
-
-		// map.Show(&window);
+		lMap.Show(window, 200.0, 200.0);
 
 		window.display();
 	}
