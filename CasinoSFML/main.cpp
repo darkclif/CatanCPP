@@ -25,7 +25,7 @@ int main()
 		window.clear();
 
 		//Draw
-		lMap.Show(window, 200.0, 200.0);
+		lMap.Show(window, 400.0, 600.0);
 
 		window.display();
 	}

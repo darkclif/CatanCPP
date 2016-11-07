@@ -1,12 +1,19 @@
 #include "Tile.h"
 
+#include <iostream>
 
-
-Tile::Tile(TileType _type, unsigned int _number) : type{ _type }, number{ _number } {
+Tile::Tile(TileType _type, unsigned int _number) : 
+	type{ _type }, 
+	number{ _number },
+	initJump{ 0 } {
 };
 
-Tile::Tile() : type{ NOT_USED }, number{ 0 } {
+Tile::Tile() : 
+	type{ NOT_USED }, 
+	number{ 0 },
+	initJump{ 0 } {
 }
+
 Tile::~Tile()
 {
 };
@@ -56,6 +63,22 @@ bool Tile::addLocation(Location * _location)
 std::vector<Location*>::iterator Tile::getLocations()
 {
 	return this->arrLocations.begin();
+}
+
+int Tile::getInitJump()
+{
+	return initJump;
+}
+
+void Tile::setInitJump(int _jump)
+{
+	if (_jump < 0) {
+		std::string lError = "Tile::setInitJump: JumpNumber less than 0";
+		std::cout << lError << std::endl;
+		throw std::logic_error(lError);
+	}
+
+	this->initJump = _jump;
 }
 
 std::vector<Road*>::iterator Tile::getRoadds()

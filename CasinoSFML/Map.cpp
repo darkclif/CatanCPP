@@ -1,7 +1,8 @@
 #include "Map.h"
-
 #include "ResourceManager.h"
+
 #include <iostream>
+#include <queue>
 
 Map::Map(): width( Map::MAP_WIDTH ), height(Map::MAP_HEIGHT)
 {
@@ -29,17 +30,23 @@ void Map::CircleMapInit( int _radius, int _x, int _y) {
 	int x = this->width / 2;
 	int y = this->height / 2;
 
+	// Add center tile to queue and start spreading map 
+	std::queue<std::pair<int,int>> qTileToInit;
 
-	/*
-	while () {
-		
+	tiles[x][y].setInitJump(1);
+	qTileToInit.push( std::make_pair(x, y) );
+
+	while ( !qTileToInit.empty() ) {
+		std::pair<int, int> lPair = qTileToInit.front();
+		qTileToInit.pop();
+
+		// TODO
 	}
-	*/
 }
 
 void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 {
-	float MAP_SCALE = 0.4;
+	float MAP_SCALE = 0.2;
 
 	// Load deafault tile texture to compute intervals
 	sf::Texture* tmpTexture = ResourceManager::getInstance().getTexture("tile_texture_blank");
@@ -69,8 +76,8 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 			lWidth += lTriangleH;
 		}
 
-		lWidth = _x + (lTriangleH / 2.0) * (i + 1);
-		lHeight += lTriangleA;
+		lWidth = _x - (lTriangleH / 2.0) * (i + 1);
+		lHeight -= lTriangleA;
 	}
 
 }

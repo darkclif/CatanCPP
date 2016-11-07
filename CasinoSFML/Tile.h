@@ -38,16 +38,23 @@ public:
 
 	// Access sourondings 
 	bool addRoad( Road* _road);
-	bool addLocation(Location* _location);
-
-	std::vector<Location*>::iterator getLocations();
 	std::vector<Road*>::iterator getRoadds();
-private:
-	TileType type;
-	unsigned int number;
 
-	std::vector<Location*> arrLocations;
-	std::vector<Road*> arrRoads;
+	bool addLocation(Location* _location);
+	std::vector<Location*>::iterator getLocations();
+	
+	// For initialize circle-style map
+	int getInitJump();
+	void setInitJump( int _jump );
+
+private:
+	TileType type;							// Type of resources 
+	unsigned int number;					// Number on dices to activate
+
+	int initJump;							// Distance from center of map + 1
+
+	std::vector<Location*> arrLocations;	// Cities/villages (max: 6)
+	std::vector<Road*> arrRoads;			// Roads (max: 6)
 };
 
 

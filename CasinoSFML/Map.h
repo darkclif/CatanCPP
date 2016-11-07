@@ -20,6 +20,10 @@ public:
 	// _radius - radius of map
 	void CircleMapInit(int _radius, int _x, int _y);
 	
+	// Return hex adjoined to given
+	// 
+	bool getTile();
+
 	~Map();
 private:
 	// Default map size

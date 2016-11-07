@@ -1,7 +1,10 @@
 ## Additional by Pinky
 Debug/
 Release/
+CasinoSFML/Debug/
 
+*.user
+*.aps
 *.opensdf
 *.sdf
 
