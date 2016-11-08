@@ -10,11 +10,17 @@ public:
 		return instance;
 	};
 
+	// Get texture 
 	sf::Texture* getTexture( std::string _texName );
+
+	// Get font 
+	sf::Font* getFont( std::string _fontName );
 
 private:
 
 	std::map< std::string, sf::Texture* > mTextureMap;
+
+	std::map< std::string, sf::Font* > mFontMap;
 
 	// Singleton
 	ResourceManager(const ResourceManager &) = delete;

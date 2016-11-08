@@ -66,6 +66,6 @@ static const std::string arrTileToTexture[Tile::TileType::__ENUM_SIZE] = {
 	"tile_texture_wheat",	// WHEAT		
 	"tile_texture_desert",	// DESERT		
 	"tile_texture_blank",	// BLANK		
-	"tile_texture_blank",	// NOT_USED	
+	"tile_texture_not_used",// NOT_USED	
 };
 

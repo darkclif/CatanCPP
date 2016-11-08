@@ -16,23 +16,26 @@ public:
 	Map();
 
 	// Initialize circle-style map 
-	// _x, _y  - center
-	// _radius - radius of map
-	void CircleMapInit(int _radius, int _x, int _y);
+	//	_x, _y  - center
+	//	_radius - radius of map
+	void initCircleMap(int _radius );
 	
-	// Return hex adjoined to given
-	// 
-	bool getTile();
+	// Return coords of hex adjoined to given hex
+	//  _status		- false if there is no specified neighbor, true otherwise
+	//  _sourceTile - origin tile
+	//	_number		- number of wanted tile; 1- top-right, 2 - right ... (clockwise)
+	sf::Vector2i getNeighborTile( bool & _status, sf::Vector2i _sourceTile, int _number );
 
 	~Map();
 private:
 	// Default map size
-	static const int MAP_WIDTH = 5;
-	static const int MAP_HEIGHT = 5;
+	static const int MAP_WIDTH = 7;
+	static const int MAP_HEIGHT = 7;
 
 	int width;
 	int height;
 
 	std::vector<std::vector<Tile>> tiles;
+	Tile& getTile(sf::Vector2i _vector);
 };
 

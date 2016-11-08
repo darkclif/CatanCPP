@@ -3,6 +3,8 @@ Debug/
 Release/
 CasinoSFML/Debug/
 
+*.xcf
+
 *.user
 *.aps
 *.opensdf
