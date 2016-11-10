@@ -14,11 +14,6 @@ public:
 	// Construct map with given dimensions
 	Map(int _width, int _height);
 	Map();
-
-	// Initialize circle-style map 
-	//	_x, _y  - center
-	//	_radius - radius of map
-	void initCircleMap(int _radius );
 	
 	// Return coords of hex adjoined to given hex
 	//  _status		- false if there is no specified neighbor, true otherwise
@@ -37,5 +32,10 @@ private:
 
 	std::vector<std::vector<Tile>> tiles;
 	Tile& getTile(sf::Vector2i _vector);
+
+	// Initialize circle-style map 
+	//	_x, _y  - center
+	//	_radius - radius of map
+	void initCircleMap(int _radius);
 };
 

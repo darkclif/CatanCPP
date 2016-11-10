@@ -6,6 +6,8 @@
 
 #include "Map.h"
 
+#include <iostream>
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1024, 800), "SFML works!");
