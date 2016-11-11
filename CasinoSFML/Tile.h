@@ -3,8 +3,12 @@
 #include <vector>
 #include <string>
 
+#include <SFML/Graphics.hpp>
+
 #include "Location.h"
 #include "Road.h"
+#include "ResourceManager.h"
+#include "resources/Textures.h"
 
 class Tile
 {
@@ -32,11 +36,15 @@ public:
 	// Get/set type of hex
 	TileType getType();				
 	void setType(TileType _type); 
-	
-	// Get name of tile texture 
-	std::string getTextureName(); 
 
-	// Access sourondings 
+	// Get/set dice number
+	int getDiceNumber();
+	void setDiceNumber(int _number);
+
+	// Get name of tile texture 
+	sf::Texture& getTexture(); 
+
+	// Access soroundings 
 	bool addRoad( Road* _road);
 	std::vector<Road*>::iterator getRoadds();
 
@@ -49,23 +57,15 @@ public:
 
 private:
 	TileType type;							// Type of resources 
-	unsigned int number;					// Number on dices to activate
+	unsigned int diceNumber;				// Number on dices to activate
 
+	// For initialize circle-style map
 	int initJump;							// Distance from center of map + 1
 
 	std::vector<Location*> arrLocations;	// Cities/villages (max: 6)
 	std::vector<Road*> arrRoads;			// Roads (max: 6)
+
+	static const Catan::Textures::Name arrTileToTexture[ TileType::__ENUM_SIZE ];
 };
 
-
-static const std::string arrTileToTexture[Tile::TileType::__ENUM_SIZE] = {
-	"tile_texture_wood",	// WOOD
-	"tile_texture_sheep",	// SHEEP		
-	"tile_texture_clay",	// CLAY		
-	"tile_texture_iron",	// IRON		
-	"tile_texture_wheat",	// WHEAT		
-	"tile_texture_desert",	// DESERT		
-	"tile_texture_blank",	// BLANK		
-	"tile_texture_not_used",// NOT_USED	
-};
 

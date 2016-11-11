@@ -1,6 +1,11 @@
 #pragma once
-#include <map>
 #include <SFML/Graphics.hpp>
+
+#include <map>
+#include <memory>
+
+#include "resources/Textures.h"
+#include "resources/Fonts.h"
 
 class ResourceManager
 {
@@ -10,17 +15,18 @@ public:
 		return instance;
 	};
 
-	// Get texture 
-	sf::Texture* getTexture( std::string _texName );
-
-	// Get font 
-	sf::Font* getFont( std::string _fontName );
+	// Resource acccesors 
+	sf::Texture& getTexture( Catan::Textures::Name _texName );
+	sf::Font& getFont(Catan::Fonts::Name _fontName );
 
 private:
 
-	std::map< std::string, sf::Texture* > mTextureMap;
+	// Resource conteners 
+	std::map< Catan::Textures::Name, std::unique_ptr<sf::Texture> > mTextureMap;
+	std::map< Catan::Fonts::Name, std::unique_ptr<sf::Font> > mFontMap;
 
-	std::map< std::string, sf::Font* > mFontMap;
+	// Clear data
+	void Clear();
 
 	// Singleton
 	ResourceManager(const ResourceManager &) = delete;

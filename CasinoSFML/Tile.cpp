@@ -2,16 +2,24 @@
 
 #include <iostream>
 
+const Catan::Textures::Name Tile::arrTileToTexture[ TileType::__ENUM_SIZE ] = {
+	Catan::Textures::Name::TILE_WOOD,	// WOOD
+	Catan::Textures::Name::TILE_SHEEP,	// SHEEP		
+	Catan::Textures::Name::TILE_CLAY,	// CLAY		
+	Catan::Textures::Name::TILE_IRON,	// IRON		
+	Catan::Textures::Name::TILE_WHEAT,	// WHEAT		
+	Catan::Textures::Name::TILE_DESERT,	// DESERT		
+	Catan::Textures::Name::TILE_BLANK,	// BLANK		
+	Catan::Textures::Name::TILE_NOT_USED,// NOT_USED	
+};
+
 Tile::Tile(TileType _type, unsigned int _number) : 
 	type{ _type }, 
-	number{ _number },
+	diceNumber{ _number },
 	initJump{ 0 } {
 };
 
-Tile::Tile() : 
-	type{ NOT_USED }, 
-	number{ 0 },
-	initJump{ 0 } {
+Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 } {
 }
 
 Tile::~Tile()
@@ -27,9 +35,21 @@ void Tile::setType(TileType _type)
 	type = _type;
 }
 
-std::string Tile::getTextureName()
+int Tile::getDiceNumber()
 {
-	return arrTileToTexture[ (int)(this->type) ];
+	return diceNumber;
+}
+
+void Tile::setDiceNumber(int _number)
+{
+	if (_number > 1 && _number < 13 && _number != 7 )
+		diceNumber = _number;
+}
+
+sf::Texture& Tile::getTexture()
+{
+	Catan::Textures::Name lTextureName = arrTileToTexture[(int)(this->type)];
+	return ResourceManager::getInstance().getTexture( lTextureName );
 }
 
 bool Tile::addRoad(Road * _road)

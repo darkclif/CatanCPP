@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Map.h"
+#include "ResourceManager.h"
 
 #include <iostream>
 
@@ -14,6 +15,7 @@ int main()
 	window.setFramerateLimit(30);
 
 	Map lMap;
+	bool draw = true;
 
 	while (window.isOpen())
 	{
@@ -22,12 +24,30 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+
+			if (event.type == sf::Event::KeyPressed) {
+				
+
+				sf::View lView = window.getView();
+
+				switch (event.key.code) {
+					case sf::Keyboard::Left: lView.move(sf::Vector2f(-10, 0)); break;
+					case sf::Keyboard::Up: lView.move(sf::Vector2f(0, -10)); break;
+					case sf::Keyboard::Right: lView.move(sf::Vector2f(10, 0)); break;
+					case sf::Keyboard::Down: lView.move(sf::Vector2f(0, 10)); break;
+					case sf::Keyboard::A: lView.zoom((float)0.99); break;
+					case sf::Keyboard::S: draw = ( draw ? false : true ); break;
+					default: break;
+				}
+
+				window.setView(lView);
+			}
 		}
 
 		window.clear();
 
 		//Draw
-		lMap.Show(window, 400.0, 600.0);
+		if (draw) lMap.Show(window, 400.0, 600.0);
 
 		window.display();
 	}

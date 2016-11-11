@@ -2,17 +2,23 @@
 
 #include <vector>
 #include "Tile.h"
+
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 // Class to store map and all tiles
 class Map
 {
 public:
+	enum Style {
+		CIRCLE
+	};
+	
 	// Render 
 	void Show(sf::RenderWindow & _window, float _x, float _y);
 
 	// Construct map with given dimensions
-	Map(int _width, int _height);
+	Map(int _width, int _height, Style _style);
 	Map();
 	
 	// Return coords of hex adjoined to given hex
@@ -24,18 +30,24 @@ public:
 	~Map();
 private:
 	// Default map size
-	static const int MAP_WIDTH = 7;
-	static const int MAP_HEIGHT = 7;
+	static const int MAP_WIDTH = 5;
+	static const int MAP_HEIGHT = 5;
 
 	int width;
 	int height;
+	Style style;
 
-	std::vector<std::vector<Tile>> tiles;
+	// Keep all tiles
+	std::vector< std::vector<Tile> > tiles;
 	Tile& getTile(sf::Vector2i _vector);
 
-	// Initialize circle-style map 
-	//	_x, _y  - center
-	//	_radius - radius of map
-	void initCircleMap(int _radius);
+	// Keep only used tiles
+	std::vector< Tile* > inGameTiles;
+
+	// Prepare map to play
+	void setupMap( Style _style );
+
+	/* Circle-style map deploy -- 19 tiles (5x5) */
+	void setupCircleMap();
 };
 
