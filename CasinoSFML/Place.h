@@ -5,8 +5,8 @@
 class Place
 {
 public:
-	Player* getOwner() {
-		return owner;
+	Player& getOwner() {
+		return *owner;
 	}
 
 protected:

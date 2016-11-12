@@ -37,12 +37,15 @@ private:
 	int height;
 	Style style;
 
-	// Keep all tiles
+	// Acces tile
+	Tile* getTile(sf::Vector2i _vector);
+	
+	// All tiles
 	std::vector< std::vector<Tile> > tiles;
-	Tile& getTile(sf::Vector2i _vector);
-
-	// Keep only used tiles
-	std::vector< Tile* > inGameTiles;
+	
+	std::vector< Tile* > inGameTiles;					// Tiles used in game
+	std::vector< std::unique_ptr<Road>> Roads;			// All roads
+	std::vector< std::unique_ptr<Location>> Locations;	// All locations
 
 	// Prepare map to play
 	void setupMap( Style _style );

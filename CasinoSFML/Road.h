@@ -13,6 +13,7 @@ public:
 
 	// Menage sourrondings 
 	bool addLocation(Location* _location);
+
 	std::vector<Location*>::iterator getLocations();
 
 private:

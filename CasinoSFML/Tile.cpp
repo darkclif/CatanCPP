@@ -17,9 +17,19 @@ Tile::Tile(TileType _type, unsigned int _number) :
 	type{ _type }, 
 	diceNumber{ _number },
 	initJump{ 0 } {
+
+	for (int i = 0; i < 6; i++) {
+		arrLocations[i] = nullptr;
+		arrRoads[i] = nullptr;
+	}
 };
 
 Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 } {
+
+	for (int i = 0; i < 6; i++) {
+		arrLocations[i] = nullptr;
+		arrRoads[i] = nullptr;
+	}
 }
 
 Tile::~Tile()
@@ -52,37 +62,34 @@ sf::Texture& Tile::getTexture()
 	return ResourceManager::getInstance().getTexture( lTextureName );
 }
 
-bool Tile::addRoad(Road * _road)
+bool Tile::addRoad(Road * _road, int _number)
 {
-	for (std::vector<Road*>::iterator it = arrRoads.begin(); it != arrRoads.end(); it++ ) {
-		if ( _road == *it ) return false;
+	if (arrRoads[_number] != nullptr) {
+		return false;
 	}
 
-	// Only six roads beside the tile
-	if (arrLocations.size() == 6)
-		throw std::logic_error("Too many unique roads at signle tile!");
-
-	arrRoads.push_back(_road);
+	arrRoads[_number] = _road;
 	return true;
 }
 
-bool Tile::addLocation(Location * _location)
+bool Tile::addLocation(Location * _location, int _number)
 {
-	for (std::vector<Location*>::iterator it = arrLocations.begin(); it != arrLocations.end(); it++) {
-		if (_location == *it) return false;
+	if (arrLocations[_number] != nullptr) {
+		return false;
 	}
 
-	// Only six locations beside the tile
-	if (arrLocations.size() == 6)
-		throw std::logic_error("Too many unique locations at signle tile!");
-
-	arrLocations.push_back(_location);
+	arrLocations[_number] = _location;
 	return true;
 }
 
-std::vector<Location*>::iterator Tile::getLocations()
+Location* Tile::getLocation( int _number )
 {
-	return this->arrLocations.begin();
+	return this->arrLocations[_number];
+}
+
+Road* Tile::getRoad(int _number)
+{
+	return this->arrRoads[_number];
 }
 
 int Tile::getInitJump()
@@ -99,9 +106,4 @@ void Tile::setInitJump(int _jump)
 	}
 
 	this->initJump = _jump;
-}
-
-std::vector<Road*>::iterator Tile::getRoadds()
-{
-	return this->arrRoads.begin();
 }

@@ -11,7 +11,7 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1024, 800), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(1300, 1000), "SFML works!");
 	window.setFramerateLimit(30);
 
 	Map lMap;
@@ -36,7 +36,7 @@ int main()
 					case sf::Keyboard::Right: lView.move(sf::Vector2f(10, 0)); break;
 					case sf::Keyboard::Down: lView.move(sf::Vector2f(0, 10)); break;
 					case sf::Keyboard::A: lView.zoom((float)0.99); break;
-					case sf::Keyboard::S: draw = ( draw ? false : true ); break;
+					case sf::Keyboard::S: /* draw = ( draw ? false : true ); */ lView.zoom((float)1.01); break;
 					default: break;
 				}
 

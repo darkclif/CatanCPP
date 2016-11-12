@@ -77,11 +77,11 @@
     <ClInclude Include="Resources\Textures.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Road.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="resources\Fonts.h">
       <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Road.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

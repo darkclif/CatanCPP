@@ -21,7 +21,7 @@ Map::Map(): width( Map::MAP_WIDTH ), height(Map::MAP_HEIGHT), style( Style::CIRC
 	}
 
 	// Prepare map to play
-	setupMap( this->style );
+	// setupMap( this->style );
 }
 
 void Map::setupMap( Style _style ) {
@@ -62,24 +62,24 @@ void Map::setupCircleMap() {
 		sf::Vector2i lVector = qTileToInit.front();
 		qTileToInit.pop();
 
-		int lJump = getTile(lVector).getInitJump();
+		int lJump = getTile(lVector)->getInitJump();
 
 		// Set tile type 
-		if (getTile(lVector).getType() == Tile::TileType::NOT_USED)
-			getTile(lVector).setType(Tile::TileType::BLANK);
+		if (getTile(lVector)->getType() == Tile::TileType::NOT_USED)
+			getTile(lVector)->setType(Tile::TileType::BLANK);
 
 		// Add tile to in-game list
-		inGameTiles.push_back(&getTile(lVector));
+		inGameTiles.push_back(getTile(lVector));
 
 		// Search for further tiles if current tile is not map edge
-		if (getTile(lVector).getInitJump() < lRadius) {
+		if (getTile(lVector)->getInitJump() < lRadius) {
 			for (int i = 1; i <= 6; i++) {
 				bool lStatus;
 				sf::Vector2i lNgVector = getNeighborTile(lStatus, lVector, i);
 
 				// Add to queue if tile exist and have not been added yet 
-				if (lStatus && getTile(lNgVector).getInitJump() == 0) {
-					getTile(lNgVector).setInitJump(lJump + 1);
+				if (lStatus && getTile(lNgVector)->getInitJump() == 0) {
+					getTile(lNgVector)->setInitJump(lJump + 1);
 					qTileToInit.push(lNgVector);
 				}
 			}
@@ -113,32 +113,29 @@ void Map::setupCircleMap() {
 	// Step 1
 	countBlock = tileToShuffleCount / 18;
 	for (int i = 0; i < countBlock; i++) {
-		tileTypes.assign(
-			{
-				Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP,
-				Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD,
-				Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT,
-				Tile::TileType::IRON, Tile::TileType::IRON, Tile::TileType::IRON,
-				Tile::TileType::CLAY, Tile::TileType::CLAY, Tile::TileType::CLAY
-			}
-		);
+		Tile::TileType lTiles[] = {
+			Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP,
+			Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD,
+			Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT,
+			Tile::TileType::IRON, Tile::TileType::IRON, Tile::TileType::IRON,
+			Tile::TileType::CLAY, Tile::TileType::CLAY, Tile::TileType::CLAY
+		};
+		tileTypes.insert( tileTypes.begin(), lTiles, lTiles + 18);
 	}
 	tileToShuffleCount -= countBlock * 18;
 
 	// Step 2
 	countBlock = tileToShuffleCount / 9;
 	for (int i = 0; i < countBlock; i++) {
-		tileTypes.assign(
-			{
-				Tile::TileType::SHEEP, Tile::TileType::SHEEP, 
-				Tile::TileType::WOOD, Tile::TileType::WOOD, 
-				Tile::TileType::WHEAT, Tile::TileType::WHEAT,
-				Tile::TileType::IRON, 
-				Tile::TileType::CLAY,
-				Tile::TileType::DESERT
-			}
-		);
-
+		Tile::TileType lTiles[] = {
+			Tile::TileType::SHEEP, Tile::TileType::SHEEP,
+			Tile::TileType::WOOD, Tile::TileType::WOOD,
+			Tile::TileType::WHEAT, Tile::TileType::WHEAT,
+			Tile::TileType::IRON,
+			Tile::TileType::CLAY,
+			Tile::TileType::DESERT
+		};
+		tileTypes.insert(tileTypes.begin(), lTiles, lTiles + 9);
 		countDesert++;
 	}
 	tileToShuffleCount -= countBlock * 9;
@@ -146,13 +143,12 @@ void Map::setupCircleMap() {
 	// Step 3
 	countBlock = tileToShuffleCount / 3;
 	for (int i = 0; i < countBlock; i++) {
-		tileTypes.assign(
-			{
-				Tile::TileType::SHEEP,
-				Tile::TileType::WOOD, 
-				Tile::TileType::WHEAT 
-			}
-		);
+		Tile::TileType lTiles[] = {
+			Tile::TileType::SHEEP,
+			Tile::TileType::WOOD, 
+			Tile::TileType::WHEAT 
+		};
+		tileTypes.insert(tileTypes.begin(), lTiles, lTiles + 3);
 	}
 	tileToShuffleCount -= countBlock * 3;
 
@@ -188,6 +184,59 @@ void Map::setupCircleMap() {
 		}
 	}
 
+	//
+	// Spawn roads and locations at in-game tiles
+	//
+	
+	for (int i = 0; i < this->width; i++) {
+		for (int j = 0; j < this->height; j++) {
+
+			if (getTile(sf::Vector2i(i, j))->getType() == Tile::TileType::NOT_USED)
+				continue;
+
+			// For each road and location
+			for (int k = 1; k <= 6; k++) {
+	
+				bool isNeighbor;
+				Tile* lNeighborTile1 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i, j), k));
+				Tile* lNeighborTile2 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i,j),(k+1) % 6) );
+
+				// Road 
+				if ( lNeighborTile1 != nullptr && lNeighborTile1->getRoad((k + 3) % 6) != nullptr ) {
+					// Get road from neighbor if exist
+					auto lNeighborRoad = lNeighborTile1->getRoad((k + 3) % 6);
+					getTile(sf::Vector2i(i, j))->addRoad(lNeighborRoad, k);
+				}
+				else {
+					// Create road if neighbor do not have road
+					std::unique_ptr<Road> lNewRoad( new Road() );
+					Roads.push_back( std::move(lNewRoad) );
+
+					// Proponuje zmienic Roads na zwykle pointery
+					// getTile(sf::Vector2i(i, j))->addRoad(nullptr, k);
+				}
+
+				/* Location
+				auto lNeighborLocation1 = ( lNeighborTile1 != nullptr ? lNeighborTile1->getLocation((k + 2)%6) : nullptr );
+				auto lNeighborLocation2 = (	lNeighborTile2 != nullptr ? lNeighborTile2->getLocation((k + 4)%6) : nullptr );
+
+				if (lNeighborLocation1 != nullptr || lNeighborLocation2 != nullptr) {
+					// Get location from neighbor
+					auto lLocation = (lNeighborLocation1 != nullptr ? lNeighborLocation1 : lNeighborLocation2);
+					getTile(sf::Vector2i(i, j))->addLocation(lLocation, k);
+				}
+				else {
+					// Create location if neighbor do not have location
+					std::unique_ptr<Location> lNewLocation(new Location());
+					Locations.push_back(std::move(lNewLocation));
+
+					getTile(sf::Vector2i(i, j))->addLocation(Locations.back().get(), k);
+				}
+				*/
+			}
+		}
+	}
+	
 }
 
 void Map::Show(sf::RenderWindow & _window, float _x, float _y)
@@ -202,7 +251,7 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 	float lWidth = _x;
 	float lHeight = _y;
 
-	for (int i = 0; i < height; i++) {
+	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			// Draw tile
 			sf::Texture& lTexture = tiles[i][j].getTexture();
@@ -272,9 +321,12 @@ Map::~Map()
 {
 }
 
-Tile & Map::getTile(sf::Vector2i _vector)
+Tile * Map::getTile(sf::Vector2i _vector)
 {
-	return tiles[_vector.x][_vector.y];
+	if (_vector.x < width && _vector.x >= 0 && _vector.y < height && _vector.y >= 0)
+		return &(tiles[_vector.x][_vector.y]);
+	else
+		return nullptr;
 }
 
 

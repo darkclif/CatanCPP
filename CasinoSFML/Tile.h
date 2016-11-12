@@ -45,11 +45,11 @@ public:
 	sf::Texture& getTexture(); 
 
 	// Access soroundings 
-	bool addRoad( Road* _road);
-	std::vector<Road*>::iterator getRoadds();
+	bool addRoad(Road* _road, int _number);
+	Road* getRoad(int _number);
 
-	bool addLocation(Location* _location);
-	std::vector<Location*>::iterator getLocations();
+	bool addLocation(Location* _location, int _number);
+	Location* getLocation(int _number);
 	
 	// For initialize circle-style map
 	int getInitJump();
@@ -62,9 +62,10 @@ private:
 	// For initialize circle-style map
 	int initJump;							// Distance from center of map + 1
 
-	std::vector<Location*> arrLocations;	// Cities/villages (max: 6)
-	std::vector<Road*> arrRoads;			// Roads (max: 6)
+	Location* arrLocations[6];	// Cities/villages
+	Road* arrRoads[6];			// Roads
 
+	// Tile::Type to Texture::Name
 	static const Catan::Textures::Name arrTileToTexture[ TileType::__ENUM_SIZE ];
 };
 
