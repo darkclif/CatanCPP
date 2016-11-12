@@ -21,7 +21,7 @@ Map::Map(): width( Map::MAP_WIDTH ), height(Map::MAP_HEIGHT), style( Style::CIRC
 	}
 
 	// Prepare map to play
-	// setupMap( this->style );
+	setupMap( this->style );
 }
 
 void Map::setupMap( Style _style ) {
@@ -73,7 +73,7 @@ void Map::setupCircleMap() {
 
 		// Search for further tiles if current tile is not map edge
 		if (getTile(lVector)->getInitJump() < lRadius) {
-			for (int i = 1; i <= 6; i++) {
+			for (int i = 0; i < 6; i++) {
 				bool lStatus;
 				sf::Vector2i lNgVector = getNeighborTile(lStatus, lVector, i);
 
@@ -162,7 +162,6 @@ void Map::setupCircleMap() {
 	}
 
 	// Shuffle tables
-	std::srand(unsigned(std::time(0)));
 
 	std::random_shuffle(std::begin(tileTypes), std::end(tileTypes));
 	std::random_shuffle(std::begin(tileDiceNumbers), std::end(tileDiceNumbers));
@@ -187,24 +186,27 @@ void Map::setupCircleMap() {
 	//
 	// Spawn roads and locations at in-game tiles
 	//
-	
-	for (int i = 0; i < this->width; i++) {
-		for (int j = 0; j < this->height; j++) {
+	int countLocations = 0;
+
+	for (int i = 0; i < this->height; i++) {
+		for (int j = 0; j < this->width; j++) {
 
 			if (getTile(sf::Vector2i(i, j))->getType() == Tile::TileType::NOT_USED)
 				continue;
 
 			// For each road and location
-			for (int k = 1; k <= 6; k++) {
+			for (int k = 0; k < 6; k++) {
 	
 				bool isNeighbor;
 				Tile* lNeighborTile1 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i, j), k));
 				Tile* lNeighborTile2 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i,j),(k+1) % 6) );
 
+				std::cout << k << ":" << (lNeighborTile1 != nullptr ? lNeighborTile1->getDiceNumber() : 0 ) << std::endl;
+
 				// Road 
-				if ( lNeighborTile1 != nullptr && lNeighborTile1->getRoad((k + 3) % 6) != nullptr ) {
-					// Get road from neighbor if exist
-					auto lNeighborRoad = lNeighborTile1->getRoad((k + 3) % 6);
+				auto lNeighborRoad = (lNeighborTile1 != nullptr ? lNeighborTile1->getRoad((k + 3) % 6) : nullptr);
+
+				if ( lNeighborRoad != nullptr ) {
 					getTile(sf::Vector2i(i, j))->addRoad(lNeighborRoad, k);
 				}
 				else {
@@ -212,11 +214,12 @@ void Map::setupCircleMap() {
 					std::unique_ptr<Road> lNewRoad( new Road() );
 					Roads.push_back( std::move(lNewRoad) );
 
-					// Proponuje zmienic Roads na zwykle pointery
-					// getTile(sf::Vector2i(i, j))->addRoad(nullptr, k);
+					std::cout << "dupa" << std::endl;
+
+					getTile(sf::Vector2i(i, j))->addRoad(Roads.back().get(), k);
 				}
 
-				/* Location
+				// Location
 				auto lNeighborLocation1 = ( lNeighborTile1 != nullptr ? lNeighborTile1->getLocation((k + 2)%6) : nullptr );
 				auto lNeighborLocation2 = (	lNeighborTile2 != nullptr ? lNeighborTile2->getLocation((k + 4)%6) : nullptr );
 
@@ -230,13 +233,17 @@ void Map::setupCircleMap() {
 					std::unique_ptr<Location> lNewLocation(new Location());
 					Locations.push_back(std::move(lNewLocation));
 
+					countLocations++;
+
+					std::cout << "Tile:" << i << " " << j << std::endl;
+					std::cout << "Locations:" << countLocations << std::endl;
+
 					getTile(sf::Vector2i(i, j))->addLocation(Locations.back().get(), k);
 				}
-				*/
 			}
 		}
 	}
-	
+
 }
 
 void Map::Show(sf::RenderWindow & _window, float _x, float _y)
@@ -245,11 +252,30 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 
 	// Load deafault tile texture to compute intervals
 	sf::Texture& tmpTexture = ResourceManager::getInstance().getTexture( Catan::Textures::Name::TILE_BLANK );
-	float lTriangleA = (float)(tmpTexture.getSize().y) * 0.75f * MAP_SCALE;	// 1,5 * hex border 
-	float lTriangleH = (float)(tmpTexture.getSize().x) * MAP_SCALE;			// 2   * height of triangle in hex
+	float lTriangleA = (float)(tmpTexture.getSize().y) * 0.5f * MAP_SCALE;	// Hex border 
+	float lTriangleH = (float)(tmpTexture.getSize().x / 2.f) * MAP_SCALE;	// Height of triangle in hex
 
 	float lWidth = _x;
 	float lHeight = _y;
+
+	// Offsets
+	sf::Vector2f offsetLocations[6] = {
+		sf::Vector2f(lTriangleH,-(lTriangleA/2.f)),
+		sf::Vector2f(lTriangleH,(lTriangleA / 2.f)),
+		sf::Vector2f(0,lTriangleA),
+		sf::Vector2f(-lTriangleH,(lTriangleA / 2.f)),
+		sf::Vector2f(-lTriangleH,-(lTriangleA / 2.f)),
+		sf::Vector2f(0,-lTriangleA),
+	};
+
+	sf::Vector2f offsetRoads[6] = {
+		sf::Vector2f((lTriangleH*0.5f),-(lTriangleH * 0.86f)),
+		sf::Vector2f(lTriangleH,0),
+		sf::Vector2f((lTriangleH*0.5f),(lTriangleH * 0.86f)),
+		sf::Vector2f(-(lTriangleH*0.5f),(lTriangleH * 0.86f)),
+		sf::Vector2f(-lTriangleH,0),
+		sf::Vector2f(-(lTriangleH*0.5f),-(lTriangleH * 0.86f)),
+	};
 
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
@@ -280,13 +306,55 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 
 			_window.draw( lText );
 
-			lWidth += lTriangleH;
+			// Set locations position 
+			for (int k = 0; k < 6; k++) {
+				Location* lLocation = getTile(i, j)->getLocation(k);
+
+				if ( lLocation == nullptr )
+					continue;
+
+				lLocation->setPosition(sf::Vector2f(lWidth,lHeight) + offsetLocations[k]);
+			}
+
+			// Set roads position 
+			for (int k = 0; k < 6; k++) {
+				Road* lRoad = getTile(i, j)->getRoad(k);
+
+				if (lRoad == nullptr)
+					continue;
+
+				lRoad->setPosition(sf::Vector2f(lWidth, lHeight) + offsetRoads[k]);
+			}
+
+			// Next
+			lWidth += lTriangleH * 2.f;
 		}
 
-		lWidth = _x - (lTriangleH / 2.0f) * (i + 1);
-		lHeight -= lTriangleA;
+		lWidth = _x - (lTriangleH * (i + 1));
+		lHeight -= lTriangleA * 1.5f;
 	}
 
+	// Draw locations
+	for (auto& lLocation : Locations) {
+
+		sf::CircleShape lCircle(10);
+		lCircle.setOrigin(10, 10);
+		lCircle.setFillColor(lLocation->color == 1 ? sf::Color::Red : sf::Color::Green);
+		lCircle.setPosition( lLocation->getPosition() );
+
+		_window.draw( lCircle );
+	}
+
+	// Draw roads
+	for (auto& lRoad : Roads) {
+
+		sf::CircleShape lCircle(10);
+		lCircle.setOrigin(10, 10);
+		lCircle.setFillColor(sf::Color::Blue);
+		lCircle.setPosition(lRoad->getPosition());
+
+		_window.draw(lCircle);
+	}
 }
 
 Map::Map(int _width, int _height, Style _style ) : width{ _width }, height{ _height }, style{ _style }
@@ -300,17 +368,20 @@ sf::Vector2i Map::getNeighborTile(bool & _status, sf::Vector2i _sourceTile, int 
 	_status = true;
 
 	switch (_number) {
-		case 1: lReturn.x++; lReturn.y++; break;
-		case 2: lReturn.x++; break;
-		case 3: lReturn.y--; break;
-		case 4: lReturn.y--; lReturn.x--; break;
-		case 5: lReturn.x--; break;
-		case 6: lReturn.y++; break;
+		case 0: lReturn.x++; lReturn.y++; break;
+		case 1: lReturn.y++; break;
+		case 2: lReturn.x--; break;
+		case 3: lReturn.y--; lReturn.x--; break;
+		case 4: lReturn.y--; break;
+		case 5: lReturn.x++; break;
 		default: break;
 	}
 
 	if (!(lReturn.x >= 0 && lReturn.x < this->width &&
 		lReturn.y >= 0 && lReturn.y < this->height)) {
+		
+		lReturn.x = -1;
+		lReturn.y = -1;
 		_status = false;
 	}
 
@@ -327,6 +398,11 @@ Tile * Map::getTile(sf::Vector2i _vector)
 		return &(tiles[_vector.x][_vector.y]);
 	else
 		return nullptr;
+}
+
+Tile * Map::getTile(int _x, int _y)
+{
+	return getTile(sf::Vector2i(_x, _y));
 }
 
 

@@ -14,6 +14,9 @@ public:
 		EMPTY
 	};
 
+	//  test
+	int color;
+
 	Location();
 	~Location();
 

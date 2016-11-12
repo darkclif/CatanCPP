@@ -30,6 +30,7 @@ public:
 	~Map();
 private:
 	// Default map size
+	// Change carefuly, some values may be hardcoded!
 	static const int MAP_WIDTH = 5;
 	static const int MAP_HEIGHT = 5;
 
@@ -39,7 +40,8 @@ private:
 
 	// Acces tile
 	Tile* getTile(sf::Vector2i _vector);
-	
+	Tile* getTile(int _x, int _y);
+
 	// All tiles
 	std::vector< std::vector<Tile> > tiles;
 	

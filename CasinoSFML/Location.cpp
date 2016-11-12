@@ -1,9 +1,12 @@
 #include "Location.h"
 
-
+#include <cstdlib>
+#include <ctime>
 
 Location::Location()
 {
+	// test
+	color = std::rand() % 2;
 }
 
 

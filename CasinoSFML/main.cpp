@@ -11,6 +11,8 @@
 
 int main()
 {
+	std::srand(unsigned(std::time(0)));
+
 	sf::RenderWindow window(sf::VideoMode(1300, 1000), "SFML works!");
 	window.setFramerateLimit(30);
 

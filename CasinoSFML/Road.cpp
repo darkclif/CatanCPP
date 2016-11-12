@@ -11,7 +11,7 @@ Road::~Road()
 
 bool Road::addLocation(Location * _location)
 {
-	for (std::vector<Location*>::iterator it = arrLocations.begin(); it != arrLocations.end(); it++) {
+	for (auto it = arrLocations.begin(); it != arrLocations.end(); it++) {
 		if (_location == *it) return false;
 	}
 
