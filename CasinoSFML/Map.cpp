@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-Map::Map(): width( Map::MAP_WIDTH ), height(Map::MAP_HEIGHT), style( Style::CIRCLE )
+Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_WIDTH), height(Map::MAP_HEIGHT), style(Style::CIRCLE), renderWindow{_window}
 {
 	// Make a square map
 	this->tiles.resize(height);
@@ -22,6 +22,9 @@ Map::Map(): width( Map::MAP_WIDTH ), height(Map::MAP_HEIGHT), style( Style::CIRC
 
 	// Prepare map to play
 	setupMap( this->style );
+
+	// Compute position of tiles, roads and locations to draw 
+	ComputeRender();
 }
 
 void Map::setupMap( Style _style ) {
@@ -167,7 +170,7 @@ void Map::setupCircleMap() {
 	std::random_shuffle(std::begin(tileDiceNumbers), std::end(tileDiceNumbers));
 
 	//
-	// Assign 
+	// Assign resources and diceNumbers
 	//
 
 	int i_type = 0;
@@ -186,8 +189,6 @@ void Map::setupCircleMap() {
 	//
 	// Spawn roads and locations at in-game tiles
 	//
-	int countLocations = 0;
-
 	for (int i = 0; i < this->height; i++) {
 		for (int j = 0; j < this->width; j++) {
 
@@ -196,12 +197,9 @@ void Map::setupCircleMap() {
 
 			// For each road and location
 			for (int k = 0; k < 6; k++) {
-	
 				bool isNeighbor;
 				Tile* lNeighborTile1 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i, j), k));
 				Tile* lNeighborTile2 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i,j),(k+1) % 6) );
-
-				std::cout << k << ":" << (lNeighborTile1 != nullptr ? lNeighborTile1->getDiceNumber() : 0 ) << std::endl;
 
 				// Road 
 				auto lNeighborRoad = (lNeighborTile1 != nullptr ? lNeighborTile1->getRoad((k + 3) % 6) : nullptr);
@@ -213,8 +211,6 @@ void Map::setupCircleMap() {
 					// Create road if neighbor do not have road
 					std::unique_ptr<Road> lNewRoad( new Road() );
 					Roads.push_back( std::move(lNewRoad) );
-
-					std::cout << "dupa" << std::endl;
 
 					getTile(sf::Vector2i(i, j))->addRoad(Roads.back().get(), k);
 				}
@@ -233,11 +229,6 @@ void Map::setupCircleMap() {
 					std::unique_ptr<Location> lNewLocation(new Location());
 					Locations.push_back(std::move(lNewLocation));
 
-					countLocations++;
-
-					std::cout << "Tile:" << i << " " << j << std::endl;
-					std::cout << "Locations:" << countLocations << std::endl;
-
 					getTile(sf::Vector2i(i, j))->addLocation(Locations.back().get(), k);
 				}
 			}
@@ -246,21 +237,18 @@ void Map::setupCircleMap() {
 
 }
 
-void Map::Show(sf::RenderWindow & _window, float _x, float _y)
-{
-	float MAP_SCALE = 0.2f;
-
+void Map::ComputeRender() {
 	// Load deafault tile texture to compute intervals
-	sf::Texture& tmpTexture = ResourceManager::getInstance().getTexture( Catan::Textures::Name::TILE_BLANK );
-	float lTriangleA = (float)(tmpTexture.getSize().y) * 0.5f * MAP_SCALE;	// Hex border 
-	float lTriangleH = (float)(tmpTexture.getSize().x / 2.f) * MAP_SCALE;	// Height of triangle in hex
+	sf::Texture& tmpTexture = ResourceManager::getInstance().getTexture(Catan::Textures::Name::TILE_BLANK);
+	float lTriangleA = (float)(tmpTexture.getSize().y) * 0.5f;	// Hex border 
+	float lTriangleH = (float)(tmpTexture.getSize().x / 2.f);	// Height of triangle in hex
 
-	float lWidth = _x;
-	float lHeight = _y;
+	float lWidth = 0;
+	float lHeight = 0;
 
 	// Offsets
 	sf::Vector2f offsetLocations[6] = {
-		sf::Vector2f(lTriangleH,-(lTriangleA/2.f)),
+		sf::Vector2f(lTriangleH,-(lTriangleA / 2.f)),
 		sf::Vector2f(lTriangleH,(lTriangleA / 2.f)),
 		sf::Vector2f(0,lTriangleA),
 		sf::Vector2f(-lTriangleH,(lTriangleA / 2.f)),
@@ -279,41 +267,17 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			// Draw tile
-			sf::Texture& lTexture = tiles[i][j].getTexture();
-			
-			sf::Sprite lTileSprite;
-			lTileSprite.setTexture( lTexture );
-			
-			sf::Rect<int> lOrigin( lTileSprite.getTextureRect() );
-			lOrigin.height /= 2;
-			lOrigin.width /= 2;
-
-			lTileSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height );
-			lTileSprite.setPosition( sf::Vector2f( lWidth, lHeight ) );
-			lTileSprite.setScale( sf::Vector2f( MAP_SCALE, MAP_SCALE) );
-			 
-			_window.draw( lTileSprite );
-
-			// Draw number
-			sf::Text lText;
-			lText.setString( std::to_string( tiles[i][j].getDiceNumber() ) );
-
-			lText.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::Name::DEFAULT));
-			lText.setCharacterSize(24);
-			lText.setFillColor( sf::Color::Red );
-			lText.setPosition( sf::Vector2f(lWidth, lHeight ) );
-
-			_window.draw( lText );
+			// Set tile position
+			getTile(i, j)->setPosition(sf::Vector2f(lWidth, lHeight));
 
 			// Set locations position 
 			for (int k = 0; k < 6; k++) {
 				Location* lLocation = getTile(i, j)->getLocation(k);
 
-				if ( lLocation == nullptr )
+				if (lLocation == nullptr)
 					continue;
 
-				lLocation->setPosition(sf::Vector2f(lWidth,lHeight) + offsetLocations[k]);
+				lLocation->setPosition(sf::Vector2f(lWidth, lHeight) + offsetLocations[k]);
 			}
 
 			// Set roads position 
@@ -330,8 +294,55 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 			lWidth += lTriangleH * 2.f;
 		}
 
-		lWidth = _x - (lTriangleH * (i + 1));
+		lWidth = -(lTriangleH * (i + 1));
 		lHeight -= lTriangleA * 1.5f;
+	}
+
+	// Center screen on map and zoom
+	sf::View lView;
+	sf::Vector2f lOppositeTile = getTile(height - 1, width - 1)->getPosition();
+
+	lView = renderWindow->getView();
+	lView.setCenter(sf::Vector2f(lOppositeTile.x / 2.f, lOppositeTile.y / 2.f));
+	lView.zoom(0.99f);
+
+	renderWindow->setView(lView);
+}
+
+void Map::Show(sf::RenderWindow & _window)
+{
+	// Draw tiles
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
+			Tile* lTile = getTile(i, j);
+
+			// Draw tile
+			sf::Texture& lTexture = lTile->getTexture();
+			sf::Sprite lTileSprite;
+
+			lTileSprite.setTexture(lTexture);
+
+			sf::Rect<int> lOrigin(lTileSprite.getTextureRect());
+
+			lOrigin.height /= 2;
+			lOrigin.width /= 2;
+
+			lTileSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
+			lTileSprite.setPosition( lTile->getPosition() );
+
+			_window.draw(lTileSprite);
+
+			// Draw number
+			sf::Text lText;
+			lText.setString(std::to_string(lTile->getDiceNumber()));
+
+			lText.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::Name::DEFAULT));
+			lText.setCharacterSize(24);
+			lText.setFillColor(sf::Color::Red);
+			lText.setPosition(lTile->getPosition());
+
+			_window.draw(lText);
+		}
 	}
 
 	// Draw locations
@@ -355,9 +366,10 @@ void Map::Show(sf::RenderWindow & _window, float _x, float _y)
 
 		_window.draw(lCircle);
 	}
+
 }
 
-Map::Map(int _width, int _height, Style _style ) : width{ _width }, height{ _height }, style{ _style }
+Map::Map(int _width, int _height, Style _style, sf::RenderWindow* _window) : width{ _width }, height{ _height }, style{ _style }, renderWindow{_window}
 {
 
 }

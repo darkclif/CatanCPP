@@ -16,7 +16,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(1300, 1000), "SFML works!");
 	window.setFramerateLimit(30);
 
-	Map lMap;
+	Map lMap(&window);
 	bool draw = true;
 
 	while (window.isOpen())
@@ -49,7 +49,7 @@ int main()
 		window.clear();
 
 		//Draw
-		if (draw) lMap.Show(window, 400.0, 600.0);
+		if (draw) lMap.Show(window);
 
 		window.display();
 	}

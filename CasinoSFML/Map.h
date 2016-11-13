@@ -15,11 +15,11 @@ public:
 	};
 	
 	// Render 
-	void Show(sf::RenderWindow & _window, float _x, float _y);
+	void Show(sf::RenderWindow & _window);
 
 	// Construct map with given dimensions
-	Map(int _width, int _height, Style _style);
-	Map();
+	Map(int _width, int _height, Style _style, sf::RenderWindow* _window);
+	Map( sf::RenderWindow* _window );
 	
 	// Return coords of hex adjoined to given hex
 	//  _status		- false if there is no specified neighbor, true otherwise
@@ -36,14 +36,19 @@ private:
 
 	int width;
 	int height;
+
 	Style style;
+
+	// Render
+	sf::RenderWindow* renderWindow;
+	void ComputeRender();
 
 	// Acces tile
 	Tile* getTile(sf::Vector2i _vector);
 	Tile* getTile(int _x, int _y);
 
 	// All tiles
-	std::vector< std::vector<Tile> > tiles;
+	std::vector< std::vector<Tile> > tiles;				// All tiles []
 	
 	std::vector< Tile* > inGameTiles;					// Tiles used in game
 	std::vector< std::unique_ptr<Road>> Roads;			// All roads

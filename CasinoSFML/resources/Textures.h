@@ -25,7 +25,7 @@ namespace Catan {
 		Textures();
 		~Textures();
 	private:
-
+		// Paths to resources
 		static const std::map< Name, std::string> mPaths;
 	};
 

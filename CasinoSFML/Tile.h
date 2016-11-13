@@ -9,18 +9,19 @@
 #include "Road.h"
 #include "ResourceManager.h"
 #include "resources/Textures.h"
+#include "Place.h"
 
-class Tile
+class Tile : public Place
 {
 public:
 	// Type of tiles
 	enum TileType : int {
-		WOOD,		// Las
-		SHEEP,		// Owce
-		CLAY,		// Glina
-		IRON,		// ¯elazo
-		WHEAT,		// Zbo¿e
-		DESERT,		// Pustynia
+		WOOD,
+		SHEEP,
+		CLAY,
+		IRON,
+		WHEAT,		
+		DESERT,	
 
 		BLANK,		// Do wylosowania
 		NOT_USED,	// Poza gra

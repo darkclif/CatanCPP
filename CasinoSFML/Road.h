@@ -20,4 +20,3 @@ private:
 
 	std::vector<Location*> arrLocations;
 };
-

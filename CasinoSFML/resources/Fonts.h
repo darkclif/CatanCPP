@@ -19,7 +19,7 @@ namespace Catan {
 		Fonts();
 		~Fonts();
 	private:
-
+		// Paths to resources
 		static const std::map< Name, std::string> mPaths;
 	};
 

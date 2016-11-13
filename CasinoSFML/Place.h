@@ -13,9 +13,9 @@ public:
 
 protected:
 	Player* owner;
-
 	sf::Vector2f position;
 
+	// Constructor/destructor
 	Place() : owner{ nullptr }, position{sf::Vector2f()} {
 	}
 
