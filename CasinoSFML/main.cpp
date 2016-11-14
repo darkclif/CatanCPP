@@ -1,32 +1,26 @@
-
 // Pinky
 // 2016
-
 #include <SFML/Graphics.hpp>
 
 #include "Map.h"
 #include "ResourceManager.h"
-#include "Debug.h"
+#include "Console.h"
 #include <iostream>
 
 int main() {
 
-	string s = "hehe";
+	std::string s = "hehe";
 	int i = 1;
 	double d = 1.1;
-	float f = 2.2;
+	float f = 2.2f;
 	bool b = true;
 	long l = 10;
 	char c = 's';
 
-	Debug::printMessage(s);
-	Debug::printMessage(i);
-	Debug::printMessage(d);
-	Debug::printMessage(f);
-	Debug::printMessage(b);
-	Debug::printMessage(l);
-	Debug::printMessage(c);
-	
+	Console::debug << s << i << d << f << b << l << c << std::endl;
+	Console::debug << s << i << d << f << b << l << c << std::endl;
+	Console::debug << s << i << d << f << b << l << c << std::endl;
+
 	std::srand(unsigned(std::time(0)));
 
 	sf::RenderWindow window(sf::VideoMode(1300, 1000), "SFML works!");

@@ -9,6 +9,8 @@ CasinoSFML/Debug/
 *.aps
 *.opensdf
 *.sdf
+*.suo
+*.VC.db
 
 # Prerequisites
 *.d

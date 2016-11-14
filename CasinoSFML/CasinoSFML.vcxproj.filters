@@ -51,7 +51,7 @@
     <ClCompile Include="resources\Fonts.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Debug.cpp">
+    <ClCompile Include="Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +86,7 @@
     <ClInclude Include="Road.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.h">
+    <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
