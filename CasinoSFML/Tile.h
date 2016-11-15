@@ -34,15 +34,15 @@ public:
 
 	~Tile();
 
-	// Get/set type of hex
+	bool isThief();
+	void setThief(bool _thief);
+
 	TileType getType();				
 	void setType(TileType _type); 
 
-	// Get/set dice number
 	int getDiceNumber();
 	void setDiceNumber(int _number);
 
-	// Get name of tile texture 
 	sf::Texture& getTexture(); 
 	sf::Texture& getDiceNumberTexture();
 
@@ -60,16 +60,17 @@ public:
 	void setInitJump( int _jump );
 
 private:
-	TileType type;							// Type of resource
-	unsigned int diceNumber;				// Number on dices to activate
+	TileType type;				// Type of resource
+	unsigned int diceNumber;	// Number on dices to activate
+	bool thief;					// Is thief on this tile
 
 	// For initialize circle-style map
-	int initJump;							// Distance from center of map + 1
+	int initJump;
 
-	Location* arrLocations[6];	// Cities/villages
-	Road* arrRoads[6];			// Roads
+	Location* arrLocations[6];
+	Road* arrRoads[6];
 
-	// Tile::Type to Texture::Name
+	// Tile::Type to Texture::Name converter
 	static const Catan::Textures::Name arrTileToTexture[TileType::__ENUM_SIZE];
 	static const Catan::Textures::Name arrDiceToTexture[11];
 };

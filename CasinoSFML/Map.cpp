@@ -259,6 +259,8 @@ void Map::ComputeRender() {
 		sf::Vector2f(-(lTriangleH*0.5f),-(lTriangleH * 0.86f)),
 	};
 
+	float rotationRoads[6] = {30.f, 90.f, -30.f, 30.f, 90.f, -30.f};
+
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			// Set tile position
@@ -281,6 +283,7 @@ void Map::ComputeRender() {
 				if (lRoad == nullptr)
 					continue;
 
+				lRoad->setRotation(rotationRoads[k]);
 				lRoad->setPosition(sf::Vector2f(lWidth, lHeight) + offsetRoads[k]);
 			}
 
@@ -305,33 +308,17 @@ void Map::ComputeRender() {
 
 void Map::Show(sf::RenderWindow & _window)
 {
-	// Draw tiles
 	for( auto& lTile : inGameTiles ){		
 		lTile->draw(_window);
 	}
 
-	// Draw locations
-	for (auto& lLocation : Locations) {
-
-		sf::CircleShape lCircle(10);
-		lCircle.setOrigin(10, 10);
-		lCircle.setFillColor(lLocation->color == 1 ? sf::Color::Red : sf::Color::Green);
-		lCircle.setPosition( lLocation->getPosition() );
-
-		_window.draw( lCircle );
-	}
-
-	// Draw roads
 	for (auto& lRoad : Roads) {
-
-		sf::CircleShape lCircle(10);
-		lCircle.setOrigin(10, 10);
-		lCircle.setFillColor(sf::Color::Blue);
-		lCircle.setPosition(lRoad->getPosition());
-
-		_window.draw(lCircle);
+		lRoad->draw(_window);
 	}
 
+	for (auto& lLocation : Locations) {
+		lLocation->draw(_window);
+	}
 }
 
 Map::Map(int _width, int _height, Style _style, sf::RenderWindow* _window) : width{ _width }, height{ _height }, style{ _style }, renderWindow{_window}

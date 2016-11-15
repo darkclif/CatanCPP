@@ -31,7 +31,13 @@ namespace Catan {
 			TILE_DICE_NUM_9,
 			TILE_DICE_NUM_10,
 			TILE_DICE_NUM_11,
-			TILE_DICE_NUM_12
+			TILE_DICE_NUM_12,
+
+			ROAD,
+			CITY,
+			VILLAGE,
+
+			THIEF
 		};
 
 		static std::string getPath( Name _name );

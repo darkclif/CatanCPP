@@ -3,6 +3,7 @@ Debug/
 Release/
 CasinoSFML/Debug/
 CasinoSFML/textures/
+CasinoSFML/fonts/
 
 *.xcf
 

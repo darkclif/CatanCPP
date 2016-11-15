@@ -6,22 +6,18 @@
 class Place
 {
 public:
-	Player* getOwner() { return owner; }
-
 	sf::Vector2f getPosition();
 	void setPosition( sf::Vector2f _position );
 
 protected:
-	Player* owner;
 	sf::Vector2f position;
 
-	// Constructor/destructor
-	Place() : owner{ nullptr }, position{sf::Vector2f()} {
+	Place() : position{sf::Vector2f()} {
 	}
 
-	Place(Player* _owner) : owner{ _owner }, position{ sf::Vector2f() } {
+	Place(Player* _owner) : position{ sf::Vector2f() } {
 	};
 
-	virtual ~Place() = 0;
+	virtual ~Place();
 };
 

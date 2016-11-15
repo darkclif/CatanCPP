@@ -51,6 +51,16 @@ Tile::~Tile()
 {
 };
 
+bool Tile::isThief()
+{
+	return thief;
+}
+
+void Tile::setThief(bool _thief)
+{
+	thief = _thief;
+}
+
 Tile::TileType Tile::getType() {
 	return type;
 }
@@ -103,7 +113,7 @@ void Tile::draw(sf::RenderWindow &_window)
 
 	_window.draw(lTileSprite);
 
-	// Draw number
+	// Number
 	sf::Sprite lTextSprite(getDiceNumberTexture());
 
 	lOrigin = lTextSprite.getTextureRect();
@@ -114,6 +124,20 @@ void Tile::draw(sf::RenderWindow &_window)
 	lTextSprite.setPosition(getPosition());
 
 	_window.draw(lTextSprite);
+
+	// Thief
+	if (isThief()) {
+		sf::Sprite lSprite();
+
+		lOrigin = lTextSprite.getTextureRect();
+		lOrigin.height /= 2;
+		lOrigin.width /= 2;
+
+		lTextSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
+		lTextSprite.setPosition(getPosition());
+
+		_window.draw(lTextSprite);
+	}
 }
 
 bool Tile::addRoad(Road * _road, int _number)

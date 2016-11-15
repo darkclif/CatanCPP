@@ -12,11 +12,18 @@ public:
 	Road();
 	~Road();
 
-	// Menage sourrondings - 2 location for each road
+	// Control two locations
 	bool addLocation(Location* _location);
-	std::vector<Location*>::iterator getLocations();
+	const std::vector<Location*>& Road::getLocations();
+
+	void setRotation( float _rotation );
+	float getRoatation();
+
+	sf::Texture& getTexture();
+	void draw( sf::RenderWindow& _window );
 
 private:
+	float rotation = 0;
 
 	std::vector<Location*> arrLocations;
 };

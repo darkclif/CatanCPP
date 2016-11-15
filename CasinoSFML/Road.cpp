@@ -1,9 +1,10 @@
 #include "Road.h"
+#include "Console.h"
+#include "ResourceManager.h"
 
 Road::Road()
 {
 }
-
 
 Road::~Road()
 {
@@ -16,14 +17,48 @@ bool Road::addLocation(Location * _location)
 	}
 
 	// Only two locations beside the road 
-	if (arrLocations.size() == 2)
-		throw std::logic_error("Too many unique locations at signle road!");
+	if (arrLocations.size() == 2) {
+		Console::debug << "Too many unique locations at signle road!" << std::endl;
+		return false;
+	}
 
 	arrLocations.push_back(_location);
 	return true;
 }
 
-std::vector<Location*>::iterator Road::getLocations()
+const std::vector<Location*>& Road::getLocations()
 {
-	return this->arrLocations.begin();
+	return arrLocations;
+}
+
+void Road::setRotation(float _rotation)
+{
+	rotation = _rotation;
+}
+
+float Road::getRoatation()
+{
+	return rotation;
+}
+
+sf::Texture & Road::getTexture()
+{
+	auto lTextureName = Catan::Textures::Name::ROAD;
+	return ResourceManager::getInstance().getTexture(lTextureName);
+}
+
+void Road::draw(sf::RenderWindow& _window)
+{
+	sf::Sprite lSprite(getTexture());
+
+	sf::Rect<int> lOrigin(lSprite.getTextureRect());
+	lOrigin.height /= 2;
+	lOrigin.width /= 2;
+
+	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
+	lSprite.setPosition(getPosition());
+	lSprite.setRotation(getRoatation());
+	// lSprite.setColor( getOwner->getColor() );
+
+	_window.draw(lSprite);
 }

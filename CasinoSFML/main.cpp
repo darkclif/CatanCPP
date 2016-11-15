@@ -1,6 +1,8 @@
 // Pinky
 // 2016
 #include <SFML/Graphics.hpp>
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Widgets.hpp>
 
 #include "Map.h"
 #include "ResourceManager.h"
@@ -8,6 +10,16 @@
 #include <iostream>
 
 int main() {
+
+	// Create a window and add the box layouter to it. Also set the window's title.
+	sfg::SFGUI m_sfgui;
+	
+	auto sf_window = sfg::Window::Create();
+	sf_window->SetTitle("Hello world!");
+
+	// Create a desktop and add the window to it.
+	sfg::Desktop desktop;
+	desktop.Add(sf_window);
 
 	std::srand(unsigned(std::time(0)));
 
@@ -17,6 +29,12 @@ int main() {
 	sf::RenderWindow window(sf::VideoMode(1300, 1000), "SFML works!", sf::Style::Default,settings);
 	window.setFramerateLimit(30);
 
+	// We're not using SFML to render anything in this program, so reset OpenGL
+	// states. Otherwise we wouldn't see anything.
+	window.resetGLStates();
+
+	sf::Clock clock;
+
 	Map lMap(&window);
 	bool draw = true;
 
@@ -24,6 +42,8 @@ int main() {
 		sf::Event event;
 
 		while (window.pollEvent(event)) {
+			desktop.HandleEvent(event);
+
 			if (event.type == sf::Event::Closed)
 				window.close();
 
@@ -37,7 +57,7 @@ int main() {
 				case sf::Keyboard::Right: lView.move(sf::Vector2f(10, 0)); break;
 				case sf::Keyboard::Down: lView.move(sf::Vector2f(0, 10)); break;
 				case sf::Keyboard::A: lView.zoom((float)0.99); break;
-				case sf::Keyboard::S: /* draw = ( draw ? false : true ); */ lView.zoom((float)1.01); break;
+				case sf::Keyboard::S: lView.zoom((float)1.01); break;
 				default: break;
 				}
 
@@ -45,10 +65,14 @@ int main() {
 			}
 		}
 
+		// Update SFGUI with elapsed seconds since last call.
+		desktop.Update(clock.restart().asSeconds());
+
 		window.clear();
 
 		//Draw
-		if (draw) lMap.Show(window);
+		lMap.Show(window);
+		m_sfgui.Display(window);
 
 		window.display();
 	}
