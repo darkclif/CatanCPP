@@ -1,6 +1,7 @@
 #include "Textures.h"
 
 #include <iostream>
+#include "../Console.h"
 
 namespace Catan {
 
@@ -8,25 +9,27 @@ namespace Catan {
 	{
 	}
 
+	Textures::~Textures()
+	{
+	}
+
 	std::string Textures::getPath(Name _name) {
 		
 		auto it =  mPaths.find(_name);
 		if ( it == mPaths.end() ) {
-			std::string lError = "No given path for texture";
-			std::cout << "No given path for texture" << std::endl;
-			throw std::logic_error("");
+			std::string lError = "Path to texture not assigned to given texture name";
+			Console::debug << lError << std::endl;
+			throw std::logic_error(lError);
 		}
 		else {
 			return it->second;
 		}
 	}
 
-	Textures::~Textures()
-	{
-	}
-
 	const std::map< Textures::Name, std::string> Textures::mPaths = {
 		/* List below must contain all enums in Texture::Name */
+		{ Catan::Textures::Name::TEXTURE_ERROR, "textures/texture_error.png" },
+		{ Catan::Textures::Name::TEXTURE_EMPTY, "textures/texture_empty.png" },
 		/* Textures of hex */
 		{ Textures::TILE_WOOD,"textures/tile_texture_wood.png" },
 		{ Textures::TILE_WHEAT,"textures/tile_texture_wheat.png" },
@@ -35,6 +38,17 @@ namespace Catan {
 		{ Textures::TILE_IRON,"textures/tile_texture_iron.png" },
 		{ Textures::TILE_DESERT,"textures/tile_texture_desert.png" },
 		{ Textures::TILE_BLANK,"textures/tile_texture_blank.png" },
-		{ Textures::TILE_NOT_USED,"textures/tile_texture_not_used.png" }
+		{ Textures::TILE_NOT_USED,"textures/tile_texture_not_used.png" },
+		/* Textures of hex dice numbers*/
+		{ Catan::Textures::Name::TILE_DICE_NUM_2, "textures/tile_dice_num_2.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_3, "textures/tile_dice_num_3.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_4, "textures/tile_dice_num_4.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_5, "textures/tile_dice_num_5.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_6, "textures/tile_dice_num_6.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_8, "textures/tile_dice_num_8.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_9, "textures/tile_dice_num_9.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_10, "textures/tile_dice_num_10.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_11, "textures/tile_dice_num_11.png"},
+		{ Catan::Textures::Name::TILE_DICE_NUM_12, "textures/tile_dice_num_12.png"}
 	};
 }

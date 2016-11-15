@@ -30,10 +30,8 @@ public:
 	~Map();
 private:
 	// Default map size
-	// Change carefuly, some values may be hardcoded!
-	static const int MAP_WIDTH = 5;
-	static const int MAP_HEIGHT = 5;
-
+	static const int MAP_RADIUS = 5;
+	
 	int width;
 	int height;
 
@@ -53,9 +51,6 @@ private:
 	std::vector< Tile* > inGameTiles;					// Tiles used in game
 	std::vector< std::unique_ptr<Road>> Roads;			// All roads
 	std::vector< std::unique_ptr<Location>> Locations;	// All locations
-
-	// Prepare map to play
-	void setupMap( Style _style );
 
 	/* Circle-style map deploy -- 19 tiles (5x5) */
 	void setupCircleMap();

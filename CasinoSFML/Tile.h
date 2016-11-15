@@ -44,6 +44,9 @@ public:
 
 	// Get name of tile texture 
 	sf::Texture& getTexture(); 
+	sf::Texture& getDiceNumberTexture();
+
+	void draw( sf::RenderWindow & _window );
 
 	// Access soroundings 
 	bool addRoad(Road* _road, int _number);
@@ -57,7 +60,7 @@ public:
 	void setInitJump( int _jump );
 
 private:
-	TileType type;							// Type of resources 
+	TileType type;							// Type of resource
 	unsigned int diceNumber;				// Number on dices to activate
 
 	// For initialize circle-style map
@@ -67,7 +70,8 @@ private:
 	Road* arrRoads[6];			// Roads
 
 	// Tile::Type to Texture::Name
-	static const Catan::Textures::Name arrTileToTexture[ TileType::__ENUM_SIZE ];
+	static const Catan::Textures::Name arrTileToTexture[TileType::__ENUM_SIZE];
+	static const Catan::Textures::Name arrDiceToTexture[11];
 };
 
 

@@ -18,8 +18,7 @@ namespace Console {
 		// Adding new lines
 		std::size_t pos = _line.find('\n');
 		while (pos != std::string::npos) {
-			auto lLast = logDebug.back();
-			lLast += (_line.substr(0, pos));
+			logDebug.back() += _line.substr(0, pos);
 
 			_line = _line.substr(pos + 1);
 			logDebug.push_back("");
@@ -37,8 +36,7 @@ namespace Console {
 		// Adding new lines
 		std::size_t pos = _line.find('\n');
 		while (pos != std::string::npos) {
-			auto lLast = logInfo.back();
-			lLast += (_line.substr(0, pos));
+			logInfo.back() += (_line.substr(0, pos));
 
 			_line = _line.substr(pos + 1);
 			logInfo.push_back("");

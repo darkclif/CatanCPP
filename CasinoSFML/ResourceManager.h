@@ -34,7 +34,6 @@ private:
 
 	// Constructor / destructor
 	ResourceManager();
-
 	~ResourceManager();
 };
 

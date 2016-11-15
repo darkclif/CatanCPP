@@ -10,6 +10,9 @@ namespace Catan {
 	public:
 		enum Name {
 			/* All texture names */
+			TEXTURE_ERROR,
+			TEXTURE_EMPTY,
+
 			TILE_WOOD,
 			TILE_WHEAT,
 			TILE_SHEEP,
@@ -17,7 +20,18 @@ namespace Catan {
 			TILE_IRON,
 			TILE_DESERT,
 			TILE_BLANK,
-			TILE_NOT_USED
+			TILE_NOT_USED,
+
+			TILE_DICE_NUM_2,
+			TILE_DICE_NUM_3,
+			TILE_DICE_NUM_4,
+			TILE_DICE_NUM_5,
+			TILE_DICE_NUM_6,
+			TILE_DICE_NUM_8,
+			TILE_DICE_NUM_9,
+			TILE_DICE_NUM_10,
+			TILE_DICE_NUM_11,
+			TILE_DICE_NUM_12
 		};
 
 		static std::string getPath( Name _name );

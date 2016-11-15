@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_WIDTH), height(Map::MAP_HEIGHT), style(Style::CIRCLE), renderWindow{_window}
+Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_RADIUS), height(Map::MAP_RADIUS), style(Style::CIRCLE), renderWindow{_window}
 {
 	// Make a square map
 	this->tiles.resize(height);
@@ -21,17 +21,10 @@ Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_WIDTH), height(Map::MAP_H
 	}
 
 	// Prepare map to play
-	setupMap( this->style );
+	setupCircleMap();
 
 	// Compute position of tiles, roads and locations to draw 
 	ComputeRender();
-}
-
-void Map::setupMap( Style _style ) {
-	switch (_style) {
-		case Style::CIRCLE: setupCircleMap(); break;
-		default: break;
-	}
 }
 
 void Map::setupCircleMap() {
@@ -240,6 +233,7 @@ void Map::setupCircleMap() {
 void Map::ComputeRender() {
 	// Load deafault tile texture to compute intervals
 	sf::Texture& tmpTexture = ResourceManager::getInstance().getTexture(Catan::Textures::Name::TILE_BLANK);
+	float tileOverlap = 4.f;
 	float lTriangleA = (float)(tmpTexture.getSize().y) * 0.5f;	// Hex border 
 	float lTriangleH = (float)(tmpTexture.getSize().x / 2.f);	// Height of triangle in hex
 
@@ -291,11 +285,11 @@ void Map::ComputeRender() {
 			}
 
 			// Next
-			lWidth += lTriangleH * 2.f;
+			lWidth += lTriangleH * 2.f - tileOverlap;
 		}
 
 		lWidth = -(lTriangleH * (i + 1));
-		lHeight -= lTriangleA * 1.5f;
+		lHeight -= lTriangleA * 1.5f - tileOverlap;
 	}
 
 	// Center screen on map and zoom
@@ -312,37 +306,8 @@ void Map::ComputeRender() {
 void Map::Show(sf::RenderWindow & _window)
 {
 	// Draw tiles
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
-			Tile* lTile = getTile(i, j);
-
-			// Draw tile
-			sf::Texture& lTexture = lTile->getTexture();
-			sf::Sprite lTileSprite;
-
-			lTileSprite.setTexture(lTexture);
-
-			sf::Rect<int> lOrigin(lTileSprite.getTextureRect());
-
-			lOrigin.height /= 2;
-			lOrigin.width /= 2;
-
-			lTileSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-			lTileSprite.setPosition( lTile->getPosition() );
-
-			_window.draw(lTileSprite);
-
-			// Draw number
-			sf::Text lText;
-			lText.setString(std::to_string(lTile->getDiceNumber()));
-
-			lText.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::Name::DEFAULT));
-			lText.setCharacterSize(24);
-			lText.setFillColor(sf::Color::Red);
-			lText.setPosition(lTile->getPosition());
-
-			_window.draw(lText);
-		}
+	for( auto& lTile : inGameTiles ){		
+		lTile->draw(_window);
 	}
 
 	// Draw locations
