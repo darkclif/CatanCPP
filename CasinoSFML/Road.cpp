@@ -31,16 +31,6 @@ const std::vector<Location*>& Road::getLocations()
 	return arrLocations;
 }
 
-void Road::setRotation(float _rotation)
-{
-	rotation = _rotation;
-}
-
-float Road::getRoatation()
-{
-	return rotation;
-}
-
 sf::Texture & Road::getTexture()
 {
 	auto lTextureName = Catan::Textures::Name::ROAD;
@@ -57,8 +47,7 @@ void Road::draw(sf::RenderWindow& _window)
 
 	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
 	lSprite.setPosition(getPosition());
-	lSprite.setRotation(getRoatation());
-	// lSprite.setColor( getOwner->getColor() );
+	lSprite.setRotation(getRotation());
 
 	_window.draw(lSprite);
 }

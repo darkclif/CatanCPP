@@ -59,7 +59,6 @@ void Location::draw(sf::RenderWindow& _window)
 
 	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
 	lSprite.setPosition(getPosition());
-	// lSprite.setColor( getOwner->getColor() );
 
 	_window.draw(lSprite);
 }

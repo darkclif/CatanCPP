@@ -9,9 +9,44 @@
 #include "Road.h"
 #include "ResourceManager.h"
 #include "resources/Textures.h"
-#include "Place.h"
+#include "DrawableEntity.h"
 
-class Tile : public Place
+//
+//	Dice number
+//
+class DiceNumber : public DrawableEntity {
+public:
+	void draw(sf::RenderWindow& _window);
+
+	void setNumber(int _number);
+
+	DiceNumber(sf::Vector2f _position, DrawableEntity* _parent) : DrawableEntity(_position, 0, _parent), number{0} {}
+	DiceNumber() : DrawableEntity(), number{0} { }
+protected:
+	sf::Texture& getTexture();
+
+	int number;
+	static const Catan::Textures::Name arrDiceToTexture[11];
+
+};
+
+//
+//	Thief
+//
+class Thief: public DrawableEntity {
+public:
+	void draw(sf::RenderWindow& _window);
+
+	Thief(): DrawableEntity() {}
+	Thief(sf::Vector2f _position, DrawableEntity* _parent) : DrawableEntity(_position, 0, _parent){}
+protected:
+	sf::Texture& getTexture();
+};
+
+//
+// Tile
+//
+class Tile : public DrawableEntity
 {
 public:
 	// Type of tiles
@@ -43,8 +78,7 @@ public:
 	int getDiceNumber();
 	void setDiceNumber(int _number);
 
-	sf::Texture& getTexture(); 
-	sf::Texture& getDiceNumberTexture();
+	sf::Texture& getTexture();
 
 	void draw( sf::RenderWindow & _window );
 
@@ -55,6 +89,8 @@ public:
 	bool addLocation(Location* _location, int _number);
 	Location* getLocation(int _number);
 	
+	bool bindRoadsLocations();
+
 	// For initialize circle-style map
 	int getInitJump();
 	void setInitJump( int _jump );
@@ -67,12 +103,14 @@ private:
 	// For initialize circle-style map
 	int initJump;
 
-	Location* arrLocations[6];
-	Road* arrRoads[6];
+	std::vector<Location*> arrLocations;
+	std::vector<Road*> arrRoads;
+
+	std::unique_ptr<Thief> thiefEntity;
+	std::unique_ptr<DiceNumber> numberEntity;
 
 	// Tile::Type to Texture::Name converter
 	static const Catan::Textures::Name arrTileToTexture[TileType::__ENUM_SIZE];
-	static const Catan::Textures::Name arrDiceToTexture[11];
 };
 
 

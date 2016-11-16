@@ -3,19 +3,11 @@
 #include <iostream>
 #include "Console.h"
 
-const Catan::Textures::Name Tile::arrTileToTexture[ TileType::__ENUM_SIZE ] = {
-	Catan::Textures::Name::TILE_WOOD,
-	Catan::Textures::Name::TILE_SHEEP,
-	Catan::Textures::Name::TILE_CLAY,
-	Catan::Textures::Name::TILE_IRON,
-	Catan::Textures::Name::TILE_WHEAT,
-	Catan::Textures::Name::TILE_DESERT,
-	Catan::Textures::Name::TILE_BLANK,	
-	Catan::Textures::Name::TILE_NOT_USED,
-};
-
-const Catan::Textures::Name Tile::arrDiceToTexture[11] = {
-	Catan::Textures::Name::TILE_DICE_NUM_2,	
+//
+// Dice number
+//
+const Catan::Textures::Name DiceNumber::arrDiceToTexture[11] = {
+	Catan::Textures::Name::TILE_DICE_NUM_2,
 	Catan::Textures::Name::TILE_DICE_NUM_3,
 	Catan::Textures::Name::TILE_DICE_NUM_4,
 	Catan::Textures::Name::TILE_DICE_NUM_5,
@@ -28,24 +20,98 @@ const Catan::Textures::Name Tile::arrDiceToTexture[11] = {
 	Catan::Textures::Name::TILE_DICE_NUM_12,
 };
 
-Tile::Tile(TileType _type, unsigned int _number) :
-	type{ _type },
-	diceNumber{ _number },
-	initJump{ 0 } {
+void DiceNumber::draw(sf::RenderWindow & _window)
+{
+	sf::Sprite lSprite(getTexture());
 
-	for (int i = 0; i < 6; i++) {
-		arrLocations[i] = nullptr;
-		arrRoads[i] = nullptr;
+	sf::Rect<int> lOrigin = lSprite.getTextureRect();
+	lOrigin.height /= 2;
+	lOrigin.width /= 2;
+
+	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
+	lSprite.setPosition(getAbsolutePosition());
+
+	_window.draw(lSprite);
+}
+
+void DiceNumber::setNumber(int _number)
+{
+	if (_number > 1 && _number < 13 && _number != 7)
+		number = _number;
+	else
+		Console::debug << "Wrong dice number given to setNumber" << std::endl;
+}
+
+sf::Texture & DiceNumber::getTexture()
+{
+	if (number > 1 && number < 13) {
+		Catan::Textures::Name lTextureName = arrDiceToTexture[number - 2];
+		return ResourceManager::getInstance().getTexture(lTextureName);
 	}
+	else {
+		return ResourceManager::getInstance().getTexture(Catan::Textures::TEXTURE_EMPTY);
+	}
+}
+
+//
+// Thief
+//
+void Thief::draw(sf::RenderWindow & _window)
+{
+	sf::Sprite lSprite(getTexture());
+
+	sf::Rect<int> lOrigin = lSprite.getTextureRect();
+	lOrigin.height /= 2;
+	lOrigin.width /= 2;
+
+	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
+	lSprite.setPosition(getAbsolutePosition());
+
+	_window.draw(lSprite);
+}
+
+sf::Texture & Thief::getTexture()
+{
+	Catan::Textures::Name lTextureName = Catan::Textures::THIEF;
+	return ResourceManager::getInstance().getTexture(lTextureName);
+}
+
+//
+// Tile
+//
+const Catan::Textures::Name Tile::arrTileToTexture[ TileType::__ENUM_SIZE ] = {
+	Catan::Textures::Name::TILE_WOOD,
+	Catan::Textures::Name::TILE_SHEEP,
+	Catan::Textures::Name::TILE_CLAY,
+	Catan::Textures::Name::TILE_IRON,
+	Catan::Textures::Name::TILE_WHEAT,
+	Catan::Textures::Name::TILE_DESERT,
+	Catan::Textures::Name::TILE_BLANK,	
+	Catan::Textures::Name::TILE_NOT_USED,
 };
 
 Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 } {
+	std::unique_ptr<Thief> tmpThief(new Thief(sf::Vector2f(100.f, -80.f), this));
+	thiefEntity = std::move(tmpThief);
+	
+	std::unique_ptr<DiceNumber> tmpNumber(new DiceNumber(sf::Vector2f(0.f, 0.f), this));
+	numberEntity = std::move(tmpNumber);
+
+	arrLocations.resize(6);
+	arrRoads.resize(6);
 
 	for (int i = 0; i < 6; i++) {
 		arrLocations[i] = nullptr;
 		arrRoads[i] = nullptr;
 	}
 }
+
+Tile::Tile(TileType _type, unsigned int _number) : type{ _type }, diceNumber{ _number }, initJump{ 0 } {
+	Tile();
+	
+	numberEntity->setNumber(_number);
+	setType(_type);
+};
 
 Tile::~Tile()
 {
@@ -77,10 +143,13 @@ int Tile::getDiceNumber()
 
 void Tile::setDiceNumber(int _number)
 {
-	if (_number > 1 && _number < 13 && _number != 7)
+	if (_number > 1 && _number < 13 && _number != 7) {
 		diceNumber = _number;
-	else
+		numberEntity->setNumber(_number);
+	}
+	else {
 		Console::debug << "Wrong dice number given to setDiceNumber" << std::endl;
+	}
 }
 
 sf::Texture& Tile::getTexture()
@@ -89,15 +158,7 @@ sf::Texture& Tile::getTexture()
 	return ResourceManager::getInstance().getTexture( lTextureName );
 }
 
-sf::Texture& Tile::getDiceNumberTexture() {
-	if (diceNumber > 1 && diceNumber < 13) {
-		Catan::Textures::Name lTextureName = arrDiceToTexture[diceNumber - 2];
-		return ResourceManager::getInstance().getTexture(lTextureName);
-	}
-	else {
-		return ResourceManager::getInstance().getTexture(Catan::Textures::TEXTURE_EMPTY);
-	}
-}
+
 
 void Tile::draw(sf::RenderWindow &_window)
 {
@@ -113,37 +174,22 @@ void Tile::draw(sf::RenderWindow &_window)
 
 	_window.draw(lTileSprite);
 
-	// Number
-	sf::Sprite lTextSprite(getDiceNumberTexture());
-
-	lOrigin = lTextSprite.getTextureRect();
-	lOrigin.height /= 2;
-	lOrigin.width /= 2;
-
-	lTextSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-	lTextSprite.setPosition(getPosition());
-
-	_window.draw(lTextSprite);
-
-	// Thief
-	if (isThief()) {
-		sf::Sprite lSprite();
-
-		lOrigin = lTextSprite.getTextureRect();
-		lOrigin.height /= 2;
-		lOrigin.width /= 2;
-
-		lTextSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-		lTextSprite.setPosition(getPosition());
-
-		_window.draw(lTextSprite);
-	}
+	if (isThief() && thiefEntity != nullptr ) thiefEntity->draw(_window);
+	if (diceNumber != 7 && numberEntity != nullptr ) numberEntity->draw(_window);
 }
 
 bool Tile::addRoad(Road * _road, int _number)
 {
 	if (arrRoads[_number] != nullptr) {
-		return false;
+		if (arrRoads[_number] == _road) {
+			// Given pointer is already here
+			return false;
+		}
+		else {
+			// Two diffrent roads on one edge
+			Console::debug << "You are trying to assign two diffrent roads on one edge!" << std::endl;
+			throw std::logic_error("");
+		}
 	}
 
 	arrRoads[_number] = _road;
@@ -158,11 +204,9 @@ bool Tile::addLocation(Location * _location, int _number)
 			return false;
 		}
 		else {
-			// Two diffrent road on one edge ?
-			std::string lError = "You are trying to assign two diffrent road on one edge \n pointer:";
-			lError += std::to_string((int)arrLocations[_number]) + "->" + std::to_string((int)_location);
-			std::cout << lError << std::endl;
-			throw std::logic_error(lError);
+			// Two diffrent locations on one place
+			Console::debug << "You are trying to assign two diffrent locations on one place!" << std::endl;
+			throw std::logic_error("");
 		}
 	}
 
@@ -179,6 +223,34 @@ Location* Tile::getLocation( int _number )
 		std::cout << lError << std::endl;
 		throw std::logic_error(lError);
 	}
+}
+
+bool Tile::bindRoadsLocations()
+{
+	for (int i = 0; i < 6; i++) {
+		Location* lLocation = getLocation(i);
+		
+		if (lLocation == nullptr) {
+			Console::debug << "Failed to link sorroundings at tile. Location is null." << std::endl;
+			return false;
+		}
+
+		lLocation->addRoad(getRoad(i));
+		lLocation->addRoad(getRoad((i + 1) % 6));
+
+		Road* lRoad1 = getRoad(i);
+		Road* lRoad2 = getRoad((i + 1) % 6);
+
+		if (lRoad1 == nullptr || lRoad2 == nullptr) {
+			Console::debug << "Failed to link sorroundings at tile. Road is null." << std::endl;
+			return false;
+		}
+
+		lRoad1->addLocation(lLocation);
+		lRoad2->addLocation(lLocation);
+	}
+
+	return true;
 }
 
 Road* Tile::getRoad(int _number)

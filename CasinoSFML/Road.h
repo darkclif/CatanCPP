@@ -1,12 +1,12 @@
 #pragma once
-#include "Place.h"
+#include "DrawableEntity.h"
 
 #include <vector>
 #include <iostream>
 
 class Location;
 
-class Road : public Place
+class Road : public DrawableEntity
 {
 public:
 	Road();
@@ -16,14 +16,10 @@ public:
 	bool addLocation(Location* _location);
 	const std::vector<Location*>& Road::getLocations();
 
-	void setRotation( float _rotation );
-	float getRoatation();
-
 	sf::Texture& getTexture();
 	void draw( sf::RenderWindow& _window );
 
 private:
-	float rotation = 0;
 
 	std::vector<Location*> arrLocations;
 };

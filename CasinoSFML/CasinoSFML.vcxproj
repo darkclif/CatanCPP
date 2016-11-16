@@ -91,12 +91,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE_LOG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>E:\1_lib\SFML-2.4.0\include;E:\1_lib\sfgui-0.3.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\lib\SFML-2.4.0\include;C:\lib\sfgui-0.3.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\1_lib\SFML-2.4.0\lib;E:\1_lib\sfgui-0.3.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\lib\SFML-2.4.0\lib;C:\lib\sfgui-0.3.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfgui-d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -152,11 +152,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="PlayerEntity.cpp" />
     <ClCompile Include="resources\Fonts.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="Place.cpp" />
+    <ClCompile Include="DrawableEntity.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Road.cpp" />
@@ -165,10 +166,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Console.h" />
+    <ClInclude Include="PlayerEntity.h" />
     <ClInclude Include="resources\Fonts.h" />
     <ClInclude Include="Location.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="Place.h" />
+    <ClInclude Include="DrawableEntity.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />

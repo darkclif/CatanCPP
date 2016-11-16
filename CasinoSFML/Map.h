@@ -30,7 +30,7 @@ public:
 	~Map();
 private:
 	// Default map size
-	static const int MAP_RADIUS = 5;
+	static const int MAP_EDGE = 5;
 	
 	int width;
 	int height;
@@ -46,7 +46,7 @@ private:
 	Tile* getTile(int _x, int _y);
 
 	// All tiles
-	std::vector< std::vector<Tile> > tiles;				// All tiles []
+	std::vector< std::vector<std::unique_ptr<Tile>> > tiles;	// All tiles []
 	
 	std::vector< Tile* > inGameTiles;					// Tiles used in game
 	std::vector< std::unique_ptr<Road>> Roads;			// All roads
@@ -54,5 +54,6 @@ private:
 
 	/* Circle-style map deploy -- 19 tiles (5x5) */
 	void setupCircleMap();
+	void SpawnAtTile( Tile* currTile, int i, int j);
 };
 

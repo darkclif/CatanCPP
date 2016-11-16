@@ -5,8 +5,9 @@
 #include <queue>
 #include <algorithm>
 #include <cstdlib>
+#include <stdlib.h>
 
-Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_RADIUS), height(Map::MAP_RADIUS), style(Style::CIRCLE), renderWindow{_window}
+Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_EDGE), height(Map::MAP_EDGE), style(Style::CIRCLE), renderWindow{_window}
 {
 	// Make a square map
 	this->tiles.resize(height);
@@ -16,7 +17,8 @@ Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_RADIUS), height(Map::MAP_
 
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			tiles[i][j] = Tile();
+			std::unique_ptr<Tile> tmpPtr(new Tile());
+			tiles[i][j] = std::move(tmpPtr);
 		}
 	}
 
@@ -32,26 +34,17 @@ void Map::setupCircleMap() {
 	//
 	// Set TileType::BLANK and TileType::DESERT at center
 	//
-
-	// Calculate center of map
-	if (!(this->height % 2 || this->width % 2) ) {
-		std::cout << "setupCircleMap: Map heigh or width is even - some hexes will remain unused." << std::endl;
-	}
-	if (this->width != this->height) {
-		std::cout << "setupCircleMap: Map heigh and width are not equals - some hexes will remain unused." << std::endl;
-	}
-
-	int a = (width < height ? width : height);
-	int x = a / 2;
-	int y = a / 2;
-
-	int lRadius = std::ceil((float)a / 2.0 );
+	int x = 2;
+	int y = 2;
+	int lRadius = 3;
 	
 	// Add center tile to queue and start spreading map 
 	std::queue<sf::Vector2i> qTileToInit;
 
-	tiles[x][y].setInitJump(1);
-	tiles[x][y].setType(Tile::TileType::DESERT);
+	getTile(x, y)->setInitJump(1);
+	getTile(x, y)->setType(Tile::TileType::DESERT);
+	getTile(x, y)->setThief(true);
+
 	qTileToInit.push(sf::Vector2i(x, y));
 
 	while (!qTileToInit.empty()) {
@@ -87,85 +80,27 @@ void Map::setupCircleMap() {
 	// Assign tile types and dice numbers to TileType::BLANK
 	//
 
-	// Prepare resources to assign
+	// Prepare resources and numbers to assign
 	std::vector<Tile::TileType> tileTypes;
-
-	int tileToShuffleCount = inGameTiles.size() - 1; // All in game tiles (-1) Desert in the middle
-	int countBlock = 0;
-
-	int tileToAssignNumbers = tileToShuffleCount;
-	int countDesert = 0;
-
-	/*
-		If map is not setup in standard 19-tile way insert 
-		more tiles in given manner:
-
-			Wo	Sh	Wh	Cl	Ir	De	- Cnt
-		s1.	4	4	4	3	3	0	- 18 (if map have 19 tiles insert this block 1 time)
-		s2.	2	2	2	1	1	1	- 9
-		s3.	1	1	1	0	0	0	- 3
-	*/
-
-	// Step 1
-	countBlock = tileToShuffleCount / 18;
-	for (int i = 0; i < countBlock; i++) {
-		Tile::TileType lTiles[] = {
-			Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP,
-			Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD,
-			Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT,
-			Tile::TileType::IRON, Tile::TileType::IRON, Tile::TileType::IRON,
-			Tile::TileType::CLAY, Tile::TileType::CLAY, Tile::TileType::CLAY
-		};
-		tileTypes.insert( tileTypes.begin(), lTiles, lTiles + 18);
-	}
-	tileToShuffleCount -= countBlock * 18;
-
-	// Step 2
-	countBlock = tileToShuffleCount / 9;
-	for (int i = 0; i < countBlock; i++) {
-		Tile::TileType lTiles[] = {
-			Tile::TileType::SHEEP, Tile::TileType::SHEEP,
-			Tile::TileType::WOOD, Tile::TileType::WOOD,
-			Tile::TileType::WHEAT, Tile::TileType::WHEAT,
-			Tile::TileType::IRON,
-			Tile::TileType::CLAY,
-			Tile::TileType::DESERT
-		};
-		tileTypes.insert(tileTypes.begin(), lTiles, lTiles + 9);
-		countDesert++;
-	}
-	tileToShuffleCount -= countBlock * 9;
-
-	// Step 3
-	countBlock = tileToShuffleCount / 3;
-	for (int i = 0; i < countBlock; i++) {
-		Tile::TileType lTiles[] = {
-			Tile::TileType::SHEEP,
-			Tile::TileType::WOOD, 
-			Tile::TileType::WHEAT 
-		};
-		tileTypes.insert(tileTypes.begin(), lTiles, lTiles + 3);
-	}
-	tileToShuffleCount -= countBlock * 3;
-
-	// Prepare numbers to assign
-	tileToAssignNumbers -= countDesert;
-	int diceNumbers[18] = { 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 3, 4, 5, 6, 8, 9, 10, 11 };
 	std::vector<int> tileDiceNumbers;
-	
-	for (int i = 0; i < tileToAssignNumbers; i++ ) {
-		tileDiceNumbers.push_back(diceNumbers[i%18]);
-	}
+
+	Tile::TileType lTiles[] = {
+		Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP, Tile::TileType::SHEEP,
+		Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD, Tile::TileType::WOOD,
+		Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT, Tile::TileType::WHEAT,
+		Tile::TileType::IRON, Tile::TileType::IRON, Tile::TileType::IRON,
+		Tile::TileType::CLAY, Tile::TileType::CLAY, Tile::TileType::CLAY
+	};
+	int lDiceNumbers[18] = { 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 3, 4, 5, 6, 8, 9, 10, 11 };
+
+	tileTypes.insert(tileTypes.begin(), lTiles, lTiles + 18);
+	tileDiceNumbers.insert(tileDiceNumbers.begin(), lDiceNumbers, lDiceNumbers + 18);
 
 	// Shuffle tables
-
 	std::random_shuffle(std::begin(tileTypes), std::end(tileTypes));
 	std::random_shuffle(std::begin(tileDiceNumbers), std::end(tileDiceNumbers));
 
-	//
 	// Assign resources and diceNumbers
-	//
-
 	int i_type = 0;
 	int i_dice = 0;
 	for (auto lTile : inGameTiles) {
@@ -184,50 +119,58 @@ void Map::setupCircleMap() {
 	//
 	for (int i = 0; i < this->height; i++) {
 		for (int j = 0; j < this->width; j++) {
+			Tile* currTile = getTile(i,j);
 
-			if (getTile(sf::Vector2i(i, j))->getType() == Tile::TileType::NOT_USED)
+			if (currTile->getType() == Tile::TileType::NOT_USED)
 				continue;
 
-			// For each road and location
-			for (int k = 0; k < 6; k++) {
-				bool isNeighbor;
-				Tile* lNeighborTile1 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i, j), k));
-				Tile* lNeighborTile2 = getTile( getNeighborTile(isNeighbor,sf::Vector2i(i,j),(k+1) % 6) );
-
-				// Road 
-				auto lNeighborRoad = (lNeighborTile1 != nullptr ? lNeighborTile1->getRoad((k + 3) % 6) : nullptr);
-
-				if ( lNeighborRoad != nullptr ) {
-					getTile(sf::Vector2i(i, j))->addRoad(lNeighborRoad, k);
-				}
-				else {
-					// Create road if neighbor do not have road
-					std::unique_ptr<Road> lNewRoad( new Road() );
-					Roads.push_back( std::move(lNewRoad) );
-
-					getTile(sf::Vector2i(i, j))->addRoad(Roads.back().get(), k);
-				}
-
-				// Location
-				auto lNeighborLocation1 = ( lNeighborTile1 != nullptr ? lNeighborTile1->getLocation((k + 2)%6) : nullptr );
-				auto lNeighborLocation2 = (	lNeighborTile2 != nullptr ? lNeighborTile2->getLocation((k + 4)%6) : nullptr );
-
-				if (lNeighborLocation1 != nullptr || lNeighborLocation2 != nullptr) {
-					// Get location from neighbor
-					auto lLocation = (lNeighborLocation1 != nullptr ? lNeighborLocation1 : lNeighborLocation2);
-					getTile(sf::Vector2i(i, j))->addLocation(lLocation, k);
-				}
-				else {
-					// Create location if neighbor do not have location
-					std::unique_ptr<Location> lNewLocation(new Location());
-					Locations.push_back(std::move(lNewLocation));
-
-					getTile(sf::Vector2i(i, j))->addLocation(Locations.back().get(), k);
-				}
-			}
+			// Spawn roads and locations
+			SpawnAtTile( currTile, i, j);
+			getTile(i,j)->bindRoadsLocations();
 		}
 	}
 
+}
+
+void Map::SpawnAtTile( Tile* currTile, int i, int j) {
+	// Spawn roads and locations for single tile
+	for (int k = 0; k < 6; k++) {
+		bool isNeighbor;
+		Tile* lNeighborTile1 = getTile(getNeighborTile(isNeighbor, sf::Vector2i(i, j), k));
+		Tile* lNeighborTile2 = getTile(getNeighborTile(isNeighbor, sf::Vector2i(i, j), (k + 1) % 6));
+
+		// Road 
+		auto lNeighborRoad = (lNeighborTile1 != nullptr ? lNeighborTile1->getRoad((k + 3) % 6) : nullptr);
+
+		if (lNeighborRoad != nullptr) {
+			currTile->addRoad(lNeighborRoad, k);
+		}
+		else {
+			// Create road if neighbor do not have road
+			std::unique_ptr<Road> lNewRoad(new Road());
+			Roads.push_back(std::move(lNewRoad));
+
+			currTile->addRoad(Roads.back().get(), k);
+		}
+
+		// Location
+		auto lNeighborLocation1 = (lNeighborTile1 != nullptr ? lNeighborTile1->getLocation((k + 2) % 6) : nullptr);
+		auto lNeighborLocation2 = (lNeighborTile2 != nullptr ? lNeighborTile2->getLocation((k + 4) % 6) : nullptr);
+
+		if (lNeighborLocation1 != nullptr || lNeighborLocation2 != nullptr) {
+			// Get location from neighbor
+			auto lLocation = (lNeighborLocation1 != nullptr ? lNeighborLocation1 : lNeighborLocation2);
+			currTile->addLocation(lLocation, k);
+		}
+		else {
+			// Create location if neighbor do not have location
+			std::unique_ptr<Location> lNewLocation(new Location());
+			Locations.push_back(std::move(lNewLocation));
+
+			currTile->addLocation(Locations.back().get(), k);
+		}
+
+	}/* end of spawn */
 }
 
 void Map::ComputeRender() {
@@ -359,7 +302,7 @@ Map::~Map()
 Tile * Map::getTile(sf::Vector2i _vector)
 {
 	if (_vector.x < width && _vector.x >= 0 && _vector.y < height && _vector.y >= 0)
-		return &(tiles[_vector.x][_vector.y]);
+		return tiles[_vector.x][_vector.y].get();
 	else
 		return nullptr;
 }

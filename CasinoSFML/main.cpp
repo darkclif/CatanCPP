@@ -4,6 +4,7 @@
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
 
+#include "Tile.h"
 #include "Map.h"
 #include "ResourceManager.h"
 #include "Console.h"
@@ -11,6 +12,7 @@
 
 int main() {
 
+	
 	// Create a window and add the box layouter to it. Also set the window's title.
 	sfg::SFGUI m_sfgui;
 	
