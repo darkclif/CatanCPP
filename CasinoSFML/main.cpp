@@ -46,6 +46,18 @@ int main() {
 		while (window.pollEvent(event)) {
 			desktop.HandleEvent(event);
 
+			if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+				int x = event.mouseButton.x;
+				int y = event.mouseButton.y;
+
+				sf::Vector2f vect = window.mapPixelToCoords(sf::Vector2i(x, y));
+
+				for (auto& lRoad : lMap.Roads) {
+					if (lRoad->isPointInEntity(vect))
+						lRoad->color = sf::Color::Red;
+				}
+			}
+
 			if (event.type == sf::Event::Closed)
 				window.close();
 

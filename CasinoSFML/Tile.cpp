@@ -22,16 +22,14 @@ const Catan::Textures::Name DiceNumber::arrDiceToTexture[11] = {
 
 void DiceNumber::draw(sf::RenderWindow & _window)
 {
-	sf::Sprite lSprite(getTexture());
+	setTexture(getTexture());
 
-	sf::Rect<int> lOrigin = lSprite.getTextureRect();
-	lOrigin.height /= 2;
-	lOrigin.width /= 2;
+	sf::Sprite tmpSprite( getSprite() );
 
-	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-	lSprite.setPosition(getAbsolutePosition());
+	if (getParent() != nullptr)
+		tmpSprite.setPosition( getAbsolutePosition());
 
-	_window.draw(lSprite);
+	_window.draw(tmpSprite);
 }
 
 void DiceNumber::setNumber(int _number)
@@ -58,16 +56,14 @@ sf::Texture & DiceNumber::getTexture()
 //
 void Thief::draw(sf::RenderWindow & _window)
 {
-	sf::Sprite lSprite(getTexture());
+	setTexture(getTexture());
 
-	sf::Rect<int> lOrigin = lSprite.getTextureRect();
-	lOrigin.height /= 2;
-	lOrigin.width /= 2;
+	sf::Sprite tmpSprite(getSprite());
 
-	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-	lSprite.setPosition(getAbsolutePosition());
+	if (getParent() != nullptr)
+		tmpSprite.setPosition(getAbsolutePosition());
 
-	_window.draw(lSprite);
+	_window.draw(tmpSprite);
 }
 
 sf::Texture & Thief::getTexture()
@@ -162,17 +158,14 @@ sf::Texture& Tile::getTexture()
 
 void Tile::draw(sf::RenderWindow &_window)
 {
-	// Tile
-	sf::Sprite lTileSprite(getTexture());
+	setTexture(getTexture());
 
-	sf::Rect<int> lOrigin(lTileSprite.getTextureRect());
-	lOrigin.height /= 2;
-	lOrigin.width /= 2;
+	sf::Sprite tmpSprite(getSprite());
 
-	lTileSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-	lTileSprite.setPosition(getPosition());
+	if (getParent() != nullptr)
+		tmpSprite.setPosition(getAbsolutePosition());
 
-	_window.draw(lTileSprite);
+	_window.draw(tmpSprite);
 
 	if (isThief() && thiefEntity != nullptr ) thiefEntity->draw(_window);
 	if (diceNumber != 7 && numberEntity != nullptr ) numberEntity->draw(_window);

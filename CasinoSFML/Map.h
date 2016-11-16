@@ -28,6 +28,9 @@ public:
 	sf::Vector2i getNeighborTile( bool & _status, sf::Vector2i _sourceTile, int _number );
 
 	~Map();
+
+	
+	std::vector<std::unique_ptr<Road>> Roads;			// All roads
 private:
 	// Default map size
 	static const int MAP_EDGE = 5;
@@ -49,7 +52,6 @@ private:
 	std::vector< std::vector<std::unique_ptr<Tile>> > tiles;	// All tiles []
 	
 	std::vector< Tile* > inGameTiles;					// Tiles used in game
-	std::vector< std::unique_ptr<Road>> Roads;			// All roads
 	std::vector< std::unique_ptr<Location>> Locations;	// All locations
 
 	/* Circle-style map deploy -- 19 tiles (5x5) */

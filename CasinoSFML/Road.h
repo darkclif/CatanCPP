@@ -19,6 +19,8 @@ public:
 	sf::Texture& getTexture();
 	void draw( sf::RenderWindow& _window );
 
+	// TEST
+	sf::Color color = sf::Color::White;
 private:
 
 	std::vector<Location*> arrLocations;

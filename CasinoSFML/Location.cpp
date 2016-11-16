@@ -51,16 +51,14 @@ sf::Texture & Location::getTexture()
 
 void Location::draw(sf::RenderWindow& _window)
 {
-	sf::Sprite lSprite(getTexture());
+	setTexture(getTexture());
 
-	sf::Rect<int> lOrigin(lSprite.getTextureRect());
-	lOrigin.height /= 2;
-	lOrigin.width /= 2;
+	sf::Sprite tmpSprite(getSprite());
 
-	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-	lSprite.setPosition(getPosition());
+	if (getParent() != nullptr)
+		tmpSprite.setPosition(getAbsolutePosition());
 
-	_window.draw(lSprite);
+	_window.draw(tmpSprite);
 }
 
 void Location::setType(Type _type)

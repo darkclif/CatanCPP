@@ -39,15 +39,15 @@ sf::Texture & Road::getTexture()
 
 void Road::draw(sf::RenderWindow& _window)
 {
-	sf::Sprite lSprite(getTexture());
+	setTexture(getTexture());
 
-	sf::Rect<int> lOrigin(lSprite.getTextureRect());
-	lOrigin.height /= 2;
-	lOrigin.width /= 2;
+	sf::Sprite tmpSprite(getSprite());
 
-	lSprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
-	lSprite.setPosition(getPosition());
-	lSprite.setRotation(getRotation());
+	if (getParent() != nullptr)
+		tmpSprite.setPosition(getAbsolutePosition());
 
-	_window.draw(lSprite);
+	// TEST
+	tmpSprite.setColor(color);
+
+	_window.draw(tmpSprite);
 }
