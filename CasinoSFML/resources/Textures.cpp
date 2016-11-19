@@ -30,6 +30,10 @@ namespace Catan {
 		/* List below must contain all enums in Texture::Name */
 		{ Catan::Textures::Name::TEXTURE_ERROR, "textures/texture_error.png" },
 		{ Catan::Textures::Name::TEXTURE_EMPTY, "textures/texture_empty.png" },
+		/** MISC **/
+		{ Textures::LOGO,"textures/logo.png" },
+		{ Textures::BIG_LOGO,"textures/big_logo.png" },
+		/** MAP **/
 		/* Hex */
 		{ Textures::TILE_WOOD,"textures/tile_texture_wood.png" },
 		{ Textures::TILE_WHEAT,"textures/tile_texture_wheat.png" },

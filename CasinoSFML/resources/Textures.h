@@ -10,6 +10,11 @@ namespace Catan {
 	public:
 		enum Name {
 			/* All texture names */
+			/* Misc.*/
+			BIG_LOGO,
+			LOGO,
+
+			/* Map */
 			TEXTURE_ERROR,
 			TEXTURE_EMPTY,
 

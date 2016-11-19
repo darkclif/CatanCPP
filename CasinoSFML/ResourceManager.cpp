@@ -24,6 +24,8 @@ sf::Texture & ResourceManager::getTexture( Catan::Textures::Name _texName )
 				throw std::logic_error("Cannot load Textures::Name::TEXTURE_ERROR");
 		}
 
+		lTexture->setSmooth(true);
+
 		// Insert to map
 		mTextureMap.insert( std::make_pair( _texName, std::move(lTexture)) );
 		return *(mTextureMap.find(_texName)->second);

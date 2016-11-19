@@ -4,22 +4,22 @@
 class DrawableEntity
 {
 public:
-	sf::Vector2f getPosition();
-	void setPosition(sf::Vector2f _position);
+	sf::Vector2f		getPosition();
+	void				setPosition(sf::Vector2f _position);
 
-	sf::Vector2f getAbsolutePosition();
+	float				getRotation();
+	void				setRotation(float _rotation);
 
-	float getRotation();
-	void setRotation( float _rotation);
+	DrawableEntity*		getParent();
+	void				setParent(DrawableEntity* _parent);
 
-	DrawableEntity* getParent();
-	void setParent( DrawableEntity* _parent );
+	sf::Vector2f		getAbsolutePosition();
+	void				setTexture(sf::Texture& _texture);
+	const sf::Sprite	getSprite();
 
-	virtual void draw(sf::RenderWindow& _window) = 0;
-	void setTexture( sf::Texture& _texture );
-	const sf::Sprite getSprite();
+	bool				isPointInEntity(sf::Vector2f _point);
 
-	bool isPointInEntity(sf::Vector2f _point);
+	virtual void		draw(sf::RenderWindow& _window) = 0;
 
 	DrawableEntity() : parent{ nullptr } {}
 
@@ -30,7 +30,7 @@ public:
 
 	virtual ~DrawableEntity();
 private:
-	sf::Sprite sprite;
+	sf::Sprite		sprite;
 	DrawableEntity* parent;
 	
 	virtual sf::Texture& getTexture() = 0;

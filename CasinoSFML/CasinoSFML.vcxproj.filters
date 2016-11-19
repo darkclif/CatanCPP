@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\Resources">
       <UniqueIdentifier>{1ee39c07-2317-4d9c-8171-b7a34c597b71}</UniqueIdentifier>
     </Filter>
@@ -25,24 +21,30 @@
     <Filter Include="Source Files\Entities">
       <UniqueIdentifier>{834285c4-473c-4883-aed9-ec277227eb7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Map">
+      <UniqueIdentifier>{c6abddfb-b6b2-4f27-b6f6-b9ed7e7c1175}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Map">
+      <UniqueIdentifier>{fec5bfb8-b151-482d-a177-996cdd2cb000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\StateManager">
+      <UniqueIdentifier>{e14be52d-bdfe-4d90-a175-b35aab08d576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\StateManager">
+      <UniqueIdentifier>{b357413b-4941-4865-b2a4-264ba0911ef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\States">
+      <UniqueIdentifier>{e96f62a8-aff3-44dc-85ed-1f65451f611f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\States">
+      <UniqueIdentifier>{774cbe61-eaab-4abb-8c0c-52104890738c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Location.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Road.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Resources\Textures.cpp">
@@ -63,21 +65,36 @@
     <ClCompile Include="PlayerEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="AnimateEntity.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Road.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Location.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StateManager.cpp">
+      <Filter>Source Files\StateManager</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>Source Files\StateManager</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroState.cpp">
+      <Filter>Source Files\States</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Map.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Location.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resources\Textures.h">
@@ -85,9 +102,6 @@
     </ClInclude>
     <ClInclude Include="resources\Fonts.h">
       <Filter>Header Files\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="Road.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
@@ -100,6 +114,39 @@
     </ClInclude>
     <ClInclude Include="PlayerEntity.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimateEntity.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Road.h">
+      <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Location.h">
+      <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StateManager.h">
+      <Filter>Header Files\StateManager</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Header Files\StateManager</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroState.h">
+      <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="States.h">
+      <Filter>Header Files\States</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
