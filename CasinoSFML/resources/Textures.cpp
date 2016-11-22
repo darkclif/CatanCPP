@@ -33,6 +33,7 @@ namespace Catan {
 		/** MISC **/
 		{ Textures::LOGO,"textures/logo.png" },
 		{ Textures::BIG_LOGO,"textures/big_logo.png" },
+		{ Textures::MENU_BG_2,"textures/menu_bg_2.png" },
 		/** MAP **/
 		/* Hex */
 		{ Textures::TILE_WOOD,"textures/tile_texture_wood.png" },

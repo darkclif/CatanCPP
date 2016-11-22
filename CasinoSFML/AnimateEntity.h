@@ -1,13 +1,16 @@
 #pragma once
+#include <SFML/Graphics.hpp>
 class AnimateEntity
 {
 public:
 	void Start();
 	void Stop();
 
-	virtual void Update( float _time ) = 0;
+	bool isRunning();
 
-	AnimateEntity() : running{ false } {};
+	virtual void update(sf::Time _time) = 0;
+
+	AnimateEntity() : running{ true } {};
 	AnimateEntity(bool _run) : running{ _run } {};
 	~AnimateEntity();
 

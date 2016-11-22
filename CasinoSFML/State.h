@@ -1,7 +1,10 @@
 #pragma once
 #include <memory>
-#include "States.h"
+
+#include <SFGUI/SFGUI.hpp>
 #include <SFML/Graphics.hpp>
+
+#include "States.h"
 
 class StateManager;
 
@@ -9,7 +12,7 @@ class State
 {
 public:
 	struct Context {
-		sf::RenderWindow* window;
+		sf::RenderWindow*	window;
 	};
 
 	typedef std::unique_ptr<State> Ptr;

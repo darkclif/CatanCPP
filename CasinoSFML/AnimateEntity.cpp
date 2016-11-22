@@ -10,6 +10,11 @@ void AnimateEntity::Stop()
 	running = false;
 }
 
+bool AnimateEntity::isRunning()
+{
+	return running;
+}
+
 AnimateEntity::~AnimateEntity()
 {
 }

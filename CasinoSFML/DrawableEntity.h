@@ -7,6 +7,9 @@ public:
 	sf::Vector2f		getPosition();
 	void				setPosition(sf::Vector2f _position);
 
+	const sf::IntRect& 	getTextureRect() const;
+	void 				setTextureRect(const sf::IntRect& _rect);
+
 	float				getRotation();
 	void				setRotation(float _rotation);
 
@@ -29,9 +32,11 @@ public:
 	}
 
 	virtual ~DrawableEntity();
-private:
-	sf::Sprite		sprite;
-	DrawableEntity* parent;
-	
+
+protected:
 	virtual sf::Texture& getTexture() = 0;
+
+private:
+	DrawableEntity* parent;	
+	sf::Sprite		sprite;
 };

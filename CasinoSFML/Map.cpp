@@ -249,7 +249,7 @@ void Map::ComputeRender() {
 	renderWindow->setView(lView);
 }
 
-void Map::Show(sf::RenderWindow & _window)
+void Map::draw(sf::RenderWindow & _window)
 {
 	for( auto& lTile : inGameTiles ){		
 		lTile->draw(_window);
@@ -293,6 +293,18 @@ sf::Vector2i Map::getNeighborTile(bool & _status, sf::Vector2i _sourceTile, int 
 	}
 
 	return lReturn;
+}
+
+void Map::acceptDiceThrow(int _dicesum)
+{
+	if (_dicesum == 7)
+		return;
+
+	for (auto& lTile : inGameTiles) {
+		if(lTile->getDiceNumber() == _dicesum ){
+			lTile->giveResourceToPlayers();
+		}
+	}
 }
 
 Map::~Map()

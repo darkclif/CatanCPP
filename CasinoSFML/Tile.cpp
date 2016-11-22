@@ -1,8 +1,9 @@
 #include "Tile.h"
 
 #include <iostream>
-#include "Console.h"
 
+#include "Console.h"
+#include "ResourceBag.h"
 //
 // Dice number
 //
@@ -86,6 +87,14 @@ const Catan::Textures::Name Tile::arrTileToTexture[ TileType::__ENUM_SIZE ] = {
 	Catan::Textures::Name::TILE_NOT_USED,
 };
 
+const std::map<Tile::TileType, Resource> Tile::mapTypeToResource = {
+	{TileType::WOOD,Resource::WOOD},
+	{TileType::SHEEP,Resource::SHEEP},
+	{TileType::CLAY,Resource::CLAY},
+	{TileType::IRON,Resource::IRON},
+	{TileType::WHEAT,Resource::WHEAT}
+};
+
 Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 } {
 	std::unique_ptr<Thief> tmpThief(new Thief(sf::Vector2f(100.f, -80.f), this));
 	thiefEntity = std::move(tmpThief);
@@ -121,6 +130,19 @@ bool Tile::isThief()
 void Tile::setThief(bool _thief)
 {
 	thief = _thief;
+}
+
+void Tile::giveResourceToPlayers()
+{
+	for (auto& lLocation : arrLocations) {
+		if ( lLocation->hasOwner()) {
+			Player* lPlayer = lLocation->getOwner();
+			int lCount = (lLocation->getType() == Location::CITY ? 2 : 1);
+
+			ResourceBag lResourceBag(lCount, getResourceType());
+			lPlayer->giveResources(lResourceBag);
+		}
+	}
 }
 
 Tile::TileType Tile::getType() {
@@ -271,4 +293,9 @@ void Tile::setInitJump(int _jump)
 	}
 
 	this->initJump = _jump;
+}
+
+Resource Tile::getResourceType()
+{
+	return mapTypeToResource.find(type)->second;
 }

@@ -14,6 +14,16 @@ void DrawableEntity::setPosition(sf::Vector2f _position)
 	sprite.setPosition( _position);
 }
 
+const sf::IntRect & DrawableEntity::getTextureRect() const
+{
+	return sprite.getTextureRect();
+}
+
+void DrawableEntity::setTextureRect(const sf::IntRect & _rect)
+{
+	sprite.setTextureRect(_rect);
+}
+
 sf::Vector2f DrawableEntity::getAbsolutePosition()
 {
 	if (parent != nullptr) {

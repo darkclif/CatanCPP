@@ -10,6 +10,7 @@
 #include "ResourceManager.h"
 #include "resources/Textures.h"
 #include "DrawableEntity.h"
+#include "ResourceBag.h"
 
 //
 //	Dice number
@@ -69,36 +70,39 @@ public:
 
 	~Tile();
 
-	bool isThief();
-	void setThief(bool _thief);
+	bool				isThief();
+	void				setThief(bool _thief);
 
-	TileType getType();				
-	void setType(TileType _type); 
+	void				giveResourceToPlayers();
 
-	int getDiceNumber();
-	void setDiceNumber(int _number);
+	TileType			getType();				
+	void				setType(TileType _type); 
 
-	sf::Texture& getTexture();
+	int					getDiceNumber();
+	void				setDiceNumber(int _number);
 
-	void draw( sf::RenderWindow & _window );
+	sf::Texture&		getTexture();
+	void				draw( sf::RenderWindow & _window );
 
 	// Access soroundings 
-	bool addRoad(Road* _road, int _number);
-	Road* getRoad(int _number);
+	bool				addRoad(Road* _road, int _number);
+	Road*				getRoad(int _number);
 
-	bool addLocation(Location* _location, int _number);
-	Location* getLocation(int _number);
+	bool				addLocation(Location* _location, int _number);
+	Location*			getLocation(int _number);
 	
-	bool bindRoadsLocations();
+	bool				bindRoadsLocations();
 
 	// For initialize circle-style map
-	int getInitJump();
-	void setInitJump( int _jump );
+	int					getInitJump();
+	void				setInitJump( int _jump );
+private:
+	Resource			getResourceType();
 
 private:
-	TileType type;				// Type of resource
-	unsigned int diceNumber;	// Number on dices to activate
-	bool thief;					// Is thief on this tile
+	TileType		type;				// Type of resource
+	unsigned int	diceNumber;	// Number on dices to activate
+	bool			thief;					// Is thief on this tile
 
 	// For initialize circle-style map
 	int initJump;
@@ -111,6 +115,7 @@ private:
 
 	// Tile::Type to Texture::Name converter
 	static const Catan::Textures::Name arrTileToTexture[TileType::__ENUM_SIZE];
+	static const std::map<TileType,Resource> mapTypeToResource;
 };
 
 

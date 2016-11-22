@@ -21,6 +21,6 @@ public:
 private:
 
 	void registerStates( StateManager& _engine );
-	void handleGlobalEvent( sf::Event _event, State::Context _context );
+	void handleGlobalEvent( sf::Event _event, State::Context _context, StateManager& _engine );
 };
 

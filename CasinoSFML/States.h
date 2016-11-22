@@ -5,6 +5,6 @@ namespace States {
 		INTRO,
 		GAME,
 		MAIN_MENU,
-		GAME_MANU
+		GAME_MENU
 	};
 }

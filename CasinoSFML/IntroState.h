@@ -1,6 +1,7 @@
 #pragma once
 #include "State.h"
 #include "StateManager.h"
+#include "Functions.h"
 
 class IntroState : public State
 {

@@ -1,18 +1,18 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Widgets.hpp>
 
 namespace Catan {
 
-	void setOriginAtCenter(sf::Sprite& _sprite) {
-		sf::FloatRect lRect = _sprite.getLocalBounds();
-		sf::Vector2f lOrig(lRect.width / 2.f, lRect.height / 2.f);
-		_sprite.setOrigin(lOrig);
-	}
+	void setOriginAtCenter(sf::Sprite& _sprite);
+	void setOriginAtCenter(sf::Text& _text);
 
-	void setOriginAtCenter(sf::Text& _text) {
-		sf::FloatRect lRect = _text.getLocalBounds();
-		sf::Vector2f lOrig(lRect.width / 2.f, lRect.height / 2.f);
-		_text.setOrigin(lOrig);
-	}
+	// SFGUI
+	void setWindowAtCenter(sfg::Window::Ptr _window, sf::RenderWindow* _render);
+
+	// SFML
+	void setViewOrigin(sf::RenderWindow* _window, sf::Vector2f _vect);
+	void moveView(sf::RenderWindow* _window, sf::Vector2f _vect);
 
 }

@@ -152,10 +152,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AnimateEntity.cpp" />
+    <ClCompile Include="AnimateSprite.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="Functions.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="IntroState.cpp" />
+    <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="PlayerEntity.cpp" />
+    <ClCompile Include="PlayerGUI.cpp" />
+    <ClCompile Include="ResourceBag.cpp" />
     <ClCompile Include="resources\Fonts.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="main.cpp" />
@@ -165,17 +172,24 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="Resources\Textures.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimateEntity.h" />
+    <ClInclude Include="AnimateSprite.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Functions.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="IntroState.h" />
+    <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="PlayerEntity.h" />
+    <ClInclude Include="PlayerGUI.h" />
+    <ClInclude Include="ResourceBag.h" />
     <ClInclude Include="resources\Fonts.h" />
     <ClInclude Include="Location.h" />
     <ClInclude Include="Map.h" />
@@ -184,6 +198,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="Resources\Textures.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="States.h" />

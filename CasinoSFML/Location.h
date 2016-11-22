@@ -1,11 +1,12 @@
 #pragma once
 #include "DrawableEntity.h"
+#include "PlayerEntity.h"
 
 #include <vector>
 
 class Road;
 
-class Location : public DrawableEntity
+class Location : public DrawableEntity, public PlayerEntity
 {
 public:
 	enum Type {
