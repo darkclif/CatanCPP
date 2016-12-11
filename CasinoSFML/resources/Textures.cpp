@@ -28,12 +28,24 @@ namespace Catan {
 
 	const std::map< Textures::Name, std::string> Textures::mPaths = {
 		/* List below must contain all enums in Texture::Name */
+		
+		/** DEV **/
 		{ Catan::Textures::Name::TEXTURE_ERROR, "textures/texture_error.png" },
 		{ Catan::Textures::Name::TEXTURE_EMPTY, "textures/texture_empty.png" },
+		
 		/** MISC **/
 		{ Textures::LOGO,"textures/logo.png" },
 		{ Textures::BIG_LOGO,"textures/big_logo.png" },
 		{ Textures::MENU_BG_2,"textures/menu_bg_2.png" },
+		
+		/** PLAYER_AVATARS **/
+		{ Textures::AVATAR_1,"textures/avatars/avatar_1.png" },
+		{ Textures::AVATAR_2,"textures/avatars/avatar_2.png" },
+		{ Textures::AVATAR_3,"textures/avatars/avatar_3.png" },
+		{ Textures::AVATAR_4,"textures/avatars/avatar_4.png" },
+		{ Textures::AVATAR_5,"textures/avatars/avatar_5.png" },
+		{ Textures::AVATAR_6,"textures/avatars/avatar_6.png" },
+
 		/** MAP **/
 		/* Hex */
 		{ Textures::TILE_WOOD,"textures/tile_texture_wood.png" },

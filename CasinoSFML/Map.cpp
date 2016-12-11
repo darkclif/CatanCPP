@@ -1,5 +1,6 @@
 #include "Map.h"
-#include "ResourceManager.h"
+
+#include "PlayerGUI.h"
 
 #include <iostream>
 #include <queue>
@@ -7,7 +8,7 @@
 #include <cstdlib>
 #include <stdlib.h>
 
-Map::Map( sf::RenderWindow* _window ) : width(Map::MAP_EDGE), height(Map::MAP_EDGE), style(Style::CIRCLE), renderWindow{_window}
+Map::Map(sf::RenderWindow* _window) : width(Map::MAP_EDGE), height(Map::MAP_EDGE), renderWindow{ _window }, selectionMode{NONE}
 {
 	// Make a square map
 	this->tiles.resize(height);
@@ -249,7 +250,7 @@ void Map::ComputeRender() {
 	renderWindow->setView(lView);
 }
 
-void Map::draw(sf::RenderWindow & _window)
+void Map::Draw(sf::RenderWindow & _window)
 {
 	for( auto& lTile : inGameTiles ){		
 		lTile->draw(_window);
@@ -264,9 +265,26 @@ void Map::draw(sf::RenderWindow & _window)
 	}
 }
 
-Map::Map(int _width, int _height, Style _style, sf::RenderWindow* _window) : width{ _width }, height{ _height }, style{ _style }, renderWindow{_window}
+void Map::HandleEvent(sf::Event _event)
 {
+	if (highlightedItem != nullptr)
+		highlightedItem->setHighlight(false);
 
+	if ( _event.type == _event.MouseMoved ) {
+		if (selectionMode != SelectionMode::NONE) {
+			checkItemsForHighlight(_event);
+		}
+	}
+
+	if (_event.type == _event.MouseButtonReleased && _event.mouseButton.button == sf::Mouse::Left) {
+		if (selectionMode != SelectionMode::NONE) {
+			checkItemsForClick(_event);
+		}
+	}
+}
+
+void Map::Update(sf::Time _dt)
+{
 }
 
 sf::Vector2i Map::getNeighborTile(bool & _status, sf::Vector2i _sourceTile, int _number)
@@ -295,6 +313,17 @@ sf::Vector2i Map::getNeighborTile(bool & _status, sf::Vector2i _sourceTile, int 
 	return lReturn;
 }
 
+void Map::getSelection(SelectionMode _mode, PlayerGUI* _playerGUI)
+{
+	playerGUI = _playerGUI;
+	selectionMode = _mode;
+}
+
+void Map::closeSelection()
+{
+	selectionMode = SelectionMode::NONE;
+}
+
 void Map::acceptDiceThrow(int _dicesum)
 {
 	if (_dicesum == 7)
@@ -305,6 +334,89 @@ void Map::acceptDiceThrow(int _dicesum)
 			lTile->giveResourceToPlayers();
 		}
 	}
+}
+
+void Map::sendCallbackFunction(SelectableMapItem * _item)
+{
+	Console::debug << "Send callback to PlayerGUI!" << std::endl;
+	selectionMode = SelectionMode::NONE;
+	playerGUI->acceptSelection(_item);
+}
+
+void Map::checkItemsForClick(sf::Event _event )
+{
+	int x = _event.mouseButton.x;
+	int y = _event.mouseButton.y;
+	sf::Vector2f point = renderWindow->mapPixelToCoords(sf::Vector2i(x, y));
+
+	switch (selectionMode) {
+		case SelectionMode::SELECT_LOCATION:
+			for (auto& lLocation : Locations) {
+				if (lLocation->isPointInEntity(point)) {
+					this->sendCallbackFunction(lLocation.get());
+					break;
+				}
+			}
+			break;
+		case SelectionMode::SELECT_ROAD:
+			for (auto& lRoad : Roads) {
+				if (lRoad->isPointInEntity(point)) {
+					this->sendCallbackFunction(lRoad.get());
+					break;
+				}
+			}
+			break;
+		case SelectionMode::SELECT_TILE:
+			for (auto lTile : inGameTiles) {
+				if (lTile->isPointInEntity(point)) {
+					//this->sendCallbackFunction(lTile);
+					break;
+				}
+			}
+			break;
+		default:
+			break;
+	}	
+	
+}
+
+void Map::checkItemsForHighlight(sf::Event _event)
+{
+	int x = _event.mouseMove.x;
+	int y = _event.mouseMove.y;
+	sf::Vector2f point = renderWindow->mapPixelToCoords(sf::Vector2i(x, y));
+
+	switch (selectionMode) {
+	case SelectionMode::SELECT_LOCATION:
+		for (auto& lLocation : Locations) {
+			if (lLocation->isPointInEntity(point)) {
+				lLocation->setHighlight(true);
+				highlightedItem = lLocation.get();
+				break;
+			}
+		}
+		break;
+	case SelectionMode::SELECT_ROAD:
+		for (auto& lRoad : Roads) {
+			if (lRoad->isPointInEntity(point)) {
+				lRoad->setHighlight(true);
+				highlightedItem = lRoad.get();
+				break;
+			}
+		}
+		break;
+	case SelectionMode::SELECT_TILE:
+		for (auto lTile : inGameTiles) {
+			if (lTile->isPointInEntity(point)) {
+				//this->sendCallbackFunction(lTile);
+				break;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
 }
 
 Map::~Map()

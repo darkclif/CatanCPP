@@ -1,12 +1,13 @@
 #pragma once
 #include "DrawableEntity.h"
 #include "PlayerEntity.h"
+#include "SelectableMapItem.h"
 
 #include <vector>
 
 class Road;
 
-class Location : public DrawableEntity, public PlayerEntity
+class Location : public DrawableEntity, public PlayerEntity, public SelectableMapItem
 {
 public:
 	enum Type {
@@ -31,16 +32,16 @@ public:
 	bool addRoad(Road* _road);
 	const std::vector<Road*>& getRoads();
 
-	sf::Texture& getTexture();
-	void draw(sf::RenderWindow& _window);
+	sf::Texture&			getTexture();
+	void					draw(sf::RenderWindow& _window);
 
-	void setType(Type _type);
-	Type getType();
+	void					setType(Type _type);
+	Type					getType();
 
 private:
-	std::vector<Road*> arrRoads;
+	std::vector<Road*>		arrRoads;
 
-	Type type;
-	Bonus bonus;
+	Type					type;
+	Bonus					bonus;
 };
 

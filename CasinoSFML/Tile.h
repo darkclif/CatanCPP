@@ -11,6 +11,7 @@
 #include "resources/Textures.h"
 #include "DrawableEntity.h"
 #include "ResourceBag.h"
+#include "SelectableMapItem.h"
 
 //
 //	Dice number
@@ -47,7 +48,7 @@ protected:
 //
 // Tile
 //
-class Tile : public DrawableEntity
+class Tile : public DrawableEntity, public SelectableMapItem
 {
 public:
 	// Type of tiles
@@ -59,9 +60,8 @@ public:
 		WHEAT,		
 		DESERT,	
 
-		BLANK,		// Do wylosowania
-		NOT_USED,	// Poza gra
-
+		BLANK,		// To assign 
+		NOT_USED,
 		__ENUM_SIZE
 	};
 
@@ -100,22 +100,21 @@ private:
 	Resource			getResourceType();
 
 private:
-	TileType		type;				// Type of resource
-	unsigned int	diceNumber;	// Number on dices to activate
-	bool			thief;					// Is thief on this tile
+	TileType		type;				
+	unsigned int	diceNumber;	
+	bool			thief;
 
 	// For initialize circle-style map
-	int initJump;
+	int				initJump;
 
-	std::vector<Location*> arrLocations;
-	std::vector<Road*> arrRoads;
+	std::vector<Location*>						arrLocations;
+	std::vector<Road*>							arrRoads;
 
-	std::unique_ptr<Thief> thiefEntity;
-	std::unique_ptr<DiceNumber> numberEntity;
+	std::unique_ptr<Thief>						thiefEntity;
+	std::unique_ptr<DiceNumber>					numberEntity;
 
-	// Tile::Type to Texture::Name converter
-	static const Catan::Textures::Name arrTileToTexture[TileType::__ENUM_SIZE];
-	static const std::map<TileType,Resource> mapTypeToResource;
+	static const Catan::Textures::Name			arrTileToTexture[TileType::__ENUM_SIZE];
+	static const std::map<TileType,Resource>	mapTypeToResource;
 };
 
 

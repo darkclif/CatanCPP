@@ -14,7 +14,12 @@ public:
 	Player( std::string _name, sf::Color _color, Catan::Textures::Name _avatar);
 	~Player();
 
-	void giveResources( ResourceBag _bag);
+	void			giveResources(ResourceBag _bag);
+	ResourceBag		getResources() const;
+
+	std::string		getName() const;
+	sf::Color		getColor() const;
+	Catan::Textures::Name getAvatarTexture() const;
 
 private:
 	// Player info

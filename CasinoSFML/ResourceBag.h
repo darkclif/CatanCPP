@@ -7,7 +7,6 @@ enum Resource : int {
 	CLAY,
 	IRON,
 	WHEAT,
-	DESERT,
 	_SIZE
 };
 
@@ -20,6 +19,8 @@ public:
 	void			addResource(int _count, Resource _res);
 	int				operator[](int _el);
 	ResourceBag&	operator+=(const ResourceBag& _bag);
+
+	std::string		print() const;
 
 private:
 	std::vector<int> resources;

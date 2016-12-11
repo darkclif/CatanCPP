@@ -32,4 +32,10 @@ namespace Catan {
 		lView.setCenter(lView.getCenter() + _vect);
 		_window->setView(lView);
 	}
+	void zoomView(sf::RenderWindow * _window, float _zoom)
+	{
+		sf::View lView = _window->getView();
+		lView.zoom(_zoom);
+		_window->setView(lView);
+	}
 }

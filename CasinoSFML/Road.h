@@ -1,12 +1,14 @@
 #pragma once
 #include "DrawableEntity.h"
+#include "SelectableMapItem.h"
 
 #include <vector>
 #include <iostream>
+#include "PlayerEntity.h"
 
 class Location;
 
-class Road : public DrawableEntity
+class Road : public DrawableEntity, public SelectableMapItem, public PlayerEntity
 {
 public:
 	Road();

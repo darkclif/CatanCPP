@@ -7,6 +7,8 @@
 #include "resources/Textures.h"
 #include "resources/Fonts.h"
 
+#define ResourceMgr ResourceManager::getInstance()
+
 class ResourceManager
 {
 public:
@@ -36,4 +38,3 @@ private:
 	ResourceManager();
 	~ResourceManager();
 };
-

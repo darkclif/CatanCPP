@@ -10,6 +10,8 @@ public:
 	bool Update(sf::Time _dt);
 	void Draw(sf::RenderWindow& _window);
 
+	void resizeContent();
+
 	IntroState( StateManager* _engine, Context _context);
 	~IntroState();
 

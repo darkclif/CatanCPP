@@ -21,6 +21,8 @@ public:
 	virtual bool Update( sf::Time _dt) = 0;
 	virtual void Draw( sf::RenderWindow& _window) = 0;
 
+	virtual void resizeContent() = 0;
+
 	bool isTransparent();
 	void setTransparency(bool _trans);
 

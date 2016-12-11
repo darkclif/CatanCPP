@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 
-Location::Location()
+Location::Location(): SelectableMapItem( SelectableMapItem::Type::LOCATION )
 {
 	type = Type::VILLAGE;
 	bonus = Bonus::NONE;
@@ -52,8 +52,17 @@ sf::Texture & Location::getTexture()
 void Location::draw(sf::RenderWindow& _window)
 {
 	setTexture(getTexture());
-
 	sf::Sprite tmpSprite(getSprite());
+	
+	if (hasOwner()) {
+		tmpSprite.setColor(getOwner()->getColor());
+	}
+	else {
+		if (!isHighlighted())
+			tmpSprite.setColor(sf::Color(0, 0, 0, 0));
+		else
+			tmpSprite.setColor(sf::Color(255, 255, 255, 100));
+	}
 
 	if (getParent() != nullptr)
 		tmpSprite.setPosition(getAbsolutePosition());

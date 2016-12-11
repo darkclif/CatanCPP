@@ -91,12 +91,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE_LOG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\lib\SFML-2.4.0\include;C:\lib\sfgui-0.3.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\1_lib\SFML-2.4.0\include;E:\1_lib\sfgui-0.3.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\lib\SFML-2.4.0\lib;C:\lib\sfgui-0.3.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\1_lib\SFML-2.4.0\lib;E:\1_lib\sfgui-0.3.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfgui-d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -172,6 +172,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="Resources\Textures.cpp" />
+    <ClCompile Include="SelectableMapItem.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateManager.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="Resources\Textures.h" />
+    <ClInclude Include="SelectableMapItem.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateManager.h" />

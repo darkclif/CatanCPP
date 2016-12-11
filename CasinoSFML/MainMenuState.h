@@ -17,6 +17,8 @@ public:
 	bool Update(sf::Time _dt);
 	void Draw(sf::RenderWindow& _window);
 
+	void resizeContent();
+
 	MainMenuState(StateManager* _engine, Context _context);
 	~MainMenuState();
 

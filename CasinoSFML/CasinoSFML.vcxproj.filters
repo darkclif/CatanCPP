@@ -39,6 +39,12 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{fec5bfb8-b151-482d-a177-996cdd2cb000}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game\MapItem">
+      <UniqueIdentifier>{3d308693-66ea-41f5-92b8-abacdfb6aa7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\MapItem">
+      <UniqueIdentifier>{66f96a6d-2527-47ca-9e0e-790518eb21a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,16 +74,7 @@
     <ClCompile Include="AnimateEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="Tile.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Road.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Map.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Location.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="App.cpp">
@@ -116,6 +113,18 @@
     <ClCompile Include="ResourceBag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Road.cpp">
+      <Filter>Source Files\Game\MapItem</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Source Files\Game\MapItem</Filter>
+    </ClCompile>
+    <ClCompile Include="Location.cpp">
+      <Filter>Source Files\Game\MapItem</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectableMapItem.cpp">
+      <Filter>Source Files\Game\MapItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -143,15 +152,6 @@
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Map.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Road.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Location.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="App.h">
@@ -192,6 +192,18 @@
     </ClInclude>
     <ClInclude Include="ResourceBag.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Header Files\Game\MapItem</Filter>
+    </ClInclude>
+    <ClInclude Include="Road.h">
+      <Filter>Header Files\Game\MapItem</Filter>
+    </ClInclude>
+    <ClInclude Include="Location.h">
+      <Filter>Header Files\Game\MapItem</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectableMapItem.h">
+      <Filter>Header Files\Game\MapItem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -16,8 +16,12 @@ namespace Catan {
 			MENU_BG_2,
 
 			/* Avatars */
-			AVATAR_1,AVATAR_2,AVATAR_3,
-			AVATAR_4,AVATAR_5,AVATAR_6,
+			AVATAR_1,
+			AVATAR_2,
+			AVATAR_3,
+			AVATAR_4,
+			AVATAR_5,
+			AVATAR_6,
 
 			/* Map */
 			TEXTURE_ERROR,

@@ -2,7 +2,7 @@
 #include "Console.h"
 #include "ResourceManager.h"
 
-Road::Road()
+Road::Road(): SelectableMapItem(SelectableMapItem::Type::ROAD)
 {
 }
 
@@ -40,14 +40,21 @@ sf::Texture & Road::getTexture()
 void Road::draw(sf::RenderWindow& _window)
 {
 	setTexture(getTexture());
-
 	sf::Sprite tmpSprite(getSprite());
+
+	if (hasOwner()) {
+		tmpSprite.setColor(getOwner()->getColor());
+	}
+	else {
+		if (!isHighlighted())
+			tmpSprite.setColor(sf::Color(0, 0, 0, 0));
+		else
+			tmpSprite.setColor(sf::Color(255, 255, 255, 100));
+	}
 
 	if (getParent() != nullptr)
 		tmpSprite.setPosition(getAbsolutePosition());
 
-	// TEST
-	tmpSprite.setColor(color);
-
 	_window.draw(tmpSprite);
+
 }

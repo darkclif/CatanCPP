@@ -8,6 +8,7 @@
 class Settings
 {
 public:
+	/* Structs */
 	struct PlayerConfig {
 		std::string				name;
 		sf::Color				color;
@@ -20,11 +21,12 @@ public:
 		};
 	};
 
-	//
-	// Settings
-	//
+	/* SFGUI Styles set*/
+	static const void setSfguiStyles();
 
+	/* Settings storage*/
 	static const std::vector<Settings::PlayerConfig> playersConfig;
+
 private:
 	Settings() = delete;
 	~Settings() = delete;

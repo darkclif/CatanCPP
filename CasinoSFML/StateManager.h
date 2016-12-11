@@ -44,6 +44,8 @@ private:
 	State::Ptr createState(States::ID _id);
 	void applyPendingChanges();
 
+	void handleEngineEvent(sf::Event _event);
+
 private:
 	struct PendingChange {
 		PendingChange( Action _action, States::ID _id) : action{ _action }, id{_id} {};

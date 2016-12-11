@@ -22,6 +22,10 @@ void MainMenuState::Draw(sf::RenderWindow & _window)
 	sfg_sfgui.Display(_window);
 }
 
+void MainMenuState::resizeContent()
+{
+}
+
 //
 // BUTTONS
 //

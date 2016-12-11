@@ -12,7 +12,7 @@ void PlayerEntity::setOwner(Player * _player)
 
 bool PlayerEntity::hasOwner()
 {
-	return !(owner == nullptr);
+	return (owner != nullptr);
 }
 
 PlayerEntity::~PlayerEntity()
