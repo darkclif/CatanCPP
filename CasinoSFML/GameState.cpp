@@ -4,7 +4,9 @@
 bool GameState::HandleEvents(sf::Event _event)
 {
 	sfg_desktop.HandleEvent(_event);
-	map->HandleEvent(_event);
+
+	if(!playerGUI->isMouseOverGUI())
+		map->HandleEvent(_event);
 
 	/* Keyboard */
 	if (_event.type == sf::Event::KeyPressed) {
@@ -43,14 +45,12 @@ bool GameState::Update(sf::Time _dt)
 	sfg_desktop.Update(_dt.asSeconds());
 	playerGUI->UpdateGUI(_dt);
 
-	const float MOVE_SPEED = 500.0f;
-
 	if(isActionKeyPressed(ActionKey::LEFT)) Catan::moveView(context.window, sf::Vector2f(-MOVE_SPEED * _dt.asSeconds(), 0.f));
 	if(isActionKeyPressed(ActionKey::RIGHT)) Catan::moveView(context.window, sf::Vector2f(MOVE_SPEED * _dt.asSeconds(), 0.f));
-	if (isActionKeyPressed(ActionKey::UP)) Catan::moveView(context.window, sf::Vector2f(0.f, -MOVE_SPEED * _dt.asSeconds()));
-	if (isActionKeyPressed(ActionKey::DOWN)) Catan::moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
-	if (isActionKeyPressed(ActionKey::ZOOM_IN)) Catan::zoomView(context.window, 1.2f);
-	if (isActionKeyPressed(ActionKey::ZOOM_OUT)) Catan::zoomView(context.window, 0.8f);
+	if(isActionKeyPressed(ActionKey::UP)) Catan::moveView(context.window, sf::Vector2f(0.f, -MOVE_SPEED * _dt.asSeconds()));
+	if(isActionKeyPressed(ActionKey::DOWN)) Catan::moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
+	if(isActionKeyPressed(ActionKey::ZOOM_IN)) Catan::zoomView(context.window, 1.2f);
+	if(isActionKeyPressed(ActionKey::ZOOM_OUT)) Catan::zoomView(context.window, 0.8f);
 
 	return true;
 }

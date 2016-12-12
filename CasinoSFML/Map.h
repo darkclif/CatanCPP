@@ -18,7 +18,8 @@ public:
 	enum SelectionMode {
 		NONE,
 		SELECT_ROAD,
-		SELECT_LOCATION,
+		SELECT_CITY,
+		SELECT_VILLAGE,
 		SELECT_TILE,
 		_SIZE
 	};
@@ -32,15 +33,15 @@ public:
 
 	sf::Vector2i	getNeighborTile( bool & _status, sf::Vector2i _sourceTile, int _number );
 	
-	void			getSelection(SelectionMode _mode, PlayerGUI* _playerGUI);
-	void			closeSelection();
+	void			requestSelection(SelectionMode _mode, PlayerGUI* _playerGUI);
+	void			cancelSelection();
 
 	friend class PlayerGUI;
 public:
 	void			acceptDiceThrow( int _dicesum);
 
 private:
-	void			sendCallbackFunction(SelectableMapItem* _item);
+	void			sendSelection(SelectableMapItem* _item);
 	PlayerGUI*		playerGUI;
 
 	SelectionMode	selectionMode;

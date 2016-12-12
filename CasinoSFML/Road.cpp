@@ -1,8 +1,9 @@
 #include "Road.h"
 #include "Console.h"
 #include "ResourceManager.h"
+#include "Location.h"
 
-Road::Road(): SelectableMapItem(SelectableMapItem::Type::ROAD)
+Road::Road(): SelectableMapItem(SelectableMapItem::Mode::ROAD)
 {
 }
 
@@ -57,4 +58,13 @@ void Road::draw(sf::RenderWindow& _window)
 
 	_window.draw(tmpSprite);
 
+}
+
+bool Road::isNeighbourWithLocation(Player * _player, RoundType _round)
+{
+	for (auto& lLocation : arrLocations ) {
+		if (((char)lLocation->getBuildRound() & (char)_round) && (lLocation->getOwner() == _player))
+			return true;
+	}
+	return false;
 }

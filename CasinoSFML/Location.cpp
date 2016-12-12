@@ -2,12 +2,14 @@
 #include "Console.h"
 #include "ResourceManager.h"
 
+#include "Road.h"
+
 #include <cstdlib>
 #include <ctime>
 
-Location::Location(): SelectableMapItem( SelectableMapItem::Type::LOCATION )
+Location::Location(): SelectableMapItem( SelectableMapItem::Mode::LOCATION )
 {
-	type = Type::VILLAGE;
+	type = Type::NONE;
 	bonus = Bonus::NONE;
 }
 
@@ -36,17 +38,42 @@ const std::vector<Road*>& Location::getRoads()
 	return arrRoads;
 }
 
+bool Location::isNeighbourLocation()
+{
+	for ( Road* lRoad : arrRoads ) {
+		for (Location* lLocation : lRoad->getLocations()) {
+			if (lLocation == this)
+				continue;
+
+			if (lLocation->getType() != Location::Type::NONE)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+bool Location::isNearPlayerRoad(Player * _player)
+{
+	for (auto& lRoad : arrRoads ) {
+		if (lRoad->getOwner() == _player)
+			return true;
+	}
+
+	return false;
+}
+
 sf::Texture & Location::getTexture()
 {
 	Catan::Textures::Name lTextureName;
 
 	switch (type) {
-		case CITY: lTextureName = Catan::Textures::Name::CITY; break;
-		case VILLAGE: lTextureName = Catan::Textures::Name::VILLAGE; break;
-		default: lTextureName = Catan::Textures::Name::TEXTURE_EMPTY; break;
+		case Type::CITY:	lTextureName = Catan::Textures::Name::CITY; break;
+		case Type::VILLAGE: lTextureName = Catan::Textures::Name::VILLAGE; break;
+		default:			lTextureName = Catan::Textures::Name::VILLAGE; break;
 	}
 
-	return ResourceManager::getInstance().getTexture(lTextureName);
+	return ResourceMgr.getTexture(lTextureName);
 }
 
 void Location::draw(sf::RenderWindow& _window)
@@ -54,19 +81,30 @@ void Location::draw(sf::RenderWindow& _window)
 	setTexture(getTexture());
 	sf::Sprite tmpSprite(getSprite());
 	
-	if (hasOwner()) {
+	if (hasOwner())
 		tmpSprite.setColor(getOwner()->getColor());
-	}
-	else {
-		if (!isHighlighted())
-			tmpSprite.setColor(sf::Color(0, 0, 0, 0));
-		else
-			tmpSprite.setColor(sf::Color(255, 255, 255, 100));
+	else
+		tmpSprite.setColor(sf::Color(0, 0, 0, 0));
+
+	if (isHighlighted()) {
+		sf::Color tmpColor;
+
+		if (hasOwner()) {
+			tmpColor = getOwner()->getColor();
+			tmpColor.a = 100;
+		}else {
+			tmpColor = sf::Color(255, 255, 255, 100);
+		}
+
+		tmpSprite.setColor(tmpColor);
+	
+		if (getType() == Type::VILLAGE)
+			tmpSprite.setTexture(ResourceMgr.getTexture(Catan::Textures::CITY));
 	}
 
 	if (getParent() != nullptr)
 		tmpSprite.setPosition(getAbsolutePosition());
-
+		
 	_window.draw(tmpSprite);
 }
 
@@ -78,4 +116,11 @@ void Location::setType(Type _type)
 Location::Type Location::getType()
 {
 	return type;
+}
+
+void Location::Build(Type _type, Player * _player, RoundType _round)
+{
+	setType(_type);
+	setOwner(_player);
+	setBuildRound(_round);
 }

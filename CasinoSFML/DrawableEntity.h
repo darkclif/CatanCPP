@@ -20,7 +20,7 @@ public:
 	void				setTexture(sf::Texture& _texture);
 	const sf::Sprite	getSprite();
 
-	bool				isPointInEntity(sf::Vector2f _point);
+	virtual bool		isPointInEntity(sf::Vector2f _point);
 
 	virtual void		draw(sf::RenderWindow& _window) = 0;
 

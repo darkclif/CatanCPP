@@ -95,7 +95,7 @@ const std::map<Tile::TileType, Resource> Tile::mapTypeToResource = {
 	{TileType::WHEAT,Resource::WHEAT}
 };
 
-Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 }, SelectableMapItem(SelectableMapItem::Type::TILE) {
+Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 }, SelectableMapItem(SelectableMapItem::Mode::TILE) {
 	std::unique_ptr<Thief> tmpThief(new Thief(sf::Vector2f(100.f, -80.f), this));
 	thiefEntity = std::move(tmpThief);
 	
@@ -112,7 +112,7 @@ Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 }, SelectableMapIt
 }
 
 Tile::Tile(TileType _type, unsigned int _number) : 
-	SelectableMapItem(SelectableMapItem::Type::LOCATION), 
+	SelectableMapItem(SelectableMapItem::Mode::LOCATION), 
 	type{ _type }, diceNumber{ _number }, initJump{ 0 }
 {
 	Tile();
@@ -140,7 +140,7 @@ void Tile::giveResourceToPlayers()
 	for (auto& lLocation : arrLocations) {
 		if ( lLocation->hasOwner()) {
 			Player* lPlayer = lLocation->getOwner();
-			int lCount = (lLocation->getType() == Location::CITY ? 2 : 1);
+			int lCount = (lLocation->getType() == Location::Type::CITY ? 2 : 1);
 
 			ResourceBag lResourceBag(lCount, this->getResourceType());
 			lPlayer->giveResources(lResourceBag);

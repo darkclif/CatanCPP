@@ -16,32 +16,48 @@ public:
 	PlayerGUI( sfg::SFGUI& _sfgui, sfg::Desktop& _desktop, Game* _game, Map* _map);
 	~PlayerGUI();
 
-	void				UpdateGUI( sf::Time _dt );
+	void		UpdateGUI( sf::Time _dt );
 
-	void				acceptSelection(SelectableMapItem* _item);
-	void				resizeContent();
+	void		acceptSelection(SelectableMapItem* _item);
+
+	bool		isMouseOverGUI();
+	void		resizeContent();
 
 private:
 	/* Action senders to Game */
-	void				requestThrowDice();
-	void				requestNextRound();
+	void		requestThrowDice();
+	void		requestNextRound();
 
-	void				requestLocationBuild(Location*);
-	void				requestRoadBuild(Road*);
-
-	void				updatePlayerResource();
+	void		requestCityBuild(Location*);
+	void		requestVillageBuild(Location*);
+	void		requestRoadBuild(Road*);
 
 	/* Map selection request */
-	void				requestLocationSelection();
-	void				requestRoadSelection();
+	void		requestVillageSelection();
+	void		requestCitySelection();
+	void		requestRoadSelection();
+
+	void		requestSelectionCancel();
 
 private:
-	class MainMenuManager {
+	class Panel {
+	public:
+		sfg::Box::Ptr getBox();
+	
+	protected:
+		virtual void buildInterface() = 0;
+
+		sfg::Box::Ptr boxWrapper;
+	};
+
+	class MainMenuPanel : public Panel{
 		public:
 			enum Menu { /* Main menu states */
 				MENU_MAIN,
 				MENU_BUILDING,
-				MENU_MESSAGE
+				MENU_BUILDING_MESSAGE,
+				MENU_MESSAGE,
+				_SIZE
 			};
 
 			struct PendingMenuChange {
@@ -51,23 +67,23 @@ private:
 				Menu		menu;
 
 				PendingMenuChange(Action _action, Menu _menu) : action{ _action }, menu{ _menu } {}
-				PendingMenuChange(Action _action ) : action{ _action }, menu{ /*not used*/ Menu::MENU_MESSAGE } {}
+				PendingMenuChange(Action _action ) : action{ _action }, menu{ /*not used*/ Menu::_SIZE } {}
 			};
 
-			sfg::Box::Ptr	getBox();
 			void			applyPendingMenuChanges();
 
 			/* Actions to change menu elements */
-			void ChangeMessage(std::string _message);
+			void ChangeBuildingMessage(std::string _message);
 			void ShowDiceButton(bool _show);
 
-			MainMenuManager(PlayerGUI* _playerGUI);
+			void requestPushInfo(std::string _text, std::string _btnText);
+			void requestPushMenu(Menu _menu);
+			void requestPopMenu();
+
+			MainMenuPanel(PlayerGUI* _playerGUI);
 
 		private:
-			void requestPushMenu( Menu _menu );
-			void requestPopMenu();
-			
-			void createMenus();
+			void buildInterface();
 			void packMenusToBox();
 			
 			void RefreshMenusVisibility();
@@ -75,10 +91,10 @@ private:
 			/* Menus creators */
 			sfg::Box::Ptr createMenuMain();
 			sfg::Box::Ptr createMenuBuilding();
+			sfg::Box::Ptr createMenuBuildingMessage();
 			sfg::Box::Ptr createMenuMessage();
 
 		private:
-			sfg::Box::Ptr					boxWrapper;
 			std::map<Menu, sfg::Box::Ptr>	menuStorage;
 
 			std::stack<Menu>				menuStack;
@@ -87,14 +103,15 @@ private:
 			PlayerGUI* playerGUI;
 
 			/* Elements which are changable */
-			sfg::Label::Ptr		labMessage;
+			sfg::Label::Ptr		labBuildingMessage;
 			sfg::Button::Ptr	btnDiceThrow;
+
+			sfg::Label::Ptr		labMessage;
+			sfg::Button::Ptr	btnReturn;
 	};
 	
-	class PlayerInfoPanel {
+	class PlayerInfoPanel: public Panel {
 	public:
-		sfg::Box::Ptr getBox();
-
 		void ChangePlayer( Player* _player);
 		void Refresh();
 
@@ -106,37 +123,63 @@ private:
 	private:
 		Player* player;
 
-		sfg::Box::Ptr boxWrapper;
-
 		/* Elements which are changable */
 		sfg::Label::Ptr		labPlayerName;
 		sfg::Image::Ptr		imgAvatar;
 	};
 
+	class InfoPanel: public Panel {
+	public:
+		void		ChangeInfo(std::string _info);
+		inline void ClearInfo() { ChangeInfo(""); };
+
+		InfoPanel();
+
+	private:
+		void buildInterface();
+
+	private:
+		/* Elements which are changable */
+		sfg::Label::Ptr		labInfo;
+	};
+
+	class ResourcesPanel : public Panel {
+	public:
+		void ChangePlayer(Player* _player);
+		void Refresh();
+
+		ResourcesPanel(Player* _player);
+
+	private:
+		void buildInterface();
+
+		Player* player;
+
+		/* Elements which are changable */
+		std::vector<sfg::Label::Ptr>	labCountResources;
+	};
+
 	/*** MAIN WINDOW ***/
 	sfg::Window::Ptr	mainWindow;
 
-	/* Curret player info panel */
 	PlayerInfoPanel		playerInfoPanel;
+	InfoPanel			infoPanel;
+	ResourcesPanel		resourcesPanel;
+	MainMenuPanel		mainMenuPanel;
 
-	/* Menu resource */
-	std::vector<sfg::Label::Ptr>	labCountResources;
-
-	/* Menu main */
-	MainMenuManager		mainMenuManager;
-
+	void				showRoundInfo();
 private:
 	void				setupGUI();
-	
-	sfg::Box::Ptr		setupPlayerInfoPanel();
-	sfg::Box::Ptr		setupResourcesMenu();
-	sfg::Box::Ptr		setupMainMenu();
-	
+
+	void				changeMouseOver(bool _state);
+
 private:
 	sfg::SFGUI&			sfg_sfgui;
 	sfg::Desktop&		sfg_desktop;
 
 	Game*				game;
 	Map*				map;
+
+	bool				isMouseOver;
 };
 

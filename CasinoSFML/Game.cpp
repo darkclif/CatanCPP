@@ -2,7 +2,23 @@
 #include "Settings.h"
 #include "Console.h"
 
-Game::Game(int _players, Map* _map) : gameMap{ _map }, numPlayers{ _players }, contentChanges{0}
+const std::map<Game::Item, ResourceBag> Game::buildingsCosts = {
+	std::make_pair<Game::Item, ResourceBag>(Game::Item::ROAD, ResourceBag(1,0,1,0,0)),
+	std::make_pair<Game::Item, ResourceBag>(Game::Item::VILLAGE, ResourceBag(1,1,1,0,1)),
+	std::make_pair<Game::Item, ResourceBag>(Game::Item::CITY, ResourceBag(0,0,0,3,2))
+};
+
+bool Game::canPlayerAffordItem(Item _item, Player * _player)
+{
+	ResourceBag lItemCost = buildingsCosts.at(_item);
+	
+	if (lItemCost <= _player->getResources())
+		return true;
+	else
+		return false;
+}
+
+Game::Game(int _players, Map* _map) : gameMap{ _map }, numPlayers{ _players }, contentChanges{ContentChange::ALL}
 {
 	if (_players < 2 || _players > 4) {
 		std::string lError = "Wrong number of players";
@@ -19,6 +35,13 @@ Game::Game(int _players, Map* _map) : gameMap{ _map }, numPlayers{ _players }, c
 			)
 		);
 	}
+
+	/*TEST */
+	for (auto& lPlayer : arrPlayers) {
+		int a = 100;
+		lPlayer.giveResources(ResourceBag(a,a,a,a,a));
+	}
+	/*END_TEST*/
 
 	roundInfo = RoundInfo();
 	numCurrentPlayer = 0;
@@ -41,15 +64,100 @@ int Game::getDiceSum() {
 	return roundInfo.dices[0] + roundInfo.dices[1];
 }
 
-bool Game::buildLocation(Player * _player, Location * _location)
+bool Game::buildVillage(Player * _player, Location * _location)
 {
-	_location->setOwner(_player);
+	if ( getRoundType() == RoundType::BEGINNING_FORWARD ) {
+		if (_location->isNeighbourLocation())
+			return false;
+
+		if (_player->getPhaseState(Player::Phase::BEGINNING_FORWARD).village)
+			return false;
+
+		_location->Build(Location::Type::VILLAGE, _player,  Location::RoundType::BEGINNING_FORWARD);
+		_player->setPhaseState(Player::Phase::BEGINNING_FORWARD,Player::Item::VILLAGE);
+	}
+	else if (getRoundType() == RoundType::BEGINNING_BACKWARD) {		
+		if (_location->isNeighbourLocation())
+			return false;
+
+		if (_player->getPhaseState(Player::Phase::BEGINNING_BACKWARD).village)
+			return false;
+
+		_location->Build(Location::Type::VILLAGE, _player, Location::RoundType::BEGINNING_BACKWARD);
+		_player->setPhaseState(Player::Phase::BEGINNING_BACKWARD, Player::Item::VILLAGE);
+	}
+	else { /* NORMAL ROUND */
+		if (!canPlayerAffordItem(Item::VILLAGE, _player))
+			return false;
+
+		if (_location->isNeighbourLocation())
+			return false;
+
+		if (!(_location->isNearPlayerRoad(_player)))
+			return false;
+
+		_player->takeResources(buildingsCosts.at(Item::VILLAGE));
+		_location->Build(Location::Type::VILLAGE, _player);
+		
+		addContentChange(ContentChange::PLAYER_RESOURCE);
+	}
+	
+	return true;
+}
+
+bool Game::buildCity(Player * _player, Location * _location)
+{
+	if (getRoundType() == RoundType::NORMAL) {
+		if (!(_location->getType() == Location::Type::VILLAGE))
+			return false;
+
+		if (!(canPlayerAffordItem(Item::CITY, _player)))
+			return false;
+
+		_player->takeResources(buildingsCosts.at(Item::CITY));
+		_location->Build(Location::Type::CITY, _player);
+		
+		addContentChange(ContentChange::PLAYER_RESOURCE);
+	}
+	else {
+		return false;
+	}
+
 	return true;
 }
 
 bool Game::buildRoad(Player * _player, Road * _road)
 {
-	_road->setOwner(_player);
+	if ( getRoundType() == RoundType::BEGINNING_FORWARD ) {
+		if (!(_road->isNeighbourWithLocation(_player, Road::RoundType::BEGINNING_FORWARD)))
+			return false;
+	
+		if (_player->getPhaseState(Player::Phase::BEGINNING_FORWARD).road)
+			return false;
+
+		_road->setOwner(_player);
+		_player->setPhaseState(Player::Phase::BEGINNING_FORWARD, Player::Item::ROAD);
+	}
+	else if ( getRoundType() == RoundType::BEGINNING_BACKWARD ) {
+		if (!(_road->isNeighbourWithLocation(_player, Road::RoundType::BEGINNING_BACKWARD)))
+			return false;
+
+		if (_player->getPhaseState(Player::Phase::BEGINNING_BACKWARD).road)
+			return false;
+
+		_road->setOwner(_player);
+		_player->setPhaseState(Player::Phase::BEGINNING_BACKWARD, Player::Item::ROAD);
+	}
+	else { /* NORMAL ROUND */
+		if (!(canPlayerAffordItem(Item::ROAD, _player)))
+			return false;
+
+		_player->takeResources(buildingsCosts.at(Item::ROAD));
+		_road->setOwner(_player);
+
+		addContentChange(ContentChange::PLAYER_RESOURCE);
+	}
+
 	return true;
 }
 
@@ -112,7 +220,7 @@ bool Game::throwDices()
 	return true;
 }
 
-Game::RoundType Game::getRoundType()
+Game::RoundType Game::getRoundType() const
 {
 	return roundInfo.roundType;
 }

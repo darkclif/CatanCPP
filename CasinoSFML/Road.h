@@ -14,15 +14,14 @@ public:
 	Road();
 	~Road();
 
-	// Control two locations
-	bool addLocation(Location* _location);
-	const std::vector<Location*>& Road::getLocations();
+	bool							addLocation(Location* _location);
+	const std::vector<Location*>&	getLocations();
 
-	sf::Texture& getTexture();
-	void draw( sf::RenderWindow& _window );
+	sf::Texture&		getTexture();
+	void				draw( sf::RenderWindow& _window );
 
-	// TEST
-	sf::Color color = sf::Color::White;
+	bool				isNeighbourWithLocation(Player* _player, RoundType _round = RoundType::ANY);
+
 private:
 
 	std::vector<Location*> arrLocations;

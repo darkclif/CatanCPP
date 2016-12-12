@@ -267,10 +267,11 @@ void Map::Draw(sf::RenderWindow & _window)
 
 void Map::HandleEvent(sf::Event _event)
 {
-	if (highlightedItem != nullptr)
-		highlightedItem->setHighlight(false);
-
+	
 	if ( _event.type == _event.MouseMoved ) {
+		if (highlightedItem != nullptr)
+			highlightedItem->setHighlight(false);
+		
 		if (selectionMode != SelectionMode::NONE) {
 			checkItemsForHighlight(_event);
 		}
@@ -313,15 +314,18 @@ sf::Vector2i Map::getNeighborTile(bool & _status, sf::Vector2i _sourceTile, int 
 	return lReturn;
 }
 
-void Map::getSelection(SelectionMode _mode, PlayerGUI* _playerGUI)
+void Map::requestSelection(SelectionMode _mode, PlayerGUI* _playerGUI)
 {
 	playerGUI = _playerGUI;
 	selectionMode = _mode;
 }
 
-void Map::closeSelection()
+void Map::cancelSelection()
 {
 	selectionMode = SelectionMode::NONE;
+
+	if (highlightedItem != nullptr)
+		highlightedItem->setHighlight(false);
 }
 
 void Map::acceptDiceThrow(int _dicesum)
@@ -336,10 +340,8 @@ void Map::acceptDiceThrow(int _dicesum)
 	}
 }
 
-void Map::sendCallbackFunction(SelectableMapItem * _item)
+void Map::sendSelection(SelectableMapItem * _item)
 {
-	Console::debug << "Send callback to PlayerGUI!" << std::endl;
-	selectionMode = SelectionMode::NONE;
 	playerGUI->acceptSelection(_item);
 }
 
@@ -350,10 +352,20 @@ void Map::checkItemsForClick(sf::Event _event )
 	sf::Vector2f point = renderWindow->mapPixelToCoords(sf::Vector2i(x, y));
 
 	switch (selectionMode) {
-		case SelectionMode::SELECT_LOCATION:
+		case SelectionMode::SELECT_CITY:
 			for (auto& lLocation : Locations) {
-				if (lLocation->isPointInEntity(point)) {
-					this->sendCallbackFunction(lLocation.get());
+				if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::VILLAGE) {
+					lLocation->setLocationSelectionMode(SelectableMapItem::LocationSelectionMode::CITY);
+					this->sendSelection(lLocation.get());
+					break;
+				}
+			}
+			break;
+		case SelectionMode::SELECT_VILLAGE:
+			for (auto& lLocation : Locations) {
+				if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::NONE ) {
+					lLocation->setLocationSelectionMode(SelectableMapItem::LocationSelectionMode::VILLAGE);
+					this->sendSelection(lLocation.get());
 					break;
 				}
 			}
@@ -361,7 +373,7 @@ void Map::checkItemsForClick(sf::Event _event )
 		case SelectionMode::SELECT_ROAD:
 			for (auto& lRoad : Roads) {
 				if (lRoad->isPointInEntity(point)) {
-					this->sendCallbackFunction(lRoad.get());
+					this->sendSelection(lRoad.get());
 					break;
 				}
 			}
@@ -387,9 +399,18 @@ void Map::checkItemsForHighlight(sf::Event _event)
 	sf::Vector2f point = renderWindow->mapPixelToCoords(sf::Vector2i(x, y));
 
 	switch (selectionMode) {
-	case SelectionMode::SELECT_LOCATION:
+	case SelectionMode::SELECT_CITY:
 		for (auto& lLocation : Locations) {
-			if (lLocation->isPointInEntity(point)) {
+			if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::VILLAGE ) {
+				lLocation->setHighlight(true);
+				highlightedItem = lLocation.get();
+				break;
+			}
+		}
+		break;
+	case SelectionMode::SELECT_VILLAGE:
+		for (auto& lLocation : Locations) {
+			if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::NONE) {
 				lLocation->setHighlight(true);
 				highlightedItem = lLocation.get();
 				break;

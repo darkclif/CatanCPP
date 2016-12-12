@@ -3,9 +3,9 @@
 #include <SFGUI/Widgets.hpp>
 
 const std::vector<Settings::PlayerConfig> Settings::playersConfig = {
-	PlayerConfig("Ignacy",sf::Color::Blue,Catan::Textures::AVATAR_1),
-	PlayerConfig("Jan",sf::Color::Yellow,Catan::Textures::AVATAR_2),
-	PlayerConfig("Karol",sf::Color::Red,Catan::Textures::AVATAR_3),
+	PlayerConfig("Papjesz",sf::Color::Blue,Catan::Textures::AVATAR_1),
+	PlayerConfig("Oleczka",sf::Color::Yellow,Catan::Textures::AVATAR_5),
+	PlayerConfig("Chynia",sf::Color::Red,Catan::Textures::AVATAR_6),
 	PlayerConfig("Maciej",sf::Color::Green,Catan::Textures::AVATAR_4)
 };
 

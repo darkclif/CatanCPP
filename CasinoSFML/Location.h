@@ -10,33 +10,38 @@ class Road;
 class Location : public DrawableEntity, public PlayerEntity, public SelectableMapItem
 {
 public:
-	enum Type {
+	enum class Type {
 		CITY,
-		VILLAGE
+		VILLAGE,
+		NONE
 	};
 
-	enum Bonus {
-		NONE,
+	enum class Bonus {
 		NORMAL_3_1,
 		CLAY_2_1,
 		WOOD_2_1,
 		WHEAT_2_1,
 		IRON_2_1,
-		SHEEP_2_1
+		SHEEP_2_1,
+		NONE
 	};
 
 	Location();
 	~Location();
 
-	// Control three roads
-	bool addRoad(Road* _road);
-	const std::vector<Road*>& getRoads();
+	bool						addRoad(Road* _road);
+	const std::vector<Road*>&	getRoads();
+
+	bool					isNeighbourLocation();
+	bool					isNearPlayerRoad(Player* _player);
 
 	sf::Texture&			getTexture();
 	void					draw(sf::RenderWindow& _window);
 
 	void					setType(Type _type);
 	Type					getType();
+
+	void					Build(Type _type, Player* _player, RoundType _round = RoundType::NORMAL);
 
 private:
 	std::vector<Road*>		arrRoads;

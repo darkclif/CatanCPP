@@ -2,21 +2,32 @@
 class SelectableMapItem
 {
 public:
-	enum Type {
+	enum Mode {
 		TILE,
 		LOCATION,
 		ROAD
 	};
 
-	Type		getType() const;
+	enum LocationSelectionMode {
+		CITY,
+		VILLAGE,
+		NONE
+	};
+
+	Mode					getMode() const;
+	LocationSelectionMode	getLocationSelectionMode() const;
+
+	void			setLocationSelectionMode(LocationSelectionMode _locationType);
 
 	bool		isHighlighted();
 	void		setHighlight(bool _light);
 
-	SelectableMapItem(Type _type) : itemType{ _type }, highlighted{false} {};
+	SelectableMapItem(Mode _mode) : mode{ _mode}, highlighted{ false }, locationSelectionMode{ LocationSelectionMode::NONE} {};
 	~SelectableMapItem();
 private:
-	Type		itemType;
-	bool		highlighted;
+	Mode					mode;
+	LocationSelectionMode	locationSelectionMode;
+
+	bool			highlighted;
 };
 

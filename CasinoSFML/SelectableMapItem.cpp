@@ -1,8 +1,18 @@
 #include "SelectableMapItem.h"
 
-SelectableMapItem::Type SelectableMapItem::getType() const
+SelectableMapItem::Mode SelectableMapItem::getMode() const
 {
-	return itemType;
+	return mode;
+}
+
+SelectableMapItem::LocationSelectionMode SelectableMapItem::getLocationSelectionMode() const
+{
+	return locationSelectionMode;
+}
+
+void SelectableMapItem::setLocationSelectionMode( LocationSelectionMode _locationSelectionMode)
+{
+	locationSelectionMode = _locationSelectionMode;
 }
 
 bool SelectableMapItem::isHighlighted()

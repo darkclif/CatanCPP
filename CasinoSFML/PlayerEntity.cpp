@@ -1,5 +1,15 @@
 #include "PlayerEntity.h"
 
+void PlayerEntity::setBuildRound(RoundType _round)
+{
+	buildRound = _round;
+}
+
+PlayerEntity::RoundType PlayerEntity::getBuildRound()
+{
+	return buildRound;
+}
+
 Player * PlayerEntity::getOwner()
 {
 	return owner;
