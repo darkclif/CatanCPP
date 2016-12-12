@@ -68,3 +68,20 @@ bool Road::isNeighbourWithLocation(Player * _player, RoundType _round)
 	}
 	return false;
 }
+
+bool Road::isBesidePlayerItem(Player * _player)
+{
+	for (auto& lLocation : arrLocations) {
+		if (lLocation->getOwner() == _player)
+			return true;
+
+		for (auto& lRoad : lLocation->getRoads()) {
+			if (lRoad == this)
+				continue;
+
+			if (lRoad->getOwner() == _player)
+				return true;
+		}
+	}
+	return false;
+}

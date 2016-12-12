@@ -26,6 +26,8 @@ public:
 	struct PhaseBuildings {
 		bool road = false;
 		bool village = false;
+
+		inline bool Completed() { return (road && village); }
 	};
 
 	Player( std::string _name, sf::Color _color, Catan::Textures::Name _avatar);

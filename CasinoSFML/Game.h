@@ -20,9 +20,9 @@ public:
 	enum ContentChange : unsigned int{
 		PLAYER_RESOURCE = 1,
 		CURRENT_PLAYER = 1 << 1,
-		THIEF_ACTIVATED = 1 << 2,
+		MENU_BUTTONS = 1 << 2,
 		ROUND_TYPE = 1 << 3,
-		ALL = PLAYER_RESOURCE | CURRENT_PLAYER | THIEF_ACTIVATED | ROUND_TYPE
+		ALL = PLAYER_RESOURCE | CURRENT_PLAYER | MENU_BUTTONS | ROUND_TYPE
 	};
 
 	enum RoundType : char{
@@ -36,15 +36,19 @@ public:
 	struct RoundInfo {
 		bool		isThrowed;
 		int			dices[2];
+		bool		isThiefAwaken;
+
 		RoundType	roundType;
 		int			roundNumber;
-
+		
 		RoundInfo() {
+			roundType = BEGINNING_FORWARD;
+			roundNumber = 0;
+
+			isThiefAwaken = false;
 			isThrowed = false;
 			dices[0] = 0;
 			dices[1] = 0;
-			roundType = BEGINNING_FORWARD;
-			roundNumber = 0;
 		}
 	};
 	/* END_Types */
@@ -61,9 +65,10 @@ public:
 	bool				getContentChange(unsigned int _change);
 
 	RoundType			getRoundType() const;
+	RoundInfo			getRoundInfo() const;
 
 private:
-	void				nextRound();
+	bool				nextRound();
 	Player*				getCurrentPlayer();
 
 	bool				throwDices();

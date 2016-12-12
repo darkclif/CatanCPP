@@ -30,38 +30,21 @@ void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 		showRoundInfo();
 	}
 
+	//if (game->getContentChange(Game::ContentChange::MENU_BUTTONS)) {
+		refreshMenuButtons();
+	//}
+
 	mainMenuPanel.applyPendingMenuChanges();
 }
 
 void PlayerGUI::acceptSelection(SelectableMapItem * _item)
 {
 	bool selectionCorrect = true;
-	Location* lLocation;
-
+	
 	switch (_item->getMode())
 	{
 		case SelectableMapItem::Mode::LOCATION:
-			lLocation = static_cast<Location*>(_item);
-
-			if ( lLocation->isNeighbourLocation()) {
-				selectionCorrect = false;
-				mainMenuPanel.ChangeBuildingMessage("You cannot build village one road away from another village!");
-				break;
-			}
-
-			if (_item->getLocationSelectionMode() == SelectableMapItem::LocationSelectionMode::CITY) {
-				if (lLocation->getOwner() != game->getCurrentPlayer()) {
-					selectionCorrect = false;
-					mainMenuPanel.ChangeBuildingMessage("You cannot upgrade your opponent village!");
-					break;
-				}
-				
-				requestCityBuild(static_cast<Location*>(_item));
-			}
-			
-			if (_item->getLocationSelectionMode() == SelectableMapItem::LocationSelectionMode::VILLAGE)
-				requestVillageBuild(static_cast<Location*>(_item));
-		
+			requestLocationBuild(static_cast<Location*>(_item));
 			break;
 		case SelectableMapItem::Mode::ROAD:
 			requestRoadBuild(static_cast<Road*>(_item));
@@ -71,13 +54,6 @@ void PlayerGUI::acceptSelection(SelectableMapItem * _item)
 			break;
 		default:
 			break;
-	}
-
-	// Pop prompt message 
-
-	if (selectionCorrect) {
-		mainMenuPanel.requestPopMenu();
-		map->cancelSelection();
 	}
 }
 
@@ -96,74 +72,143 @@ void PlayerGUI::resizeContent()
 void PlayerGUI::requestThrowDice()
 {
 	game->throwDices();
-	mainMenuPanel.ShowDiceButton(false);
 }
 
 void PlayerGUI::requestNextRound()
 {
-	game->nextRound();
-
-	playerInfoPanel.ChangePlayer(game->getCurrentPlayer());
-	mainMenuPanel.ShowDiceButton(true);
+	if (game->nextRound()) {
+		playerInfoPanel.ChangePlayer(game->getCurrentPlayer());
+	}
 }
 
-void PlayerGUI::requestCityBuild(Location * _location)
+void PlayerGUI::requestLocationBuild(Location * _location)
 {
-	game->buildCity(game->getCurrentPlayer(), _location);
-}
+	Player* lPlayer = game->getCurrentPlayer();
+	Game::RoundType lRoundType = game->getRoundType();
 
-void PlayerGUI::requestVillageBuild(Location * _location)
-{
-	game->buildVillage(game->getCurrentPlayer(), _location);
+	if (_location->isNeighbourLocation()) {
+		mainMenuPanel.ChangeBuildingMessage("You cannot build village one road away from another village!");
+		return;
+	}
+
+	if (_location->getLocationSelectionMode() == SelectableMapItem::LocationSelectionMode::CITY) {
+		if (_location->getOwner() != game->getCurrentPlayer()) {
+			mainMenuPanel.ChangeBuildingMessage("You cannot upgrade your opponent village!");
+			return;
+		}
+
+		game->buildCity(game->getCurrentPlayer(), _location);
+	}
+	else {  /* LocationSelectionMode::VILLAGE */
+
+		if (!(_location->isNearPlayerRoad(lPlayer)) && (lRoundType & Game::RoundType::NORMAL)) {
+			mainMenuPanel.ChangeBuildingMessage("You can only build village beside one of your road!");
+			return;
+		}
+
+		game->buildVillage(game->getCurrentPlayer(), _location);
+	}
+
+	mainMenuPanel.requestPopMenu();
+	map->cancelSelection();
 }
 
 void PlayerGUI::requestRoadBuild(Road * _road)
 {
+	Player* lPlayer = game->getCurrentPlayer();
+
+	if (!(_road->isBesidePlayerItem(lPlayer))) {
+		mainMenuPanel.ChangeBuildingMessage("Road can only be placed next to player city, village or road!");
+		return;
+	}
+
+	if (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD) {
+		
+		if (!(_road->isNeighbourWithLocation(lPlayer,Road::RoundType::BEGINNING_BACKWARD))) {
+			mainMenuPanel.ChangeBuildingMessage("Road must be places beside village placed in this turn!");
+			return;
+		}
+	}
+
 	game->buildRoad(game->getCurrentPlayer(), _road);
+
+	mainMenuPanel.requestPopMenu();
+	map->cancelSelection();
 }
 
 /* Map selections */
 void PlayerGUI::requestCitySelection()
 {
-	if (game->getRoundType() & Game::RoundType::BEGINNING) {
-		
-	}
-	else {/* RoundType::NORMAL */
-		if (game->canPlayerAffordItem(Game::Item::CITY, game->getCurrentPlayer())) {
-			map->requestSelection(Map::SelectionMode::SELECT_CITY, this);
+	if (game->getRoundType() & Game::RoundType::BEGINNING)
+		mainMenuPanel.requestPushInfo("In this phase you cannot build a city.", "OK");
+	
+	if (!(game->canPlayerAffordItem(Game::Item::CITY, game->getCurrentPlayer())))
+		mainMenuPanel.requestPushInfo("Not enough resources to build city.", "OK");
 
-			mainMenuPanel.ChangeBuildingMessage("Choose village for upgrading to city.");
-			mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
-		}
-		else {
-			mainMenuPanel.requestPushInfo("Not enough resources to build city.", "OK");
-		}
-	}
+	/* Succes */
+	map->requestSelection(Map::SelectionMode::SELECT_CITY, this);
+
+	mainMenuPanel.ChangeBuildingMessage("Choose village for upgrading to city.");
+	mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
 }
 
 void PlayerGUI::requestVillageSelection()
 {	
-	if (game->canPlayerAffordItem(Game::Item::VILLAGE, game->getCurrentPlayer())) {
-		map->requestSelection(Map::SelectionMode::SELECT_VILLAGE, this);
-
-		mainMenuPanel.ChangeBuildingMessage("Choose place to build village.");
-		mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
-	}
-	else {
+	if (!(game->canPlayerAffordItem(Game::Item::VILLAGE, game->getCurrentPlayer()))) {
+	
 		mainMenuPanel.requestPushInfo("Not enough resources to build village.", "OK");
+		return;
 	}
+
+	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).village
+		&& (game->getRoundType() & Game::RoundType::BEGINNING_FORWARD)) {
+		
+		mainMenuPanel.requestPushInfo("You have already build one village in this phase.", "OK");
+		return;
+	}
+
+	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).village
+		&& (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD)) {
+
+		mainMenuPanel.requestPushInfo("You have already build one village in this phase.", "OK");
+		return;
+	}
+
+	/* Succes */
+	map->requestSelection(Map::SelectionMode::SELECT_VILLAGE, this);
+
+	mainMenuPanel.ChangeBuildingMessage("Choose place to build village.");
+	mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
 }
 
 void PlayerGUI::requestRoadSelection()
 {
-	if (game->canPlayerAffordItem(Game::Item::ROAD, game->getCurrentPlayer())) {
-		map->requestSelection(Map::SelectionMode::SELECT_ROAD, this);
+	if (!(game->canPlayerAffordItem(Game::Item::ROAD, game->getCurrentPlayer()))) {
 
-		mainMenuPanel.ChangeBuildingMessage("Choose place to build road.");
-		mainMenuPanel.requestPushMenu( MainMenuPanel::Menu::MENU_BUILDING_MESSAGE );
-	}else {
-		mainMenuPanel.requestPushInfo("Not enough resources to build road.","OK");
+		mainMenuPanel.requestPushInfo("Not enough resources to build road.", "OK");
+		return;
 	}
+
+	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).road
+		&& (game->getRoundType() & Game::RoundType::BEGINNING_FORWARD)) {
+
+		mainMenuPanel.requestPushInfo("You have already build one road in this phase.", "OK");
+		return;
+	}
+
+	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).road
+		&& (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD)) {
+
+		mainMenuPanel.requestPushInfo("You have already build one road in this phase.", "OK");
+		return;
+	}
+
+	/* Succes */
+	map->requestSelection(Map::SelectionMode::SELECT_ROAD, this);
+
+	mainMenuPanel.ChangeBuildingMessage("Choose place to build road.");
+	mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
+
 }
 
 void PlayerGUI::requestSelectionCancel()
@@ -225,6 +270,40 @@ void PlayerGUI::setupGUI()
 	sfg_desktop.Add(mainWindow);
 }
 
+void PlayerGUI::refreshMenuButtons()
+{
+	mainMenuPanel.ShowAllButtons();
+	
+	Game::RoundType lRoundType = game->getRoundType();
+	Player* lPlayer = game->getCurrentPlayer();
+
+	/* Throw dices */
+	if ( lRoundType & Game::BEGINNING ) {
+		mainMenuPanel.ShowButton(MainMenuPanel::Button::THROW_DICES, false);
+		mainMenuPanel.ShowButton(MainMenuPanel::Button::BUILD_CITY, false);
+
+
+		if (lRoundType & Game::BEGINNING_FORWARD) {
+			if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_FORWARD).Completed()))
+				mainMenuPanel.ShowButton(MainMenuPanel::Button::END_ROUND, false);
+
+		}
+		else { /* Game::BEGINNING_BACKWARD */
+			if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_BACKWARD).Completed()))
+				mainMenuPanel.ShowButton(MainMenuPanel::Button::END_ROUND, false);
+
+		}
+	}
+	else {/* Game::NORMAL */
+		if(game->getRoundInfo().isThrowed)
+			mainMenuPanel.ShowButton(MainMenuPanel::Button::THROW_DICES, false);
+		else
+			mainMenuPanel.ShowButton(MainMenuPanel::Button::END_ROUND, false);
+		 
+			
+	}
+}
+
 void PlayerGUI::changeMouseOver(bool _state)
 {
 	isMouseOver = _state;
@@ -271,9 +350,19 @@ void PlayerGUI::MainMenuPanel::ChangeBuildingMessage(std::string _message)
 	labBuildingMessage->SetText(_message);
 }
 
-void PlayerGUI::MainMenuPanel::ShowDiceButton(bool _show)
+void PlayerGUI::MainMenuPanel::ShowButton(Button _button, bool _show)
 {
-	btnDiceThrow->Show(_show);
+	if (mapButtons.find(_button) != mapButtons.end()) {
+		auto lButton = mapButtons.at(_button);
+		lButton->Show(_show);
+	}
+}
+
+void PlayerGUI::MainMenuPanel::ShowAllButtons()
+{
+	for ( auto& lElem : mapButtons) {
+		lElem.second->Show(true);
+	}
 }
 
 void PlayerGUI::MainMenuPanel::requestPushInfo(std::string _text, std::string _btnText)
@@ -330,7 +419,7 @@ void PlayerGUI::MainMenuPanel::RefreshMenusVisibility()
 sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuMain()
 {
 	// Buttons
-	btnDiceThrow = sfg::Button::Create("Throw dices");
+	sfg::Button::Ptr btnDiceThrow = sfg::Button::Create("Throw dices");
 	btnDiceThrow->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestThrowDice, playerGUI));
 	
 	sfg::Button::Ptr btnBuild = sfg::Button::Create("Build");
@@ -338,6 +427,10 @@ sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuMain()
 
 	sfg::Button::Ptr btnNextRound = sfg::Button::Create("End round");
 	btnNextRound->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestNextRound, playerGUI));
+
+	mapButtons.insert({ Button::THROW_DICES, btnDiceThrow });
+	mapButtons.insert({ Button::BUILD_MENU, btnBuild });
+	mapButtons.insert({ Button::END_ROUND, btnNextRound });
 
 	// Box
 	sfg::Box::Ptr boxMenuMainAction = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
@@ -364,6 +457,10 @@ sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuBuilding()
 	
 	sfg::Button::Ptr btnBuildCancel = sfg::Button::Create("Cancel");	
 	btnBuildCancel->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&MainMenuPanel::requestPopMenu, this));
+
+	mapButtons.insert({ Button::BUILD_ROAD, btnBuildRoad });
+	mapButtons.insert({ Button::BUILD_CITY, btnBuildCity});
+	mapButtons.insert({ Button::BUILD_VILLAGE, btnBuildVillage });
 
 	// Box
 	sfg::Box::Ptr boxMenuMainBuild = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);

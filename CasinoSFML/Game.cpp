@@ -36,15 +36,15 @@ Game::Game(int _players, Map* _map) : gameMap{ _map }, numPlayers{ _players }, c
 		);
 	}
 
-	/*TEST */
+	roundInfo = RoundInfo();
+	numCurrentPlayer = 0;
+
+	/*TEST*/
 	for (auto& lPlayer : arrPlayers) {
 		int a = 100;
 		lPlayer.giveResources(ResourceBag(a,a,a,a,a));
 	}
 	/*END_TEST*/
-
-	roundInfo = RoundInfo();
-	numCurrentPlayer = 0;
 }
 
 
@@ -128,6 +128,9 @@ bool Game::buildCity(Player * _player, Location * _location)
 
 bool Game::buildRoad(Player * _player, Road * _road)
 {
+	if (_road->hasOwner())
+		return false;
+
 	if ( getRoundType() == RoundType::BEGINNING_FORWARD ) {
 		if (!(_road->isNeighbourWithLocation(_player, Road::RoundType::BEGINNING_FORWARD)))
 			return false;
@@ -152,6 +155,9 @@ bool Game::buildRoad(Player * _player, Road * _road)
 		if (!(canPlayerAffordItem(Item::ROAD, _player)))
 			return false;
 
+		if (!(_road->isBesidePlayerItem(_player)))
+			return false;
+
 		_player->takeResources(buildingsCosts.at(Item::ROAD));
 		_road->setOwner(_player);
 
@@ -161,7 +167,7 @@ bool Game::buildRoad(Player * _player, Road * _road)
 	return true;
 }
 
-void Game::nextRound()
+bool Game::nextRound()
 {
 	switch (getRoundType()) {
 		case RoundType::NORMAL: 
@@ -169,6 +175,9 @@ void Game::nextRound()
 			numCurrentPlayer %= numPlayers;
 			break;
 		case RoundType::BEGINNING_FORWARD:
+			if (!(getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).Completed()))
+				return false;
+
 			numCurrentPlayer++;
 			if (numCurrentPlayer == numPlayers) {
 				setRoundType( RoundType::BEGINNING_BACKWARD);
@@ -176,6 +185,9 @@ void Game::nextRound()
 			}
 			break;
 		case RoundType::BEGINNING_BACKWARD:
+			if (!(getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).Completed()))
+				return false;
+			
 			numCurrentPlayer--;
 			if (numCurrentPlayer == -1) {
 				setRoundType(RoundType::NORMAL);
@@ -190,18 +202,24 @@ void Game::nextRound()
 	}
 
 	roundInfo.isThrowed = false;
+	roundInfo.isThiefAwaken = false;
 	roundInfo.dices[0] = 0;
 	roundInfo.dices[1] = 0;
 	roundInfo.roundNumber++;
 
 	addContentChange(ContentChange::CURRENT_PLAYER);
+	addContentChange(ContentChange::ROUND_TYPE);
 
 	Console::info << "Current player: " << getCurrentPlayer()->getName() << std::endl;
+	return true;
 }
 
 bool Game::throwDices()
 {
 	if (roundInfo.isThrowed)
+		return false;
+
+	if (!(getRoundType() == RoundType::NORMAL))
 		return false;
 
 	roundInfo.isThrowed = true;
@@ -213,9 +231,10 @@ bool Game::throwDices()
 		gameMap->acceptDiceThrow(getDiceSum());
 	}
 	else {
-		// Change thief state
+		roundInfo.isThiefAwaken = true;
 	}
 
+	addContentChange(ContentChange::MENU_BUTTONS);
 	Console::info << "Dices throwed! (" << roundInfo.dices[0] << "," << roundInfo.dices[1] << ")" << std::endl;
 	return true;
 }
@@ -223,6 +242,11 @@ bool Game::throwDices()
 Game::RoundType Game::getRoundType() const
 {
 	return roundInfo.roundType;
+}
+
+Game::RoundInfo Game::getRoundInfo() const
+{
+	return roundInfo;
 }
 
 void Game::setRoundType(RoundType _type)

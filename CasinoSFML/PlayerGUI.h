@@ -28,8 +28,7 @@ private:
 	void		requestThrowDice();
 	void		requestNextRound();
 
-	void		requestCityBuild(Location*);
-	void		requestVillageBuild(Location*);
+	void		requestLocationBuild(Location*);
 	void		requestRoadBuild(Road*);
 
 	/* Map selection request */
@@ -52,12 +51,25 @@ private:
 
 	class MainMenuPanel : public Panel{
 		public:
+			/* Structs */
 			enum Menu { /* Main menu states */
 				MENU_MAIN,
 				MENU_BUILDING,
 				MENU_BUILDING_MESSAGE,
 				MENU_MESSAGE,
 				_SIZE
+			};
+
+			enum class Button : int {
+				/* MENU_MAIN */
+				THROW_DICES,
+				BUILD_MENU,
+				END_ROUND,
+
+				/* MENU_BUILDING */
+				BUILD_ROAD,
+				BUILD_CITY,
+				BUILD_VILLAGE,
 			};
 
 			struct PendingMenuChange {
@@ -69,12 +81,15 @@ private:
 				PendingMenuChange(Action _action, Menu _menu) : action{ _action }, menu{ _menu } {}
 				PendingMenuChange(Action _action ) : action{ _action }, menu{ /*not used*/ Menu::_SIZE } {}
 			};
+			/* END_Structs */
 
 			void			applyPendingMenuChanges();
 
 			/* Actions to change menu elements */
 			void ChangeBuildingMessage(std::string _message);
-			void ShowDiceButton(bool _show);
+
+			void ShowButton(Button _button, bool _show = true);
+			void ShowAllButtons();
 
 			void requestPushInfo(std::string _text, std::string _btnText);
 			void requestPushMenu(Menu _menu);
@@ -103,9 +118,10 @@ private:
 			PlayerGUI* playerGUI;
 
 			/* Elements which are changable */
+			std::map<Button,sfg::Button::Ptr>	mapButtons;
+			
 			sfg::Label::Ptr		labBuildingMessage;
-			sfg::Button::Ptr	btnDiceThrow;
-
+			
 			sfg::Label::Ptr		labMessage;
 			sfg::Button::Ptr	btnReturn;
 	};
@@ -171,6 +187,7 @@ private:
 private:
 	void				setupGUI();
 
+	void				refreshMenuButtons();
 	void				changeMouseOver(bool _state);
 
 private:

@@ -21,6 +21,7 @@ public:
 	void				draw( sf::RenderWindow& _window );
 
 	bool				isNeighbourWithLocation(Player* _player, RoundType _round = RoundType::ANY);
+	bool				isBesidePlayerItem(Player* _player);
 
 private:
 

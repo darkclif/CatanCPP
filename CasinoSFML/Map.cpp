@@ -372,7 +372,7 @@ void Map::checkItemsForClick(sf::Event _event )
 			break;
 		case SelectionMode::SELECT_ROAD:
 			for (auto& lRoad : Roads) {
-				if (lRoad->isPointInEntity(point)) {
+				if (lRoad->isPointInEntity(point) && !(lRoad->hasOwner())) {
 					this->sendSelection(lRoad.get());
 					break;
 				}
@@ -419,7 +419,7 @@ void Map::checkItemsForHighlight(sf::Event _event)
 		break;
 	case SelectionMode::SELECT_ROAD:
 		for (auto& lRoad : Roads) {
-			if (lRoad->isPointInEntity(point)) {
+			if (lRoad->isPointInEntity(point) && !(lRoad->hasOwner())) {
 				lRoad->setHighlight(true);
 				highlightedItem = lRoad.get();
 				break;
