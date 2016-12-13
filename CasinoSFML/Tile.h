@@ -53,15 +53,18 @@ class Tile : public DrawableEntity, public SelectableMapItem
 public:
 	// Type of tiles
 	enum TileType : int {
-		WOOD,
-		SHEEP,
-		CLAY,
-		IRON,
-		WHEAT,		
-		DESERT,	
+		WOOD = 1,
+		SHEEP = 1 << 1,
+		CLAY = 1 << 2,
+		IRON = 1 << 3,
+		WHEAT = 1 << 4,
+		DESERT = 1 << 5,
+		
+		BLANK = 1 << 6,		// Resource to assign 
+		NOT_USED = 1 << 7,
 
-		BLANK,		// To assign 
-		NOT_USED,
+		RESOURCE = WOOD | SHEEP | CLAY | IRON | WHEAT,
+
 		__ENUM_SIZE
 	};
 
@@ -113,7 +116,7 @@ private:
 	std::unique_ptr<Thief>						thiefEntity;
 	std::unique_ptr<DiceNumber>					numberEntity;
 
-	static const Catan::Textures::Name			arrTileToTexture[TileType::__ENUM_SIZE];
+	static const std::map<TileType,Catan::Textures::Name>	mapTypeToTexture;
 	static const std::map<TileType,Resource>	mapTypeToResource;
 };
 

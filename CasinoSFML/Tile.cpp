@@ -76,15 +76,15 @@ sf::Texture & Thief::getTexture()
 //
 // Tile
 //
-const Catan::Textures::Name Tile::arrTileToTexture[ TileType::__ENUM_SIZE ] = {
-	Catan::Textures::Name::TILE_WOOD,
-	Catan::Textures::Name::TILE_SHEEP,
-	Catan::Textures::Name::TILE_CLAY,
-	Catan::Textures::Name::TILE_IRON,
-	Catan::Textures::Name::TILE_WHEAT,
-	Catan::Textures::Name::TILE_DESERT,
-	Catan::Textures::Name::TILE_BLANK,	
-	Catan::Textures::Name::TILE_NOT_USED,
+const std::map<Tile::TileType, Catan::Textures::Name>	Tile::mapTypeToTexture = {
+	{ TileType::WOOD, Catan::Textures::Name::TILE_WOOD},
+	{ TileType::SHEEP, Catan::Textures::Name::TILE_SHEEP },
+	{ TileType::CLAY, Catan::Textures::Name::TILE_CLAY },
+	{ TileType::IRON, Catan::Textures::Name::TILE_IRON },
+	{ TileType::WHEAT, Catan::Textures::Name::TILE_WHEAT },
+	{ TileType::DESERT, Catan::Textures::Name::TILE_DESERT },
+	{ TileType::BLANK, Catan::Textures::Name::TILE_BLANK },
+	{ TileType::NOT_USED, Catan::Textures::Name::TILE_NOT_USED }
 };
 
 const std::map<Tile::TileType, Resource> Tile::mapTypeToResource = {
@@ -175,7 +175,7 @@ void Tile::setDiceNumber(int _number)
 
 sf::Texture& Tile::getTexture()
 {
-	Catan::Textures::Name lTextureName = arrTileToTexture[(int)type];
+	Catan::Textures::Name lTextureName = mapTypeToTexture.at(type);
 	return ResourceManager::getInstance().getTexture( lTextureName );
 }
 
@@ -300,5 +300,10 @@ void Tile::setInitJump(int _jump)
 
 Resource Tile::getResourceType()
 {
+	if (mapTypeToResource.find(type) == mapTypeToResource.end()) {
+		Console::debug << "There is no resource assign to this type of tile!" << std::endl;
+		throw std::logic_error("");
+	}
+	
 	return mapTypeToResource.find(type)->second;
 }

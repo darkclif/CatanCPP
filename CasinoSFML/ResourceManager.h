@@ -18,8 +18,8 @@ public:
 	};
 
 	// Resource acccesors 
-	sf::Texture& getTexture( Catan::Textures::Name _texName );
-	sf::Font& getFont(Catan::Fonts::Name _fontName );
+	sf::Texture&	getTexture( Catan::Textures::Name _texName );
+	sf::Font&		getFont(Catan::Fonts::Name _fontName );
 
 private:
 

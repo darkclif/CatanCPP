@@ -24,6 +24,7 @@ void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 	}
 	if (game->getContentChange(Game::ContentChange::CURRENT_PLAYER)) {
 		resourcesPanel.ChangePlayer(game->getCurrentPlayer());
+		infoPanel.ChangeDiceSum(game->getDiceSum());
 	}
 
 	if (game->getContentChange(Game::ContentChange::ROUND_TYPE)) {
@@ -71,7 +72,9 @@ void PlayerGUI::resizeContent()
 //
 void PlayerGUI::requestThrowDice()
 {
-	game->throwDices();
+	if (game->throwDices()) {
+		infoPanel.ChangeDiceSum(game->getDiceSum());
+	}
 }
 
 void PlayerGUI::requestNextRound()
@@ -557,28 +560,41 @@ void PlayerGUI::PlayerInfoPanel::buildInterface()
 	boxWrapper->Pack(boxSecondRow);
 }
 
-void PlayerGUI::InfoPanel::ChangeInfo(std::string _info)
-{
-	labInfo->SetText(_info);
-}
-
 //
 // [InfoPanel]
 //
 PlayerGUI::InfoPanel::InfoPanel()
 {
 	buildInterface();
+	ChangeDiceSum(0);
+}
+
+void PlayerGUI::InfoPanel::ChangeInfo(std::string _info)
+{
+	labInfo->SetText(_info);
+}
+
+void PlayerGUI::InfoPanel::ChangeDiceSum(int _dice)
+{
+	std::string lPrefix = "Dice: ";
+	std::string lNumber = ((_dice > 1 && _dice < 13) ? std::to_string(_dice) : "-");
+
+	labDiceSum->SetText(lPrefix + lNumber);
 }
 
 void PlayerGUI::InfoPanel::buildInterface()
 {
 	// Widgets
+	labDiceSum = sfg::Label::Create();
+
 	labInfo = sfg::Label::Create("[Info]");
 	labInfo->SetLineWrap(true);
 	labInfo->SetRequisition(sf::Vector2f(200.f, 0));
 
 	// Box
 	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
+	boxWrapper->Pack(labDiceSum);
+	boxWrapper->Pack(sfg::Separator::Create());
 	boxWrapper->Pack(labInfo);
 }
 

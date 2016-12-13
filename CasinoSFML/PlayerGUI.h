@@ -149,6 +149,8 @@ private:
 		void		ChangeInfo(std::string _info);
 		inline void ClearInfo() { ChangeInfo(""); };
 
+		void		ChangeDiceSum(int _dice);
+
 		InfoPanel();
 
 	private:
@@ -157,6 +159,7 @@ private:
 	private:
 		/* Elements which are changable */
 		sfg::Label::Ptr		labInfo;
+		sfg::Label::Ptr		labDiceSum;
 	};
 
 	class ResourcesPanel : public Panel {

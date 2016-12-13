@@ -39,6 +39,7 @@ public:
 	friend class PlayerGUI;
 public:
 	void			acceptDiceThrow( int _dicesum);
+	void			giveInitialResources();
 
 private:
 	void			sendSelection(SelectableMapItem* _item);

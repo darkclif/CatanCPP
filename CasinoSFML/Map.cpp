@@ -340,6 +340,14 @@ void Map::acceptDiceThrow(int _dicesum)
 	}
 }
 
+void Map::giveInitialResources()
+{
+	for (auto& lTile : inGameTiles) {
+		if( lTile->getType() & Tile::TileType::RESOURCE)
+			lTile->giveResourceToPlayers();
+	}
+}
+
 void Map::sendSelection(SelectableMapItem * _item)
 {
 	playerGUI->acceptSelection(_item);

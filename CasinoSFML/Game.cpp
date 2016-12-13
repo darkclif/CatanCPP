@@ -44,6 +44,8 @@ Game::Game(int _players, Map* _map) : gameMap{ _map }, numPlayers{ _players }, c
 		int a = 100;
 		lPlayer.giveResources(ResourceBag(a,a,a,a,a));
 	}
+
+	setRoundType(RoundType::NORMAL);
 	/*END_TEST*/
 }
 
@@ -192,6 +194,8 @@ bool Game::nextRound()
 			if (numCurrentPlayer == -1) {
 				setRoundType(RoundType::NORMAL);
 				numCurrentPlayer = 0;
+
+				gameMap->giveInitialResources();
 			}
 			break;
 		default: 
