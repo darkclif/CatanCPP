@@ -41,26 +41,47 @@ private:
 private:
 	class Panel {
 	public:
-		sfg::Box::Ptr getBox();
-	
+		sfg::Box::Ptr	getBox();
+		virtual void	Refresh(Game*) = 0;
+
+		// Show Widget with enum
+		template<typename W>
+		void ShowWidget(W _widget, bool show = true) {
+			if (mapWidgets.find((int)_widget) == mapWidgets.end()) {
+				Console::debug << "Given Widget does not exist in panel." << std::endl;
+				return;
+			}
+			
+			mapWidgets.at((int)_widget)->Show(show);
+		}
+
+		// Return Widget with enum and cast to Type
+		template<typename W, typename Type>
+		std::shared_ptr<Type> getWidget(W _widget) {
+			if (mapWidgets.find((int)_widget) == mapWidgets.end()) {
+				Console::debug << "Given Widget does not exist in panel." << std::endl;
+				return nullptr;
+			}
+
+			return std::static_pointer_cast<Type>( mapWidgets.at((int)_widget) );
+		}
+
+		void ShowAllWidgets();
+
+		Panel();
+
 	protected:
 		virtual void buildInterface() = 0;
 
 		sfg::Box::Ptr boxWrapper;
+
+		/* Elements which are changable */
+		std::map<int, sfg::Widget::Ptr>	mapWidgets;
 	};
 
 	class MainMenuPanel : public Panel{
 		public:
-			/* Structs */
-			enum Menu { /* Main menu states */
-				MENU_MAIN,
-				MENU_BUILDING,
-				MENU_BUILDING_MESSAGE,
-				MENU_MESSAGE,
-				_SIZE
-			};
-
-			enum class Button : int {
+			enum class Widget : int {
 				/* MENU_MAIN */
 				THROW_DICES,
 				BUILD_MENU,
@@ -70,6 +91,21 @@ private:
 				BUILD_ROAD,
 				BUILD_CITY,
 				BUILD_VILLAGE,
+
+				/* MENU_BUILDING_MESSAGE */
+				BUILD_MESSAGE,
+
+				/* MENU_MESSAGE */
+				INFO_MESSAGE
+			};
+
+			/* Menu navigation stack */
+			enum class Menu { /* Main menu states */
+				MENU_MAIN,
+				MENU_BUILDING,
+				MENU_BUILDING_MESSAGE,
+				MENU_INFO,
+				_SIZE
 			};
 
 			struct PendingMenuChange {
@@ -81,26 +117,24 @@ private:
 				PendingMenuChange(Action _action, Menu _menu) : action{ _action }, menu{ _menu } {}
 				PendingMenuChange(Action _action ) : action{ _action }, menu{ /*not used*/ Menu::_SIZE } {}
 			};
-			/* END_Structs */
-
-			void			applyPendingMenuChanges();
+			/* END_Menu navigation stack */
 
 			/* Actions to change menu elements */
 			void ChangeBuildingMessage(std::string _message);
 
-			void ShowButton(Button _button, bool _show = true);
-			void ShowAllButtons();
-
-			void requestPushInfo(std::string _text, std::string _btnText);
+			void requestPushInfo(std::string _text);
 			void requestPushMenu(Menu _menu);
 			void requestPopMenu();
+
+			void Refresh(Game* _game);
+			void Update();
 
 			MainMenuPanel(PlayerGUI* _playerGUI);
 
 		private:
 			void buildInterface();
-			void packMenusToBox();
 			
+			void applyPendingMenuChanges();
 			void RefreshMenusVisibility();
 
 			/* Menus creators */
@@ -111,68 +145,57 @@ private:
 
 		private:
 			std::map<Menu, sfg::Box::Ptr>	menuStorage;
-
 			std::stack<Menu>				menuStack;
+
 			std::vector<PendingMenuChange>	pendingChanges;
 
 			PlayerGUI* playerGUI;
-
-			/* Elements which are changable */
-			std::map<Button,sfg::Button::Ptr>	mapButtons;
-			
-			sfg::Label::Ptr		labBuildingMessage;
-			
-			sfg::Label::Ptr		labMessage;
-			sfg::Button::Ptr	btnReturn;
 	};
 	
 	class PlayerInfoPanel: public Panel {
 	public:
-		void ChangePlayer( Player* _player);
-		void Refresh();
+		enum class Widget : int{
+			IMG_AVATAR,
+			LAB_NAME
+		};
 
-		PlayerInfoPanel( Player* _player);
+		void Refresh(Game* _game);
+
+		PlayerInfoPanel();
 	
 	private:
 		void buildInterface();
-
-	private:
-		Player* player;
-
-		/* Elements which are changable */
-		sfg::Label::Ptr		labPlayerName;
-		sfg::Image::Ptr		imgAvatar;
 	};
 
 	class InfoPanel: public Panel {
 	public:
-		void		ChangeInfo(std::string _info);
-		inline void ClearInfo() { ChangeInfo(""); };
+		enum class Widget {
+			LABEL_TILE,
+			LABEL_TURN_NUMBER,
+			LABEL_DICE,
+			LABEL_INFO
+		};
 
-		void		ChangeDiceSum(int _dice);
+		void	Refresh(Game* _game);
 
 		InfoPanel();
 
 	private:
 		void buildInterface();
-
-	private:
-		/* Elements which are changable */
-		sfg::Label::Ptr		labInfo;
-		sfg::Label::Ptr		labDiceSum;
 	};
 
 	class ResourcesPanel : public Panel {
 	public:
-		void ChangePlayer(Player* _player);
-		void Refresh();
+		void Refresh(Game* _game);
 
-		ResourcesPanel(Player* _player);
+		template<typename W>
+		void ShowWidget(W _widget, bool _show = true) = delete;
+		void ShowAllWidgets() = delete;
+
+		ResourcesPanel();
 
 	private:
 		void buildInterface();
-
-		Player* player;
 
 		/* Elements which are changable */
 		std::vector<sfg::Label::Ptr>	labCountResources;
@@ -186,11 +209,9 @@ private:
 	ResourcesPanel		resourcesPanel;
 	MainMenuPanel		mainMenuPanel;
 
-	void				showRoundInfo();
 private:
 	void				setupGUI();
 
-	void				refreshMenuButtons();
 	void				changeMouseOver(bool _state);
 
 private:

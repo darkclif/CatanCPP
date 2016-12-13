@@ -9,8 +9,12 @@ const std::vector<Settings::PlayerConfig> Settings::playersConfig = {
 	PlayerConfig("Maciej",sf::Color::Green,Catan::Textures::AVATAR_4)
 };
 
-const void Settings::setSfguiStyles()
-{
-	// sfg::Context::Get().GetEngine().SetProperty("Box#playerInfo", "BackgroundColor", sf::Color(0, 50, 120, 255));
+#define SfgProp sfg::Context::Get().GetEngine()
 
+void Settings::setSfguiStyles()
+{
+	// Template: sfg::Context::Get().GetEngine().SetProperty("Box#playerInfo", "BackgroundColor", sf::Color(0, 50, 120, 255));
+	
+	/* .title */
+	SfgProp.SetProperty("Label.title", "FontSize", 15);
 }

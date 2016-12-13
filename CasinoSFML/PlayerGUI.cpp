@@ -1,14 +1,19 @@
 #include "PlayerGUI.h"
 #include "Map.h"
+#include "Settings.h"
 
 PlayerGUI::PlayerGUI(sfg::SFGUI & _sfgui, sfg::Desktop & _desktop, Game * _game, Map * _map)
 	: sfg_sfgui{ _sfgui }, sfg_desktop{ _desktop }, game{ _game }, map{ _map },
-	mainMenuPanel(this),
-	playerInfoPanel(_game->getCurrentPlayer()),
-	resourcesPanel(_game->getCurrentPlayer())
+	mainMenuPanel(this), playerInfoPanel(), resourcesPanel()
 {	
 	setupGUI();
 	UpdateGUI(sf::Time());
+
+	mainMenuPanel.Refresh(game);
+	playerInfoPanel.Refresh(game);
+	resourcesPanel.Refresh(game);
+
+	Settings::setSfguiStyles();
 }
 
 PlayerGUI::~PlayerGUI()
@@ -20,22 +25,19 @@ PlayerGUI::~PlayerGUI()
 //
 void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 	if (game->getContentChange(Game::ContentChange::PLAYER_RESOURCE)) {
-		resourcesPanel.Refresh();
-	}
-	if (game->getContentChange(Game::ContentChange::CURRENT_PLAYER)) {
-		resourcesPanel.ChangePlayer(game->getCurrentPlayer());
-		infoPanel.ChangeDiceSum(game->getDiceSum());
+		resourcesPanel.Refresh(game);
 	}
 
-	if (game->getContentChange(Game::ContentChange::ROUND_TYPE)) {
-		showRoundInfo();
+	if (game->getContentChange(Game::ContentChange::CURRENT_PLAYER)) {
+		resourcesPanel.Refresh(game);
+		infoPanel.Refresh(game);
 	}
 
 	//if (game->getContentChange(Game::ContentChange::MENU_BUTTONS)) {
-		refreshMenuButtons();
+		mainMenuPanel.Refresh(game);
 	//}
 
-	mainMenuPanel.applyPendingMenuChanges();
+	mainMenuPanel.Update();
 }
 
 void PlayerGUI::acceptSelection(SelectableMapItem * _item)
@@ -67,20 +69,18 @@ void PlayerGUI::resizeContent()
 {
 }
 
-//
-// Requests
-//
+/* Requests to Game object */
 void PlayerGUI::requestThrowDice()
 {
 	if (game->throwDices()) {
-		infoPanel.ChangeDiceSum(game->getDiceSum());
+		infoPanel.Refresh(game);
 	}
 }
 
 void PlayerGUI::requestNextRound()
 {
 	if (game->nextRound()) {
-		playerInfoPanel.ChangePlayer(game->getCurrentPlayer());
+		playerInfoPanel.Refresh(game);
 	}
 }
 
@@ -143,10 +143,10 @@ void PlayerGUI::requestRoadBuild(Road * _road)
 void PlayerGUI::requestCitySelection()
 {
 	if (game->getRoundType() & Game::RoundType::BEGINNING)
-		mainMenuPanel.requestPushInfo("In this phase you cannot build a city.", "OK");
+		mainMenuPanel.requestPushInfo("In this phase you cannot build a city.");
 	
 	if (!(game->canPlayerAffordItem(Game::Item::CITY, game->getCurrentPlayer())))
-		mainMenuPanel.requestPushInfo("Not enough resources to build city.", "OK");
+		mainMenuPanel.requestPushInfo("Not enough resources to build city.");
 
 	/* Succes */
 	map->requestSelection(Map::SelectionMode::SELECT_CITY, this);
@@ -159,21 +159,21 @@ void PlayerGUI::requestVillageSelection()
 {	
 	if (!(game->canPlayerAffordItem(Game::Item::VILLAGE, game->getCurrentPlayer()))) {
 	
-		mainMenuPanel.requestPushInfo("Not enough resources to build village.", "OK");
+		mainMenuPanel.requestPushInfo("Not enough resources to build village.");
 		return;
 	}
 
 	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).village
 		&& (game->getRoundType() & Game::RoundType::BEGINNING_FORWARD)) {
 		
-		mainMenuPanel.requestPushInfo("You have already build one village in this phase.", "OK");
+		mainMenuPanel.requestPushInfo("You have already build one village in this phase.");
 		return;
 	}
 
 	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).village
 		&& (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD)) {
 
-		mainMenuPanel.requestPushInfo("You have already build one village in this phase.", "OK");
+		mainMenuPanel.requestPushInfo("You have already build one village in this phase.");
 		return;
 	}
 
@@ -188,21 +188,21 @@ void PlayerGUI::requestRoadSelection()
 {
 	if (!(game->canPlayerAffordItem(Game::Item::ROAD, game->getCurrentPlayer()))) {
 
-		mainMenuPanel.requestPushInfo("Not enough resources to build road.", "OK");
+		mainMenuPanel.requestPushInfo("Not enough resources to build road.");
 		return;
 	}
 
 	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).road
 		&& (game->getRoundType() & Game::RoundType::BEGINNING_FORWARD)) {
 
-		mainMenuPanel.requestPushInfo("You have already build one road in this phase.", "OK");
+		mainMenuPanel.requestPushInfo("You have already build one road in this phase.");
 		return;
 	}
 
 	if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).road
 		&& (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD)) {
 
-		mainMenuPanel.requestPushInfo("You have already build one road in this phase.", "OK");
+		mainMenuPanel.requestPushInfo("You have already build one road in this phase.");
 		return;
 	}
 
@@ -217,27 +217,6 @@ void PlayerGUI::requestRoadSelection()
 void PlayerGUI::requestSelectionCancel()
 {
 	map->cancelSelection();
-}
-
-void PlayerGUI::showRoundInfo()
-{
-	Game::RoundType lRoundType = game->getRoundType();
-	std::string lMessage = "";
-
-	switch (lRoundType) {
-		case Game::BEGINNING_FORWARD: 
-			lMessage = "You must build one village and road baside this village for free. Then end the round.";
-			break;
-		case Game::BEGINNING_BACKWARD: 
-			lMessage = "You must build one village and road baside this village for free, turns will go opposite. Then end the round.";
-			break;
-		case Game::NORMAL: 
-			lMessage = "Throw dices and do some actions, then end the round.";
-			break;
-		default: break;
-	}
-
-	infoPanel.ChangeInfo(lMessage);
 }
 
 //
@@ -273,57 +252,95 @@ void PlayerGUI::setupGUI()
 	sfg_desktop.Add(mainWindow);
 }
 
-void PlayerGUI::refreshMenuButtons()
-{
-	mainMenuPanel.ShowAllButtons();
-	
-	Game::RoundType lRoundType = game->getRoundType();
-	Player* lPlayer = game->getCurrentPlayer();
-
-	/* Throw dices */
-	if ( lRoundType & Game::BEGINNING ) {
-		mainMenuPanel.ShowButton(MainMenuPanel::Button::THROW_DICES, false);
-		mainMenuPanel.ShowButton(MainMenuPanel::Button::BUILD_CITY, false);
-
-
-		if (lRoundType & Game::BEGINNING_FORWARD) {
-			if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_FORWARD).Completed()))
-				mainMenuPanel.ShowButton(MainMenuPanel::Button::END_ROUND, false);
-
-		}
-		else { /* Game::BEGINNING_BACKWARD */
-			if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_BACKWARD).Completed()))
-				mainMenuPanel.ShowButton(MainMenuPanel::Button::END_ROUND, false);
-
-		}
-	}
-	else {/* Game::NORMAL */
-		if(game->getRoundInfo().isThrowed)
-			mainMenuPanel.ShowButton(MainMenuPanel::Button::THROW_DICES, false);
-		else
-			mainMenuPanel.ShowButton(MainMenuPanel::Button::END_ROUND, false);
-		 
-			
-	}
-}
-
 void PlayerGUI::changeMouseOver(bool _state)
 {
 	isMouseOver = _state;
 }
 
+///
+/// PANELS AND MENUS
+///
+
+//
+// [Panel]
+//
+sfg::Box::Ptr PlayerGUI::Panel::getBox()
+{
+	return boxWrapper;
+}
+
+void PlayerGUI::Panel::ShowAllWidgets()
+{
+	for (auto& lWidget : mapWidgets) {
+		lWidget.second->Show(true);
+	}
+}
+
+PlayerGUI::Panel::Panel()
+{
+}
+
 //
 // [MainMenuManager]
 //
-PlayerGUI::MainMenuPanel::MainMenuPanel(PlayerGUI * _playerGUI)
+PlayerGUI::MainMenuPanel::MainMenuPanel(PlayerGUI * _playerGUI) : playerGUI{_playerGUI}
 {
-	this->playerGUI = _playerGUI;
-
 	buildInterface();
-	packMenusToBox();
 
 	menuStack.push(Menu::MENU_MAIN);
 	RefreshMenusVisibility();
+}
+
+void PlayerGUI::MainMenuPanel::Refresh(Game * _game)
+{
+	ShowAllWidgets();
+
+	Game::RoundInfo lRoundInfo = _game->getRoundInfo();
+	Player* lPlayer = _game->getCurrentPlayer();
+
+	/* Throw dices */
+	if (lRoundInfo.roundType & Game::BEGINNING) {
+		ShowWidget(Widget::THROW_DICES, false);
+		ShowWidget(Widget::BUILD_CITY, false);
+
+
+		if (lRoundInfo.roundType & Game::BEGINNING_FORWARD) {
+			if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_FORWARD).Completed()))
+				ShowWidget(Widget::END_ROUND, false);
+
+		}
+		else { /* Game::BEGINNING_BACKWARD */
+			if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_BACKWARD).Completed()))
+				ShowWidget(Widget::END_ROUND, false);
+
+		}
+	}
+	else {/* Game::NORMAL */
+		if (lRoundInfo.isThrowed)
+			ShowWidget(Widget::THROW_DICES, false);
+		else
+			ShowWidget(Widget::END_ROUND, false);
+
+	}
+}
+
+void PlayerGUI::MainMenuPanel::Update()
+{
+	applyPendingMenuChanges();
+}
+
+void PlayerGUI::MainMenuPanel::buildInterface()
+{
+	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_MAIN, createMenuMain()));
+	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_BUILDING, createMenuBuilding()));
+	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_BUILDING_MESSAGE, createMenuBuildingMessage()));
+	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_INFO, createMenuMessage()));
+
+	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
+
+	for (auto menu_it : menuStorage) {
+		boxWrapper->Pack(menu_it.second);
+	}
 }
 
 void PlayerGUI::MainMenuPanel::applyPendingMenuChanges()
@@ -350,30 +367,14 @@ void PlayerGUI::MainMenuPanel::applyPendingMenuChanges()
 
 void PlayerGUI::MainMenuPanel::ChangeBuildingMessage(std::string _message)
 {
-	labBuildingMessage->SetText(_message);
+	getWidget<Widget, sfg::Label>(Widget::BUILD_MESSAGE)->SetText(_message);
 }
 
-void PlayerGUI::MainMenuPanel::ShowButton(Button _button, bool _show)
+void PlayerGUI::MainMenuPanel::requestPushInfo(std::string _text)
 {
-	if (mapButtons.find(_button) != mapButtons.end()) {
-		auto lButton = mapButtons.at(_button);
-		lButton->Show(_show);
-	}
-}
+	getWidget<Widget, sfg::Label>(Widget::INFO_MESSAGE)->SetText(_text);
 
-void PlayerGUI::MainMenuPanel::ShowAllButtons()
-{
-	for ( auto& lElem : mapButtons) {
-		lElem.second->Show(true);
-	}
-}
-
-void PlayerGUI::MainMenuPanel::requestPushInfo(std::string _text, std::string _btnText)
-{
-	labMessage->SetText(_text);
-	btnReturn = sfg::Button::Create(_btnText);
-
-	requestPushMenu(Menu::MENU_MESSAGE);
+	requestPushMenu(Menu::MENU_INFO);
 }
 
 void PlayerGUI::MainMenuPanel::requestPushMenu(Menu _menu)
@@ -386,27 +387,10 @@ void PlayerGUI::MainMenuPanel::requestPopMenu()
 	pendingChanges.push_back(PendingMenuChange(PendingMenuChange::Action::POP));
 }
 
-void PlayerGUI::MainMenuPanel::buildInterface()
-{
-	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_MAIN, createMenuMain()) );
-	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_BUILDING, createMenuBuilding()));
-	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_BUILDING_MESSAGE, createMenuBuildingMessage()));
-	menuStorage.insert(std::pair<Menu, sfg::Box::Ptr>(Menu::MENU_MESSAGE, createMenuMessage()));
-}
-
-void PlayerGUI::MainMenuPanel::packMenusToBox()
-{
-	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	for ( auto menu_it : menuStorage ) {
-		boxWrapper->Pack(menu_it.second);
-	}
-}
-
 void PlayerGUI::MainMenuPanel::RefreshMenusVisibility()
 {
-	for (auto menu_it : menuStorage ) {
-		menu_it.second->Show(false);
+	for (auto lMenu : menuStorage ) {
+		lMenu.second->Show(false);
 	}
 
 	if (!menuStack.empty()) {
@@ -416,74 +400,75 @@ void PlayerGUI::MainMenuPanel::RefreshMenusVisibility()
 	}
 }
 
-//
 // [MainMenuManager] - MenuCreators
-//
 sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuMain()
 {
 	// Buttons
-	sfg::Button::Ptr btnDiceThrow = sfg::Button::Create("Throw dices");
+	auto btnDiceThrow = sfg::Button::Create("Throw dices");
 	btnDiceThrow->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestThrowDice, playerGUI));
 	
-	sfg::Button::Ptr btnBuild = sfg::Button::Create("Build");
+	auto btnBuild = sfg::Button::Create("Build");
 	btnBuild->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&MainMenuPanel::requestPushMenu, this, Menu::MENU_BUILDING));
 
-	sfg::Button::Ptr btnNextRound = sfg::Button::Create("End round");
+	auto btnNextRound = sfg::Button::Create("End round");
 	btnNextRound->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestNextRound, playerGUI));
 
-	mapButtons.insert({ Button::THROW_DICES, btnDiceThrow });
-	mapButtons.insert({ Button::BUILD_MENU, btnBuild });
-	mapButtons.insert({ Button::END_ROUND, btnNextRound });
+	mapWidgets.insert({ (int)Widget::THROW_DICES, btnDiceThrow });
+	mapWidgets.insert({ (int)Widget::BUILD_MENU, btnBuild });
+	mapWidgets.insert({ (int)Widget::END_ROUND, btnNextRound });
 
 	// Box
-	sfg::Box::Ptr boxMenuMainAction = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
-	boxMenuMainAction->Pack(btnDiceThrow, true);
-	boxMenuMainAction->Pack(btnBuild, true);
-	boxMenuMainAction->Pack(btnNextRound, true);
+	sfg::Box::Ptr lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
+	lBox->Pack(btnDiceThrow, true);
+	lBox->Pack(btnBuild, true);
+	lBox->Pack(btnNextRound, true);
 
-	boxMenuMainAction->SetId("playerInfo");
+	lBox->SetId("playerInfo");
 
-	return boxMenuMainAction;
+	return lBox;
 }
 
 sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuBuilding()
 {
-	// Buttons
-	sfg::Button::Ptr btnBuildRoad = sfg::Button::Create("Build road");
+	// Widgets
+	auto btnBuildRoad = sfg::Button::Create("Build road");
 	btnBuildRoad->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestRoadSelection, playerGUI));
 
-	sfg::Button::Ptr btnBuildVillage = sfg::Button::Create("Build village");
+	auto btnBuildVillage = sfg::Button::Create("Build village");
 	btnBuildVillage->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestVillageSelection, playerGUI));
 	
-	sfg::Button::Ptr btnBuildCity = sfg::Button::Create("Build city");
+	auto btnBuildCity = sfg::Button::Create("Build city");
 	btnBuildCity->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestCitySelection, playerGUI));
 	
-	sfg::Button::Ptr btnBuildCancel = sfg::Button::Create("Cancel");	
+	auto btnBuildCancel = sfg::Button::Create("Cancel");
 	btnBuildCancel->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&MainMenuPanel::requestPopMenu, this));
 
-	mapButtons.insert({ Button::BUILD_ROAD, btnBuildRoad });
-	mapButtons.insert({ Button::BUILD_CITY, btnBuildCity});
-	mapButtons.insert({ Button::BUILD_VILLAGE, btnBuildVillage });
+	mapWidgets.insert({ (int)Widget::BUILD_ROAD, btnBuildRoad });
+	mapWidgets.insert({ (int)Widget::BUILD_CITY, btnBuildCity});
+	mapWidgets.insert({ (int)Widget::BUILD_VILLAGE, btnBuildVillage });
 
 	// Box
-	sfg::Box::Ptr boxMenuMainBuild = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
-	boxMenuMainBuild->Pack(btnBuildRoad, true);
-	boxMenuMainBuild->Pack(btnBuildCity, true);
-	boxMenuMainBuild->Pack(btnBuildVillage, true);
-	boxMenuMainBuild->Pack(btnBuildCancel, true);
+	auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
+	lBox->Pack(btnBuildRoad, true);
+	lBox->Pack(btnBuildCity, true);
+	lBox->Pack(btnBuildVillage, true);
+	lBox->Pack(btnBuildCancel, true);
 
-	return boxMenuMainBuild;
+	return lBox;
 }
 
 sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuBuildingMessage()
 {
-	labBuildingMessage = sfg::Label::Create("[Info builing messege]");
+	// Widgets
+	auto labBuildingMessage = sfg::Label::Create("[Info builing messege]");
 	labBuildingMessage->SetLineWrap(true);
 	labBuildingMessage->SetRequisition(sf::Vector2f(200.f, 0));
 	
-	sfg::Button::Ptr btnReturn = sfg::Button::Create("Cancel");
+	auto btnReturn = sfg::Button::Create("Cancel");
 	btnReturn->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestSelectionCancel, playerGUI));
 	btnReturn->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&MainMenuPanel::requestPopMenu, this));
+
+	mapWidgets.insert({(int)Widget::BUILD_MESSAGE, labBuildingMessage});
 
 	// Box
 	sfg::Box::Ptr lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
@@ -495,16 +480,19 @@ sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuBuildingMessage()
 
 sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuMessage()
 {
-	labMessage = sfg::Label::Create("[Info messege]");
-	labMessage->SetLineWrap(true);
-	labMessage->SetRequisition(sf::Vector2f(200.f,0));
+	// Widgets
+	auto labInfo = sfg::Label::Create("[Info messege]");
+	labInfo->SetLineWrap(true);
+	labInfo->SetRequisition(sf::Vector2f(200.f,0));
 
-	sfg::Button::Ptr btnReturn = sfg::Button::Create("OK");
+	auto btnReturn = sfg::Button::Create("OK");
 	btnReturn->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&MainMenuPanel::requestPopMenu, this));
 
+	mapWidgets.insert({(int)Widget::INFO_MESSAGE, labInfo});
+
 	// Box
-	sfg::Box::Ptr lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
-	lBox->Pack(labMessage, false);
+	auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
+	lBox->Pack(labInfo, false);
 	lBox->Pack(btnReturn, true);
 
 	return lBox;
@@ -513,31 +501,26 @@ sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuMessage()
 //
 // [PlayerInfoPanel]
 //
-void PlayerGUI::PlayerInfoPanel::ChangePlayer(Player * _player)
-{
-	player = _player;
-	Refresh();
-}
-
-void PlayerGUI::PlayerInfoPanel::Refresh()
-{
-	// Change avatar 
-	sf::Texture& tex = ResourceMgr.getTexture(player->getAvatarTexture());
-	sf::Image lImage = tex.copyToImage();
-
-	imgAvatar->SetImage(lImage);
-
-	// Change name
-	labPlayerName->SetText(player->getName());
-
-	sfg::Context::Get().GetEngine().SetProperty("Label#playerName","Color",player->getColor());
-	labPlayerName->SetId("playerName");
-}
-
-PlayerGUI::PlayerInfoPanel::PlayerInfoPanel(Player * _player) : player{ _player }
+PlayerGUI::PlayerInfoPanel::PlayerInfoPanel() : Panel()
 {
 	buildInterface();
-	Refresh();
+}
+
+void PlayerGUI::PlayerInfoPanel::Refresh(Game* _game)
+{
+	Player* lPlayer = _game->getCurrentPlayer();
+
+	// Change avatar 
+	sf::Texture& tex = ResourceMgr.getTexture(lPlayer->getAvatarTexture());
+	sf::Image lImage = tex.copyToImage();
+
+	getWidget<Widget, sfg::Image>(Widget::IMG_AVATAR)->SetImage(lImage);
+
+	// Change name
+	getWidget<Widget, sfg::Label>(Widget::LAB_NAME)->SetText(lPlayer->getName());
+
+	sfg::Context::Get().GetEngine().SetProperty("Label#playerName","Color",lPlayer->getColor());
+	getWidget<Widget, sfg::Label>(Widget::LAB_NAME)->SetId("playerName");
 }
 
 void PlayerGUI::PlayerInfoPanel::buildInterface()
@@ -545,14 +528,18 @@ void PlayerGUI::PlayerInfoPanel::buildInterface()
 	// Widgets
 	/* 1 row */
 	sfg::Label::Ptr labTitle = sfg::Label::Create("Current player:");
-	
-	/* 2 row */
-	imgAvatar = sfg::Image::Create();
-	labPlayerName = sfg::Label::Create("[player_name]");
+	labTitle->SetClass("title");
 
-	sfg::Box::Ptr boxSecondRow = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 10.f);
+	/* 2 row */
+	auto imgAvatar = sfg::Image::Create();
+	auto labPlayerName = sfg::Label::Create("[player_name]");
+
+	auto boxSecondRow = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 10.f);
 	boxSecondRow->Pack(imgAvatar, false);
 	boxSecondRow->Pack(labPlayerName, true);
+
+	mapWidgets.insert({ (int)Widget::IMG_AVATAR, imgAvatar });
+	mapWidgets.insert({ (int)Widget::LAB_NAME, labPlayerName });
 
 	// Box
 	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
@@ -563,69 +550,109 @@ void PlayerGUI::PlayerInfoPanel::buildInterface()
 //
 // [InfoPanel]
 //
-PlayerGUI::InfoPanel::InfoPanel()
+PlayerGUI::InfoPanel::InfoPanel() : Panel()
 {
-	buildInterface();
-	ChangeDiceSum(0);
+	buildInterface();	
 }
 
-void PlayerGUI::InfoPanel::ChangeInfo(std::string _info)
+void PlayerGUI::InfoPanel::Refresh(Game * _game)
 {
-	labInfo->SetText(_info);
-}
+	Game::RoundInfo lRoundInfo = _game->getRoundInfo();
 
-void PlayerGUI::InfoPanel::ChangeDiceSum(int _dice)
-{
-	std::string lPrefix = "Dice: ";
-	std::string lNumber = ((_dice > 1 && _dice < 13) ? std::to_string(_dice) : "-");
+	int lDice[2];
+	lDice[0] = lRoundInfo.dices[0];
+	lDice[1] = lRoundInfo.dices[1];
 
-	labDiceSum->SetText(lPrefix + lNumber);
+	Game::RoundType lRoundType = lRoundInfo.roundType;
+	int lTurnNumber = lRoundInfo.roundNumber;
+
+	// Turn number
+	std::string lTurnNumberString = "Turn number: " + std::to_string(lTurnNumber);
+	getWidget<InfoPanel::Widget, sfg::Label>(Widget::LABEL_TURN_NUMBER)->SetText(lTurnNumberString);
+
+	// Dice 
+	if (lRoundType & Game::RoundType::NORMAL) {
+		std::string lPrefix = "Dice: ";
+		std::string lDiceString = ""; 
+		int lDiceSum = lDice[0] + lDice[1];
+
+		if (lDiceSum > 1 && lDiceSum < 13)
+			lDiceString = "[" + std::to_string(lDice[0]) + "]" +
+					  "[" + std::to_string(lDice[1]) + "]" +
+					  "=(" + std::to_string(lDiceSum) + ")";
+		else 
+			lDiceString = "-";
+
+		getWidget<InfoPanel::Widget, sfg::Label>(Widget::LABEL_DICE)->SetText(lPrefix + lDiceString);
+		ShowWidget<InfoPanel::Widget>(Widget::LABEL_DICE);
+	}
+	else {
+		ShowWidget<InfoPanel::Widget>(Widget::LABEL_DICE, false);
+	}
+
+	std::string lInfo = "";
+
+	// Info
+	switch (lRoundType) {
+	case Game::BEGINNING_FORWARD:
+		lInfo = "You must build one village and road baside this village for free. Then end the round.";
+		break;
+	case Game::BEGINNING_BACKWARD:
+		lInfo = "You must build one village and road baside this village for free, turns will go opposite. Then end the round.";
+		break;
+	case Game::NORMAL:
+		lInfo = "Throw dices and do some actions, then end the round.";
+		break;
+	default: break;
+	}
+
+	getWidget<InfoPanel::Widget, sfg::Label>(Widget::LABEL_INFO)->SetText(lInfo);
 }
 
 void PlayerGUI::InfoPanel::buildInterface()
 {
 	// Widgets
-	labDiceSum = sfg::Label::Create();
+	auto labTitle = sfg::Label::Create("Current turn:");
+	labTitle->SetClass("title");
+	
+	auto labTurnNumber = sfg::Label::Create();
+	auto labDiceSum = sfg::Label::Create();
 
-	labInfo = sfg::Label::Create("[Info]");
+	auto labInfo = sfg::Label::Create("[Info]");
 	labInfo->SetLineWrap(true);
 	labInfo->SetRequisition(sf::Vector2f(200.f, 0));
 
+	mapWidgets.insert({ (int)Widget::LABEL_TILE, labTitle });
+	mapWidgets.insert({ (int)Widget::LABEL_TURN_NUMBER, labTurnNumber });
+	mapWidgets.insert({ (int)Widget::LABEL_DICE, labDiceSum });
+	mapWidgets.insert({ (int)Widget::LABEL_INFO, labInfo });
+
 	// Box
 	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
+	boxWrapper->Pack(labTitle);
+	boxWrapper->Pack(labTurnNumber);
 	boxWrapper->Pack(labDiceSum);
+	
 	boxWrapper->Pack(sfg::Separator::Create());
 	boxWrapper->Pack(labInfo);
 }
 
-sfg::Box::Ptr PlayerGUI::Panel::getBox()
-{
-	return boxWrapper;
-}
-
-
 //
 // [ResourcesMenu]
 //
-void PlayerGUI::ResourcesPanel::ChangePlayer(Player * _player)
+PlayerGUI::ResourcesPanel::ResourcesPanel() : Panel()
 {
-	player = _player;
-	Refresh();
+	buildInterface();
 }
 
-void PlayerGUI::ResourcesPanel::Refresh()
+void PlayerGUI::ResourcesPanel::Refresh(Game* _game)
 {
-	ResourceBag lPlayerResources = player->getResources();
+	Player* lPlayer = _game->getCurrentPlayer();
+	ResourceBag lPlayerResources = lPlayer->getResources();
 
 	for (int i = 0; i < Resource::_SIZE; i++) {
 		labCountResources[i]->SetText(std::to_string(lPlayerResources[i]));
 	}
-}
-
-PlayerGUI::ResourcesPanel::ResourcesPanel(Player * _player) : player{_player}
-{
-	buildInterface();
-	Refresh();
 }
 
 void PlayerGUI::ResourcesPanel::buildInterface()

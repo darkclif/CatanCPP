@@ -22,7 +22,7 @@ public:
 	};
 
 	/* SFGUI Styles set*/
-	static const void setSfguiStyles();
+	static void setSfguiStyles();
 
 	/* Settings storage*/
 	static const std::vector<Settings::PlayerConfig> playersConfig;
