@@ -56,7 +56,7 @@ private:
 	sf::Color				color;
 
 	// Player items
-	int						items[(int)(Item::_SIZE)];
+	std::vector<int>		items;
 	ResourceBag				playerResources;
 
 	// Beginning phases states

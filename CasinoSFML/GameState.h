@@ -10,11 +10,11 @@
 class GameState : public State
 {
 public:
-	const float MOVE_SPEED = 500.0f;
+	const float MOVE_SPEED = 1000.0f;
 
 	enum ActionKey : int{
-		ZOOM_IN,
-		ZOOM_OUT,
+		ZOOM_IN,	//obsolete
+		ZOOM_OUT,	//obsolete
 		LEFT,
 		RIGHT,
 		UP,
@@ -47,10 +47,24 @@ private:
 
 	std::unique_ptr<PlayerGUI>	playerGUI;
 
+	/* SFGUI */
 	sfg::SFGUI					sfg_sfgui;
 	sfg::Desktop				sfg_desktop;
 
 	/* Navigation */
 	std::vector<bool>			actionKeysStates;
+
+private:
+	/* Table */
+	class TableEntity : public DrawableEntity {
+	public:
+		void draw(sf::RenderWindow& _window);
+
+		TableEntity();
+	private:
+		sf::Texture& getTexture();
+
+	} tableEntity;
+
 };
 

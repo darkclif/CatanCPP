@@ -32,15 +32,17 @@ public:
 	void			Update(sf::Time _dt);
 
 	sf::Vector2i	getNeighborTile( bool & _status, sf::Vector2i _sourceTile, int _number );
-	
-	void			requestSelection(SelectionMode _mode, PlayerGUI* _playerGUI);
-	void			cancelSelection();
 
 	friend class PlayerGUI;
+
 public:
+	/* Game flow */
 	void			acceptDiceThrow( int _dicesum);
 	void			giveInitialResources();
 	void			clearAllThiefs();
+
+	void			requestSelection(SelectionMode _mode, PlayerGUI* _playerGUI);
+	void			cancelSelection();
 
 private:
 	void			sendSelection(SelectableMapItem* _item);
@@ -52,6 +54,7 @@ private:
 	void			checkItemsForClick( sf::Event _event );
 	void			checkItemsForHighlight(sf::Event _event);
 
+private:
 	// Default map size
 	static const int MAP_EDGE = 5;
 	int width;
@@ -60,15 +63,16 @@ private:
 	sf::RenderWindow* renderWindow;
 	void ComputeRender();
 
-	Tile* getTile(sf::Vector2i _vector);
-	Tile* getTile(int _x, int _y);
+	// Tiles 
+	std::vector< Tile* >	inGameTiles;
+	Tile*					getTile(sf::Vector2i _vector);
+	Tile*					getTile(int _x, int _y);
 
-	// All tiles
-	std::vector< std::vector<std::unique_ptr<Tile>> > tiles;	// All tiles []
-
-	std::vector< Tile* >					inGameTiles;					
-	std::vector<std::unique_ptr<Location>> Locations;
-	std::vector<std::unique_ptr<Road>>		Roads;
+	// Drawable entities
+	std::vector<std::vector<std::unique_ptr<Tile>>> arrTiles;
+				
+	std::vector<std::unique_ptr<Location>>	arrLocations;
+	std::vector<std::unique_ptr<Road>>		arrRoads;
 
 	/* Circle-style map deploy -- 19 tiles (5x5) */
 	void setupCircleMap();

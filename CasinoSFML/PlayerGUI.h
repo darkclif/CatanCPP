@@ -189,6 +189,11 @@ private:
 
 	class ResourcesPanel : public Panel {
 	public:
+		enum class Widget {
+			LAB_CITY,
+			LAB_VILLAGE
+		};
+
 		void Refresh(Game* _game);
 
 		template<typename W>
@@ -202,6 +207,7 @@ private:
 
 		sfg::Box::Ptr buildPageResources();
 		sfg::Box::Ptr buildPageCosts();
+		sfg::Box::Ptr buildPageUnits();
 
 		/* Elements which are changable */
 		std::vector<sfg::Label::Ptr>	labCountResources;

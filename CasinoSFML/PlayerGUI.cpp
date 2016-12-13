@@ -691,6 +691,7 @@ void PlayerGUI::ResourcesPanel::buildInterface()
 
 	nbkNotebook->AppendPage(buildPageResources(), sfg::Label::Create("Resources"));
 	nbkNotebook->AppendPage(buildPageCosts(), sfg::Label::Create("Costs"));
+	nbkNotebook->AppendPage(buildPageUnits(), sfg::Label::Create("Units"));
 
 	boxWrapper->Pack(nbkNotebook);
 }
@@ -748,7 +749,7 @@ sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageCosts()
 		{Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_SHEEP, Catan::Textures::ICON_IRON }
 	};
 
-	for (int i = 0; i < costNames.size(); i++ ) {
+	for (sf::Uint32 i = 0; i < costNames.size(); i++ ) {
 		auto lResBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 2.f);
 		
 		auto labName = sfg::Label::Create(costNames[i]);
@@ -761,6 +762,27 @@ sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageCosts()
 		}
 
 		lBox->Pack(lResBox);
+	}
+
+	return lBox;
+}
+
+sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageUnits()
+{
+	auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 2.f);
+
+	std::vector<Catan::Textures::Name> textureNames = {
+		Catan::Textures::ICON_VILLAGE,
+		Catan::Textures::ICON_CITY
+	};
+
+	for ( auto& lUnit : textureNames ) {
+		auto lBoxRow = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 2.f);
+
+		auto imgUnit = sfg::Image::Create(ResourceMgr.getTexture(lUnit).copyToImage());
+		lBoxRow->Pack(imgUnit, false);
+	
+		// TODO
 	}
 
 	return lBox;

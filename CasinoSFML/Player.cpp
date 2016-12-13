@@ -7,6 +7,7 @@ Player::Player(std::string _name, sf::Color _color, Catan::Textures::Name _avata
 	color = _color;
 	avatarTexture = _avatar;
 
+	items.resize((int)Item::_SIZE);
 	giveItem(Item::CITY, 4);
 	giveItem(Item::VILLAGE, 5);
 	giveItem(Item::ROAD, 15);

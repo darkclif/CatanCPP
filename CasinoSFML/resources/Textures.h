@@ -14,6 +14,7 @@ namespace Catan {
 			BIG_LOGO,
 			LOGO,
 			MENU_BG_2,
+			TABLE,
 
 			/* Avatars */
 			AVATAR_1,
@@ -23,12 +24,14 @@ namespace Catan {
 			AVATAR_5,
 			AVATAR_6,
 
-			/* Resources icons*/
+			/* Icons*/
 			ICON_WOOD,
 			ICON_WHEAT,
 			ICON_SHEEP,
 			ICON_CLAY,
 			ICON_IRON,
+			ICON_CITY,
+			ICON_VILLAGE,
 
 			/* Map */
 			TEXTURE_ERROR,

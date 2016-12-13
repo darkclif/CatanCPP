@@ -18,8 +18,6 @@ bool GameState::HandleEvents(sf::Event _event)
 			case sf::Keyboard::Right: changeActionKeyState(ActionKey::RIGHT, true); break;
 			case sf::Keyboard::Up: changeActionKeyState(ActionKey::UP, true);  break;
 			case sf::Keyboard::Down: changeActionKeyState(ActionKey::DOWN, true);  break;
-			case sf::Keyboard::Q: changeActionKeyState(ActionKey::ZOOM_OUT, true);  break;
-			case sf::Keyboard::A: changeActionKeyState(ActionKey::ZOOM_IN, true);  break;
 			default:break;
 		}
 	}
@@ -31,8 +29,6 @@ bool GameState::HandleEvents(sf::Event _event)
 			case sf::Keyboard::Right: changeActionKeyState(ActionKey::RIGHT, false); break;
 			case sf::Keyboard::Up: changeActionKeyState(ActionKey::UP, false);  break;
 			case sf::Keyboard::Down: changeActionKeyState(ActionKey::DOWN, false);  break;
-			case sf::Keyboard::Q: changeActionKeyState(ActionKey::ZOOM_OUT, false);  break;
-			case sf::Keyboard::A: changeActionKeyState(ActionKey::ZOOM_IN, false);  break;
 			default:break;
 		}
 	}
@@ -45,18 +41,47 @@ bool GameState::Update(sf::Time _dt)
 	sfg_desktop.Update(_dt.asSeconds());
 	playerGUI->UpdateGUI(_dt);
 
-	if(isActionKeyPressed(ActionKey::LEFT)) Catan::moveView(context.window, sf::Vector2f(-MOVE_SPEED * _dt.asSeconds(), 0.f));
-	if(isActionKeyPressed(ActionKey::RIGHT)) Catan::moveView(context.window, sf::Vector2f(MOVE_SPEED * _dt.asSeconds(), 0.f));
-	if(isActionKeyPressed(ActionKey::UP)) Catan::moveView(context.window, sf::Vector2f(0.f, -MOVE_SPEED * _dt.asSeconds()));
-	if(isActionKeyPressed(ActionKey::DOWN)) Catan::moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
-	if(isActionKeyPressed(ActionKey::ZOOM_IN)) Catan::zoomView(context.window, 1.2f);
-	if(isActionKeyPressed(ActionKey::ZOOM_OUT)) Catan::zoomView(context.window, 0.8f);
+	// Check if view is not out of table
+	struct { float top, down, left, right; } boundView, boundTable;
+
+	/* View */
+	const float OFFSET = 10.f;
+
+	sf::Vector2i lPoint1(0,0);
+	sf::Vector2i lPoint2(context.window->getSize());
+
+	sf::Vector2f lFloatPoint1 = context.window->mapPixelToCoords(lPoint1);
+	sf::Vector2f lFloatPoint2 = context.window->mapPixelToCoords(lPoint2);
+
+	boundView.left = lFloatPoint1.x + OFFSET;
+	boundView.right = lFloatPoint2.x - OFFSET;
+	boundView.top = lFloatPoint1.y + OFFSET;
+	boundView.down = lFloatPoint2.y - OFFSET;
+
+	/* Table */
+	sf::FloatRect lTableRect = tableEntity.getSpriteGlobalBounds();
+
+	boundTable.left = lTableRect.left;
+	boundTable.right = lTableRect.left + lTableRect.width;
+	boundTable.top = lTableRect.top;
+	boundTable.down = lTableRect.top + lTableRect.height;
+
+	// Move screen
+	if(isActionKeyPressed(ActionKey::LEFT) && (boundView.left > boundTable.left)) 
+		Catan::moveView(context.window, sf::Vector2f(-MOVE_SPEED * _dt.asSeconds(), 0.f));
+	if(isActionKeyPressed(ActionKey::RIGHT) && (boundView.right < boundTable.right))
+		Catan::moveView(context.window, sf::Vector2f(MOVE_SPEED * _dt.asSeconds(), 0.f));
+	if(isActionKeyPressed(ActionKey::UP) && (boundView.top > boundTable.top))
+		Catan::moveView(context.window, sf::Vector2f(0.f, -MOVE_SPEED * _dt.asSeconds()));
+	if(isActionKeyPressed(ActionKey::DOWN) && (boundView.down < boundTable.down))
+		Catan::moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
 
 	return true;
 }
 
 void GameState::Draw(sf::RenderWindow & _window)
 {
+	tableEntity.draw(_window);
 	map->Draw(_window);
 	sfg_sfgui.Display(_window);
 }
@@ -85,8 +110,9 @@ GameState::GameState(StateManager * _engine, Context _context): State(_engine, _
 
 	map = std::make_unique<Map>(_context.window);
 	game = std::make_unique<Game>(3, map.get());
-
 	playerGUI = std::make_unique<PlayerGUI>(sfg_sfgui, sfg_desktop, game.get(), map.get());
+
+	Catan::zoomView(context.window, 3.f);
 
 	spawnGUI();
 }
@@ -101,4 +127,30 @@ GameState::~GameState()
 void GameState::exitGame() {
 	requestStackPop();
 	requestStackPush(States::MAIN_MENU);
+}
+
+//
+// [Table]
+//
+void GameState::TableEntity::draw(sf::RenderWindow & _window)
+{
+	sf::Sprite tmpSprite(getSprite());
+	tmpSprite.setTexture(getTexture());
+
+	Catan::setOriginAtCenter(tmpSprite);
+
+	_window.draw(tmpSprite);
+}
+
+GameState::TableEntity::TableEntity()
+{
+	setTexture(ResourceMgr.getTexture(Catan::Textures::Name::TABLE));
+
+	setScale(8.f,8.f);
+	setPosition(sf::Vector2f(610.f,-800.f));
+}
+
+sf::Texture & GameState::TableEntity::getTexture()
+{
+	return ResourceMgr.getTexture(Catan::Textures::Name::TABLE);
 }

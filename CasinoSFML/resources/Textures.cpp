@@ -37,7 +37,8 @@ namespace Catan {
 		{ Textures::LOGO,"textures/logo.png" },
 		{ Textures::BIG_LOGO,"textures/big_logo.png" },
 		{ Textures::MENU_BG_2,"textures/menu_bg_2.png" },
-		
+		{ Textures::TABLE,"textures/table.png" },
+
 		/** PLAYER_AVATARS **/
 		{ Textures::AVATAR_1,"textures/avatars/avatar_1.png" },
 		{ Textures::AVATAR_2,"textures/avatars/avatar_2.png" },
@@ -46,12 +47,14 @@ namespace Catan {
 		{ Textures::AVATAR_5,"textures/avatars/avatar_5.png" },
 		{ Textures::AVATAR_6,"textures/avatars/avatar_6.png" },
 
-		/** RESOURCES ICONS **/
-		{ Textures::ICON_WOOD, "textures/res_icons/wood_icon.png" },
-		{ Textures::ICON_WHEAT, "textures/res_icons/wheat_icon.png" },
-		{ Textures::ICON_SHEEP, "textures/res_icons/sheep_icon.png" },
-		{ Textures::ICON_CLAY, "textures/res_icons/clay_icon.png" },
-		{ Textures::ICON_IRON, "textures/res_icons/iron_icon.png" },
+		/** ICONS **/
+		{ Textures::ICON_WOOD, "textures/icons/wood_icon.png" },
+		{ Textures::ICON_WHEAT, "textures/icons/wheat_icon.png" },
+		{ Textures::ICON_SHEEP, "textures/icons/sheep_icon.png" },
+		{ Textures::ICON_CLAY, "textures/icons/clay_icon.png" },
+		{ Textures::ICON_IRON, "textures/icons/iron_icon.png" },
+		{ Textures::ICON_CITY, "textures/icons/city_icon.png" },
+		{ Textures::ICON_VILLAGE, "textures/icons/village_icon.png" },
 
 		/** MAP **/
 		/* Hex */

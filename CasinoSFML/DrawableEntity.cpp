@@ -44,6 +44,16 @@ void DrawableEntity::setRotation( float _rotation)
 	sprite.setRotation( _rotation );
 }
 
+void DrawableEntity::setScale(float _x, float _y)
+{
+	sprite.setScale(_x,_y);
+}
+
+sf::Vector2f DrawableEntity::getScale()
+{
+	return sprite.getScale();
+}
+
 DrawableEntity * DrawableEntity::getParent()
 {
 	return parent;
@@ -68,6 +78,11 @@ void DrawableEntity::setTexture(sf::Texture & _texture)
 const sf::Sprite DrawableEntity::getSprite()
 {
 	return sprite;
+}
+
+sf::FloatRect DrawableEntity::getSpriteGlobalBounds()
+{
+	return sprite.getGlobalBounds();
 }
 
 bool DrawableEntity::isPointInEntity(sf::Vector2f _point)

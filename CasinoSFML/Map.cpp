@@ -11,15 +11,15 @@
 Map::Map(sf::RenderWindow* _window) : width(Map::MAP_EDGE), height(Map::MAP_EDGE), renderWindow{ _window }, selectionMode{NONE}
 {
 	// Make a square map
-	this->tiles.resize(height);
+	this->arrTiles.resize(height);
 	for (int i = 0; i < height; i++) {
-		tiles[i].resize(width);
+		arrTiles[i].resize(width);
 	}
 
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
 			std::unique_ptr<Tile> tmpPtr(new Tile());
-			tiles[i][j] = std::move(tmpPtr);
+			arrTiles[i][j] = std::move(tmpPtr);
 		}
 	}
 
@@ -149,9 +149,9 @@ void Map::SpawnAtTile( Tile* currTile, int i, int j) {
 		else {
 			// Create road if neighbor do not have road
 			std::unique_ptr<Road> lNewRoad(new Road());
-			Roads.push_back(std::move(lNewRoad));
+			arrRoads.push_back(std::move(lNewRoad));
 
-			currTile->addRoad(Roads.back().get(), k);
+			currTile->addRoad(arrRoads.back().get(), k);
 		}
 
 		// Location
@@ -166,9 +166,9 @@ void Map::SpawnAtTile( Tile* currTile, int i, int j) {
 		else {
 			// Create location if neighbor do not have location
 			std::unique_ptr<Location> lNewLocation(new Location());
-			Locations.push_back(std::move(lNewLocation));
+			arrLocations.push_back(std::move(lNewLocation));
 
-			currTile->addLocation(Locations.back().get(), k);
+			currTile->addLocation(arrLocations.back().get(), k);
 		}
 
 	}/* end of spawn */
@@ -256,11 +256,11 @@ void Map::Draw(sf::RenderWindow & _window)
 		lTile->draw(_window);
 	}
 
-	for (auto& lRoad : Roads) {
+	for (auto& lRoad : arrRoads) {
 		lRoad->draw(_window);
 	}
 
-	for (auto& lLocation : Locations) {
+	for (auto& lLocation : arrLocations) {
 		lLocation->draw(_window);
 	}
 }
@@ -380,7 +380,7 @@ void Map::checkItemsForClick(sf::Event _event )
 
 	switch (selectionMode) {
 		case SelectionMode::SELECT_CITY:
-			for (auto& lLocation : Locations) {
+			for (auto& lLocation : arrLocations) {
 				if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::VILLAGE) {
 					lLocation->setLocationSelectionMode(SelectableMapItem::LocationSelectionMode::CITY);
 					this->sendSelection(lLocation.get());
@@ -389,7 +389,7 @@ void Map::checkItemsForClick(sf::Event _event )
 			}
 			break;
 		case SelectionMode::SELECT_VILLAGE:
-			for (auto& lLocation : Locations) {
+			for (auto& lLocation : arrLocations) {
 				if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::NONE ) {
 					lLocation->setLocationSelectionMode(SelectableMapItem::LocationSelectionMode::VILLAGE);
 					this->sendSelection(lLocation.get());
@@ -398,7 +398,7 @@ void Map::checkItemsForClick(sf::Event _event )
 			}
 			break;
 		case SelectionMode::SELECT_ROAD:
-			for (auto& lRoad : Roads) {
+			for (auto& lRoad : arrRoads) {
 				if (lRoad->isPointInEntity(point) && !(lRoad->hasOwner())) {
 					this->sendSelection(lRoad.get());
 					break;
@@ -427,7 +427,7 @@ void Map::checkItemsForHighlight(sf::Event _event)
 
 	switch (selectionMode) {
 	case SelectionMode::SELECT_CITY:
-		for (auto& lLocation : Locations) {
+		for (auto& lLocation : arrLocations) {
 			if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::VILLAGE ) {
 				lLocation->setHighlight(true);
 				highlightedItem = lLocation.get();
@@ -436,7 +436,7 @@ void Map::checkItemsForHighlight(sf::Event _event)
 		}
 		break;
 	case SelectionMode::SELECT_VILLAGE:
-		for (auto& lLocation : Locations) {
+		for (auto& lLocation : arrLocations) {
 			if (lLocation->isPointInEntity(point) && lLocation->getType() == Location::Type::NONE) {
 				lLocation->setHighlight(true);
 				highlightedItem = lLocation.get();
@@ -445,7 +445,7 @@ void Map::checkItemsForHighlight(sf::Event _event)
 		}
 		break;
 	case SelectionMode::SELECT_ROAD:
-		for (auto& lRoad : Roads) {
+		for (auto& lRoad : arrRoads) {
 			if (lRoad->isPointInEntity(point) && !(lRoad->hasOwner())) {
 				lRoad->setHighlight(true);
 				highlightedItem = lRoad.get();
@@ -475,7 +475,7 @@ Map::~Map()
 Tile * Map::getTile(sf::Vector2i _vector)
 {
 	if (_vector.x < width && _vector.x >= 0 && _vector.y < height && _vector.y >= 0)
-		return tiles[_vector.x][_vector.y].get();
+		return arrTiles[_vector.x][_vector.y].get();
 	else
 		return nullptr;
 }

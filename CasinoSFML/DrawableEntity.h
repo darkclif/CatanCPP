@@ -13,16 +13,19 @@ public:
 	float				getRotation();
 	void				setRotation(float _rotation);
 
+	void				setScale(float _x, float _y);
+	sf::Vector2f		getScale();
+
 	DrawableEntity*		getParent();
 	void				setParent(DrawableEntity* _parent);
 
 	sf::Vector2f		getAbsolutePosition();
 	void				setTexture(sf::Texture& _texture);
+
 	const sf::Sprite	getSprite();
+	sf::FloatRect		getSpriteGlobalBounds();
 
 	virtual bool		isPointInEntity(sf::Vector2f _point);
-
-	virtual void		draw(sf::RenderWindow& _window) = 0;
 
 	DrawableEntity() : parent{ nullptr } {}
 
@@ -30,6 +33,8 @@ public:
 		sprite.setPosition(_position);
 		sprite.setRotation(_rotation);
 	}
+
+	virtual void		draw(sf::RenderWindow& _window) = 0;
 
 	virtual ~DrawableEntity();
 
