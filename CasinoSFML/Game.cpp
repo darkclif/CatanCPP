@@ -66,6 +66,9 @@ int Game::getDiceSum() {
 
 bool Game::buildVillage(Player * _player, Location * _location)
 {
+	if (_location->hasOwner())
+		return false;
+
 	if ( getRoundType() == RoundType::BEGINNING_FORWARD ) {
 		if (_location->isNeighbourLocation())
 			return false;
@@ -97,11 +100,10 @@ bool Game::buildVillage(Player * _player, Location * _location)
 			return false;
 
 		_player->takeResources(buildingsCosts.at(Item::VILLAGE));
-		_location->Build(Location::Type::VILLAGE, _player);
-		
-		addContentChange(ContentChange::PLAYER_RESOURCE);
+		_location->Build(Location::Type::VILLAGE, _player);	
 	}
 	
+	addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 	return true;
 }
 
@@ -116,13 +118,12 @@ bool Game::buildCity(Player * _player, Location * _location)
 
 		_player->takeResources(buildingsCosts.at(Item::CITY));
 		_location->Build(Location::Type::CITY, _player);
-		
-		addContentChange(ContentChange::PLAYER_RESOURCE);
 	}
 	else {
 		return false;
 	}
 
+	addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 	return true;
 }
 
@@ -160,9 +161,26 @@ bool Game::buildRoad(Player * _player, Road * _road)
 
 		_player->takeResources(buildingsCosts.at(Item::ROAD));
 		_road->setOwner(_player);
-
-		addContentChange(ContentChange::PLAYER_RESOURCE);
 	}
+
+	addContentChange(ContentChange::PLAYER_RESOURCE|ContentChange::MENU_BUTTONS);
+	return true;
+}
+
+bool Game::setThiefTile(Player * _player, Tile * _tile)
+{
+	if (!(getRoundInfo().isThiefAwaken))
+		return false;
+
+	if (_tile->isThief())
+		return false;
+
+	/* Succes */
+	gameMap->clearAllThiefs();
+	_tile->setThief(true);
+	roundInfo.isThiefAwaken = false;
+
+	addContentChange(ContentChange::MENU_BUTTONS);
 
 	return true;
 }
@@ -209,8 +227,7 @@ bool Game::nextRound()
 	roundInfo.dices[1] = 0;
 	roundInfo.roundNumber++;
 
-	addContentChange(ContentChange::CURRENT_PLAYER);
-	addContentChange(ContentChange::ROUND_TYPE);
+	addContentChange(ContentChange::CURRENT_PLAYER | ContentChange::MENU_BUTTONS);
 
 	Console::info << "Current player: " << getCurrentPlayer()->getName() << std::endl;
 	return true;
@@ -228,16 +245,17 @@ bool Game::throwDices()
 	roundInfo.dices[0] = (rand() % 6) + 1;
 	roundInfo.dices[1] = (rand() % 6) + 1;
 
+	gameMap->acceptDiceThrow(getDiceSum());
+
 	if (getDiceSum() != 7) {
 		addContentChange(ContentChange::PLAYER_RESOURCE);
-		gameMap->acceptDiceThrow(getDiceSum());
 	}
 	else {
 		roundInfo.isThiefAwaken = true;
 	}
 
-	addContentChange(ContentChange::MENU_BUTTONS);
-	Console::info << "Dices throwed! (" << roundInfo.dices[0] << "," << roundInfo.dices[1] << ")" << std::endl;
+	addContentChange(ContentChange::MENU_BUTTONS | ContentChange::DICE_THROW);
+	Console::info << "Dices throwed (" << getDiceSum() << ") = [" << roundInfo.dices[0] << "][" << roundInfo.dices[1] << "]" << std::endl;
 	return true;
 }
 

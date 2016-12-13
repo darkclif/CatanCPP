@@ -330,12 +330,24 @@ void Map::cancelSelection()
 
 void Map::acceptDiceThrow(int _dicesum)
 {
-	if (_dicesum == 7)
-		return;
+	if (_dicesum == 7) {
+		for (auto& lTile : inGameTiles) {
+			lTile->setHighlight(false);
+		}
 
+		return;
+	}
+		
 	for (auto& lTile : inGameTiles) {
 		if(lTile->getDiceNumber() == _dicesum ){
-			lTile->giveResourceToPlayers();
+			
+			if(!(lTile->isThief()))
+				lTile->giveResourceToPlayers();
+			
+			lTile->setHighlight(true);
+		}
+		else {
+			lTile->setHighlight(false);
 		}
 	}
 }
@@ -345,6 +357,13 @@ void Map::giveInitialResources()
 	for (auto& lTile : inGameTiles) {
 		if( lTile->getType() & Tile::TileType::RESOURCE)
 			lTile->giveResourceToPlayers();
+	}
+}
+
+void Map::clearAllThiefs()
+{
+	for (auto& lTile : inGameTiles) {
+		lTile->setThief(false);
 	}
 }
 
@@ -388,8 +407,8 @@ void Map::checkItemsForClick(sf::Event _event )
 			break;
 		case SelectionMode::SELECT_TILE:
 			for (auto lTile : inGameTiles) {
-				if (lTile->isPointInEntity(point)) {
-					//this->sendCallbackFunction(lTile);
+				if (lTile->isPointInEntity(point) && !(lTile->isThief())) {
+					this->sendSelection(lTile);
 					break;
 				}
 			}
@@ -435,9 +454,10 @@ void Map::checkItemsForHighlight(sf::Event _event)
 		}
 		break;
 	case SelectionMode::SELECT_TILE:
-		for (auto lTile : inGameTiles) {
-			if (lTile->isPointInEntity(point)) {
-				//this->sendCallbackFunction(lTile);
+		for (auto& lTile : inGameTiles) {
+			if (lTile->isPointInEntity(point) && !(lTile->isThief())) {
+				lTile->setHighlight(true);
+				highlightedItem = lTile;
 				break;
 			}
 		}

@@ -29,13 +29,18 @@ void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 	}
 
 	if (game->getContentChange(Game::ContentChange::CURRENT_PLAYER)) {
+		playerInfoPanel.Refresh(game);
 		resourcesPanel.Refresh(game);
 		infoPanel.Refresh(game);
 	}
 
-	//if (game->getContentChange(Game::ContentChange::MENU_BUTTONS)) {
+	if (game->getContentChange(Game::ContentChange::DICE_THROW)) {
+		infoPanel.Refresh(game);
+	}
+
+	if (game->getContentChange(Game::ContentChange::MENU_BUTTONS)) {
 		mainMenuPanel.Refresh(game);
-	//}
+	}
 
 	mainMenuPanel.Update();
 }
@@ -53,10 +58,9 @@ void PlayerGUI::acceptSelection(SelectableMapItem * _item)
 			requestRoadBuild(static_cast<Road*>(_item));
 			break;
 		case SelectableMapItem::Mode::TILE:
-			// game->buildLocation(game->getCurrentPlayer(), static_cast<Location*>(_item));
+			requestThiefSet(static_cast<Tile*>(_item));
 			break;
-		default:
-			break;
+		default: break;
 	}
 }
 
@@ -72,16 +76,12 @@ void PlayerGUI::resizeContent()
 /* Requests to Game object */
 void PlayerGUI::requestThrowDice()
 {
-	if (game->throwDices()) {
-		infoPanel.Refresh(game);
-	}
+	game->throwDices();
 }
 
 void PlayerGUI::requestNextRound()
 {
-	if (game->nextRound()) {
-		playerInfoPanel.Refresh(game);
-	}
+	game->nextRound();
 }
 
 void PlayerGUI::requestLocationBuild(Location * _location)
@@ -134,6 +134,14 @@ void PlayerGUI::requestRoadBuild(Road * _road)
 	}
 
 	game->buildRoad(game->getCurrentPlayer(), _road);
+
+	mainMenuPanel.requestPopMenu();
+	map->cancelSelection();
+}
+
+void PlayerGUI::requestThiefSet(Tile * _tile)
+{
+	game->setThiefTile(game->getCurrentPlayer(), _tile);
 
 	mainMenuPanel.requestPopMenu();
 	map->cancelSelection();
@@ -211,7 +219,20 @@ void PlayerGUI::requestRoadSelection()
 
 	mainMenuPanel.ChangeBuildingMessage("Choose place to build road.");
 	mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
+}
 
+void PlayerGUI::requestTileSelection()
+{
+	if (!(game->getRoundInfo().isThiefAwaken)) {
+		mainMenuPanel.requestPushInfo("You cannot place thief now.");
+		return;
+	}
+
+	/* Succes */
+	map->requestSelection(Map::SelectionMode::SELECT_TILE, this);
+
+	mainMenuPanel.ChangeBuildingMessage("Choose tile to place a thief.");
+	mainMenuPanel.requestPushMenu(MainMenuPanel::Menu::MENU_BUILDING_MESSAGE);
 }
 
 void PlayerGUI::requestSelectionCancel()
@@ -298,7 +319,9 @@ void PlayerGUI::MainMenuPanel::Refresh(Game * _game)
 	Game::RoundInfo lRoundInfo = _game->getRoundInfo();
 	Player* lPlayer = _game->getCurrentPlayer();
 
-	/* Throw dices */
+	if (!(lRoundInfo.isThiefAwaken))
+		ShowWidget(Widget::SET_THIEF, false);
+
 	if (lRoundInfo.roundType & Game::BEGINNING) {
 		ShowWidget(Widget::THROW_DICES, false);
 		ShowWidget(Widget::BUILD_CITY, false);
@@ -320,7 +343,6 @@ void PlayerGUI::MainMenuPanel::Refresh(Game * _game)
 			ShowWidget(Widget::THROW_DICES, false);
 		else
 			ShowWidget(Widget::END_ROUND, false);
-
 	}
 }
 
@@ -410,17 +432,22 @@ sfg::Box::Ptr PlayerGUI::MainMenuPanel::createMenuMain()
 	auto btnBuild = sfg::Button::Create("Build");
 	btnBuild->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&MainMenuPanel::requestPushMenu, this, Menu::MENU_BUILDING));
 
+	auto btnSetThief = sfg::Button::Create("Set thief");
+	btnSetThief->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestTileSelection, playerGUI));
+
 	auto btnNextRound = sfg::Button::Create("End round");
 	btnNextRound->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&PlayerGUI::requestNextRound, playerGUI));
 
 	mapWidgets.insert({ (int)Widget::THROW_DICES, btnDiceThrow });
 	mapWidgets.insert({ (int)Widget::BUILD_MENU, btnBuild });
+	mapWidgets.insert({ (int)Widget::SET_THIEF, btnSetThief});
 	mapWidgets.insert({ (int)Widget::END_ROUND, btnNextRound });
 
 	// Box
 	sfg::Box::Ptr lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.0f);
 	lBox->Pack(btnDiceThrow, true);
 	lBox->Pack(btnBuild, true);
+	lBox->Pack(btnSetThief, true);
 	lBox->Pack(btnNextRound, true);
 
 	lBox->SetId("playerInfo");
@@ -657,27 +684,84 @@ void PlayerGUI::ResourcesPanel::Refresh(Game* _game)
 
 void PlayerGUI::ResourcesPanel::buildInterface()
 {
-	std::vector<std::string> resourceNames = {
-		"Wood",
-		"Sheep",
-		"Clay",
-		"Iron",
-		"Wheat"
+	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
+	
+	// Notebook 
+	auto nbkNotebook = sfg::Notebook::Create();
+
+	nbkNotebook->AppendPage(buildPageResources(), sfg::Label::Create("Resources"));
+	nbkNotebook->AppendPage(buildPageCosts(), sfg::Label::Create("Costs"));
+
+	boxWrapper->Pack(nbkNotebook);
+}
+
+sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageResources()
+{
+	auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 2.f);
+	
+	std::vector<std::string> names = { "Wood","Sheep","Clay","Iron","Wheat" };
+
+	std::vector<Catan::Textures::Name> textureNames = {
+		Catan::Textures::ICON_WOOD,
+		Catan::Textures::ICON_SHEEP,
+		Catan::Textures::ICON_CLAY,
+		Catan::Textures::ICON_IRON,
+		Catan::Textures::ICON_WHEAT
 	};
 
-	labCountResources.resize(resourceNames.size());
+	labCountResources.resize(names.size());
 
-	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	for (int i = 0; i < (int)resourceNames.size(); i++) {
+	for (int i = 0; i < (int)names.size(); i++) {
 		auto boxSingleResource = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
 
-		auto labResName = sfg::Label::Create(resourceNames[i]);
-		boxSingleResource->Pack(labResName);
+		// Icon
+		sf::Image tmpIconImage(ResourceMgr.getTexture(textureNames[i]).copyToImage());
+		auto imgIcon = sfg::Image::Create(tmpIconImage);
 
+		// Name
+		auto labResName = sfg::Label::Create(names[i]);
+
+		// Number
 		labCountResources[i] = sfg::Label::Create("0");
+
+		/* Pack */
+		boxSingleResource->Pack(imgIcon);
+		boxSingleResource->Pack(labResName);
 		boxSingleResource->Pack(labCountResources[i]);
 
-		boxWrapper->Pack(boxSingleResource);
+		lBox->Pack(boxSingleResource);
 	}
+
+	return lBox;
+}
+
+sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageCosts()
+{
+	auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 2.f);
+
+	std::vector<std::string> costNames = {"Road","Village","City","Dev card"};
+
+	std::vector<std::vector<Catan::Textures::Name>> costResourceList = {
+		{Catan::Textures::ICON_WOOD, Catan::Textures::ICON_CLAY },
+		{Catan::Textures::ICON_WOOD, Catan::Textures::ICON_CLAY,  Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_SHEEP },
+		{Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_IRON, Catan::Textures::ICON_IRON, Catan::Textures::ICON_IRON },
+		{Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_SHEEP, Catan::Textures::ICON_IRON }
+	};
+
+	for (int i = 0; i < costNames.size(); i++ ) {
+		auto lResBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 2.f);
+		
+		auto labName = sfg::Label::Create(costNames[i]);
+		labName->SetAlignment(sf::Vector2f(0,0));
+		lResBox->Pack(labName, true);
+
+		for ( auto& lRes : costResourceList[i]) {
+			auto imgResource = sfg::Image::Create(ResourceMgr.getTexture(lRes).copyToImage());
+			lResBox->Pack(imgResource, false);
+		}
+
+		lBox->Pack(lResBox);
+	}
+
+	return lBox;
 }

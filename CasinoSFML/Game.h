@@ -21,8 +21,8 @@ public:
 		PLAYER_RESOURCE = 1,
 		CURRENT_PLAYER = 1 << 1,
 		MENU_BUTTONS = 1 << 2,
-		ROUND_TYPE = 1 << 3,
-		ALL = PLAYER_RESOURCE | CURRENT_PLAYER | MENU_BUTTONS | ROUND_TYPE
+		DICE_THROW = 1 << 3,
+		ALL = PLAYER_RESOURCE | CURRENT_PLAYER | MENU_BUTTONS | DICE_THROW
 	};
 
 	enum RoundType : char{
@@ -53,14 +53,14 @@ public:
 	};
 	/* END_Types */
 
-	static const std::map<Item, ResourceBag> buildingsCosts;
-
-	static bool canPlayerAffordItem(Item _item, Player* _player);
+	static const std::map<Item, ResourceBag>	buildingsCosts;
+	static bool									canPlayerAffordItem(Item _item, Player* _player);
 
 	Game(int _players, Map* _map);
 	~Game();
 
 	friend class PlayerGUI;
+
 public:
 	bool				getContentChange(unsigned int _change);
 
@@ -68,19 +68,22 @@ public:
 	RoundInfo			getRoundInfo() const;
 
 private:
+	/* Game flow */
 	bool				nextRound();
-	Player*				getCurrentPlayer();
-
 	bool				throwDices();
-	int					getDiceSum();
 
 	bool				buildVillage(Player* _player, Location* _location);
 	bool				buildCity(Player* _player, Location* _location);
 	bool				buildRoad(Player * _player, Road * _road);
 
-	void				setRoundType(RoundType _type);
+	bool				setThiefTile(Player* _player, Tile* _tile);
+	/* END_Game flow */
 
+	void				setRoundType(RoundType _type);
 	void				addContentChange(unsigned int _change);
+
+	int					getDiceSum();
+	Player*				getCurrentPlayer();
 
 private:
 	Map*				gameMap;

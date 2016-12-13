@@ -46,6 +46,13 @@ namespace Catan {
 		{ Textures::AVATAR_5,"textures/avatars/avatar_5.png" },
 		{ Textures::AVATAR_6,"textures/avatars/avatar_6.png" },
 
+		/** RESOURCES ICONS **/
+		{ Textures::ICON_WOOD, "textures/res_icons/wood_icon.png" },
+		{ Textures::ICON_WHEAT, "textures/res_icons/wheat_icon.png" },
+		{ Textures::ICON_SHEEP, "textures/res_icons/sheep_icon.png" },
+		{ Textures::ICON_CLAY, "textures/res_icons/clay_icon.png" },
+		{ Textures::ICON_IRON, "textures/res_icons/iron_icon.png" },
+
 		/** MAP **/
 		/* Hex */
 		{ Textures::TILE_WOOD,"textures/tile_texture_wood.png" },

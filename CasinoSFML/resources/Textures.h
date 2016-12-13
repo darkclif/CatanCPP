@@ -23,6 +23,13 @@ namespace Catan {
 			AVATAR_5,
 			AVATAR_6,
 
+			/* Resources icons*/
+			ICON_WOOD,
+			ICON_WHEAT,
+			ICON_SHEEP,
+			ICON_CLAY,
+			ICON_IRON,
+
 			/* Map */
 			TEXTURE_ERROR,
 			TEXTURE_EMPTY,

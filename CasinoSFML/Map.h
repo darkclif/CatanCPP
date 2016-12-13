@@ -40,6 +40,7 @@ public:
 public:
 	void			acceptDiceThrow( int _dicesum);
 	void			giveInitialResources();
+	void			clearAllThiefs();
 
 private:
 	void			sendSelection(SelectableMapItem* _item);

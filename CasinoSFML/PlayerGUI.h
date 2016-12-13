@@ -30,11 +30,13 @@ private:
 
 	void		requestLocationBuild(Location*);
 	void		requestRoadBuild(Road*);
+	void		requestThiefSet(Tile*);
 
 	/* Map selection request */
 	void		requestVillageSelection();
 	void		requestCitySelection();
 	void		requestRoadSelection();
+	void		requestTileSelection();
 
 	void		requestSelectionCancel();
 
@@ -85,6 +87,7 @@ private:
 				/* MENU_MAIN */
 				THROW_DICES,
 				BUILD_MENU,
+				SET_THIEF,
 				END_ROUND,
 
 				/* MENU_BUILDING */
@@ -196,6 +199,9 @@ private:
 
 	private:
 		void buildInterface();
+
+		sfg::Box::Ptr buildPageResources();
+		sfg::Box::Ptr buildPageCosts();
 
 		/* Elements which are changable */
 		std::vector<sfg::Label::Ptr>	labCountResources;

@@ -95,7 +95,10 @@ const std::map<Tile::TileType, Resource> Tile::mapTypeToResource = {
 	{TileType::WHEAT,Resource::WHEAT}
 };
 
-Tile::Tile() : type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 }, SelectableMapItem(SelectableMapItem::Mode::TILE) {
+Tile::Tile() : 
+	SelectableMapItem(SelectableMapItem::Mode::TILE),
+	type{ NOT_USED }, diceNumber{ 0 }, initJump{ 0 }
+{
 	std::unique_ptr<Thief> tmpThief(new Thief(sf::Vector2f(100.f, -80.f), this));
 	thiefEntity = std::move(tmpThief);
 	
@@ -123,7 +126,7 @@ Tile::Tile(TileType _type, unsigned int _number) :
 
 Tile::~Tile()
 {
-};
+}
 
 bool Tile::isThief()
 {
@@ -190,10 +193,17 @@ void Tile::draw(sf::RenderWindow &_window)
 	if (getParent() != nullptr)
 		tmpSprite.setPosition(getAbsolutePosition());
 
+	if (isHighlighted())
+		tmpSprite.setColor(sf::Color(250,180,84));
+
 	_window.draw(tmpSprite);
 
-	if (isThief() && thiefEntity != nullptr ) thiefEntity->draw(_window);
-	if (diceNumber != 7 && numberEntity != nullptr ) numberEntity->draw(_window);
+	// Childs entity
+	if (isThief() && thiefEntity != nullptr ) 
+		thiefEntity->draw(_window);
+	
+	if (diceNumber != 7 && numberEntity != nullptr ) 
+		numberEntity->draw(_window);
 }
 
 bool Tile::addRoad(Road * _road, int _number)
