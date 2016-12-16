@@ -10,17 +10,20 @@
 
 #include <iostream>
 
-class App
-{
-public:
-	void Run();
+namespace Catan {
+
+	class App
+	{
+	public:
+		void Run();
 
 
-	App();
-	~App();
-private:
+		App();
+		~App();
+	private:
 
-	void registerStates( StateManager& _engine );
-	void handleGlobalEvent( sf::Event _event, State::Context _context, StateManager& _engine );
-};
+		void registerStates(StateManager& _engine);
+		void handleGlobalEvent(sf::Event _event, State::Context _context, StateManager& _engine);
+	};
 
+}

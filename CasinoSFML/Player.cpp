@@ -1,112 +1,116 @@
 #include "Player.h"
 #include "Console.h"
 
-Player::Player(std::string _name, sf::Color _color, Catan::Textures::Name _avatar)
-{
-	name = _name;
-	color = _color;
-	avatarTexture = _avatar;
-	winPoints = 0;
-	
-	items.push_back(ItemCount(15)); // ROAD
-	items.push_back(ItemCount(4)); // CITY
-	items.push_back(ItemCount(5)); // VILLAGE
-}
+namespace Catan {
 
-Player::~Player()
-{
-}
+	Player::Player(std::string _name, sf::Color _color, Catan::Textures::Name _avatar)
+	{
+		name = _name;
+		color = _color;
+		avatarTexture = _avatar;
+		winPoints = 0;
 
-Player::PhaseBuildings Player::getPhaseState(Phase _phase)
-{
-	return phaseBuilings[(int)(_phase)];
-}
-
-void Player::setPhaseState(Phase _phase, Item _item)
-{
-	if (_item == Item::ROAD)
-		phaseBuilings[(int)(_phase)].road = true;
-	if (_item == Item::VILLAGE)
-		phaseBuilings[(int)(_phase)].village = true;
-}
-
-void Player::giveResources(ResourceBag _bag)		
-{
-	Console::info << "Player '" << this->name << "' get resources: " << _bag.print() << std::endl;
-	
-	playerResources += _bag;
-}
-
-ResourceBag Player::getResources() const
-{
-	return playerResources;
-}
-
-void Player::takeResources(ResourceBag _bag)
-{
-	if ( _bag >= playerResources ) {
-		Console::debug << "You took more resources from player than he already has!" << std::endl;
+		items.push_back(ItemCount(15)); // ROAD
+		items.push_back(ItemCount(4)); // CITY
+		items.push_back(ItemCount(5)); // VILLAGE
 	}
 
-	playerResources -= _bag;
-}
-
-int Player::getItem(Item _item) const
-{
-	return items[(int)(_item)].count;
-}
-
-void Player::takeItem(Item _item, int _count)
-{
-	if ( _count > getItem(_item)) {
-		Console::debug << "Trying to get more items (roads/cities/villages) than player already has!" << std::endl;
-		items[(int)(_item)].count = 0;
+	Player::~Player()
+	{
 	}
 
-	items[(int)(_item)].count -= _count;
+	Player::PhaseBuildings Player::getPhaseState(Phase _phase)
+	{
+		return phaseBuilings[(int)(_phase)];
+	}
 
-	recalculateWinPoints();
-}
+	void Player::setPhaseState(Phase _phase, Item _item)
+	{
+		if (_item == Item::ROAD)
+			phaseBuilings[(int)(_phase)].road = true;
+		if (_item == Item::VILLAGE)
+			phaseBuilings[(int)(_phase)].village = true;
+	}
 
-void Player::giveItem(Item _item, int _count)
-{
-	if (_count <= 0)
-		return;
+	void Player::giveResources(ResourceBag _bag)
+	{
+		Console::info << "Player '" << this->name << "' get resources: " << _bag.print() << std::endl;
 
-	items[(int)(_item)].count += _count;
+		playerResources += _bag;
+	}
 
-	if (items[(int)(_item)].count > items[(int)(_item)].MAX)
-		items[(int)(_item)].count = items[(int)(_item)].MAX;
+	ResourceBag Player::getResources() const
+	{
+		return playerResources;
+	}
 
-	recalculateWinPoints();
-}
+	void Player::takeResources(ResourceBag _bag)
+	{
+		if (_bag >= playerResources) {
+			Console::debug << "You took more resources from player than he already has!" << std::endl;
+		}
 
-void Player::recalculateWinPoints()
-{
-	int lWP = 0;
+		playerResources -= _bag;
+	}
 
-	lWP += 1 * (items[(int)Item::VILLAGE].MAX - items[(int)Item::VILLAGE].count);
-	lWP += 2 * (items[(int)Item::CITY].MAX - items[(int)Item::CITY].count);
+	int Player::getItem(Item _item) const
+	{
+		return items[(int)(_item)].count;
+	}
 
-	winPoints = lWP;
-}
+	void Player::takeItem(Item _item, int _count)
+	{
+		if (_count > getItem(_item)) {
+			Console::debug << "Trying to get more items (roads/cities/villages) than player already has!" << std::endl;
+			items[(int)(_item)].count = 0;
+		}
 
-int Player::getWinPoints() const
-{
-	return winPoints;
-}
+		items[(int)(_item)].count -= _count;
 
-std::string Player::getName() const
-{
-	return name;
-}
+		recalculateWinPoints();
+	}
 
-sf::Color Player::getColor() const
-{
-	return color;
-}
+	void Player::giveItem(Item _item, int _count)
+	{
+		if (_count <= 0)
+			return;
 
-Catan::Textures::Name Player::getAvatarTexture() const
-{
-	return avatarTexture;
+		items[(int)(_item)].count += _count;
+
+		if (items[(int)(_item)].count > items[(int)(_item)].MAX)
+			items[(int)(_item)].count = items[(int)(_item)].MAX;
+
+		recalculateWinPoints();
+	}
+
+	void Player::recalculateWinPoints()
+	{
+		int lWP = 0;
+
+		lWP += 1 * (items[(int)Item::VILLAGE].MAX - items[(int)Item::VILLAGE].count);
+		lWP += 2 * (items[(int)Item::CITY].MAX - items[(int)Item::CITY].count);
+
+		winPoints = lWP;
+	}
+
+	int Player::getWinPoints() const
+	{
+		return winPoints;
+	}
+
+	std::string Player::getName() const
+	{
+		return name;
+	}
+
+	sf::Color Player::getColor() const
+	{
+		return color;
+	}
+
+	Catan::Textures::Name Player::getAvatarTexture() const
+	{
+		return avatarTexture;
+	}
+
 }

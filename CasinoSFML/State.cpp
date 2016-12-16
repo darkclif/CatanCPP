@@ -1,37 +1,41 @@
 #include "State.h"
 #include "StateManager.h"
 
-bool State::isTransparent()
-{
-	return transparent;
-}
+namespace Catan {
 
-void State::setTransparency(bool _trans)
-{
-	transparent = _trans;
-}
+	bool State::isTransparent()
+	{
+		return transparent;
+	}
 
-State::State(StateManager * _manager, Context _context)
-{
-	stateManager = _manager;
-	context = _context;
-}
+	void State::setTransparency(bool _trans)
+	{
+		transparent = _trans;
+	}
 
-State::~State()
-{
-}
+	State::State(StateManager * _manager, Context _context)
+	{
+		stateManager = _manager;
+		context = _context;
+	}
 
-void State::requestStackPush(States::ID _id)
-{
-	stateManager->requestStackPush(_id);
-}
+	State::~State()
+	{
+	}
 
-void State::requestStackPop()
-{
-	stateManager->requestStackPop();
-}
+	void State::requestStackPush(States::ID _id)
+	{
+		stateManager->requestStackPush(_id);
+	}
 
-void State::requestStackClear()
-{
-	stateManager->requestStackClear();
+	void State::requestStackPop()
+	{
+		stateManager->requestStackPop();
+	}
+
+	void State::requestStackClear()
+	{
+		stateManager->requestStackClear();
+	}
+
 }

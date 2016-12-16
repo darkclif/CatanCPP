@@ -1,30 +1,34 @@
 #include "PlayerEntity.h"
 
-void PlayerEntity::setBuildRound(RoundType _round)
-{
-	buildRound = _round;
-}
+namespace Catan {
 
-PlayerEntity::RoundType PlayerEntity::getBuildRound()
-{
-	return buildRound;
-}
+	void PlayerEntity::setBuildRound(RoundType _round)
+	{
+		buildRound = _round;
+	}
 
-Player * PlayerEntity::getOwner()
-{
-	return owner;
-}
+	PlayerEntity::RoundType PlayerEntity::getBuildRound()
+	{
+		return buildRound;
+	}
 
-void PlayerEntity::setOwner(Player * _player)
-{
-	owner = _player;
-}
+	Player * PlayerEntity::getOwner()
+	{
+		return owner;
+	}
 
-bool PlayerEntity::hasOwner()
-{
-	return (owner != nullptr);
-}
+	void PlayerEntity::setOwner(Player * _player)
+	{
+		owner = _player;
+	}
 
-PlayerEntity::~PlayerEntity()
-{
+	bool PlayerEntity::hasOwner()
+	{
+		return (owner != nullptr);
+	}
+
+	PlayerEntity::~PlayerEntity()
+	{
+	}
+
 }

@@ -1,84 +1,88 @@
 #include "IntroState.h"
 #include "ResourceManager.h"
 
-bool IntroState::HandleEvents(sf::Event _event)
-{
-	sf::Event lEvent = _event;
+namespace Catan {
 
-	// Key pressed
-	if (lEvent.type == sf::Event::KeyPressed) {
-		SkipIntro();
+	bool IntroState::HandleEvents(sf::Event _event)
+	{
+		sf::Event lEvent = _event;
+
+		// Key pressed
+		if (lEvent.type == sf::Event::KeyPressed) {
+			SkipIntro();
+		}
+
+		// Cross button
+		if (_event.type == sf::Event::Closed) {
+			requestStackClear();
+		}
+
+		return true;
 	}
 
-	// Cross button
-	if (_event.type == sf::Event::Closed) {
-		requestStackClear();
+	bool IntroState::Update(sf::Time _dt)
+	{
+		alpha += 2.f * _dt.asSeconds();
+		txtPrompt.setFillColor(sf::Color(255, 255, 255, ((int)alpha % 2) * 255));
+
+		return true;
 	}
 
-	return true;
-}
+	void IntroState::Draw(sf::RenderWindow & _window)
+	{
+		_window.draw(sprLogo);
+		_window.draw(txtPrompt);
+		_window.draw(sprBigLogo);
+		_window.draw(txtPresents);
+	}
 
-bool IntroState::Update(sf::Time _dt)
-{
-	alpha += 2.f * _dt.asSeconds();
-	txtPrompt.setFillColor( sf::Color(255,255,255,((int)alpha % 2) * 255));
+	void IntroState::resizeContent()
+	{
+	}
 
-	return true;
-}
+	void IntroState::SkipIntro() {
+		requestStackPop();
+		requestStackPush(States::MAIN_MENU);
+	}
 
-void IntroState::Draw(sf::RenderWindow & _window)
-{
-	_window.draw(sprLogo);
-	_window.draw(txtPrompt);
-	_window.draw(sprBigLogo);
-	_window.draw(txtPresents);
-}
+	IntroState::IntroState(StateManager* _engine, State::Context _context) : State(_engine, _context)
+	{
+		alpha = 0.f;
 
-void IntroState::resizeContent()
-{
-}
+		// Logo
+		sprLogo.setPosition(0, -300);
+		sprLogo.setTexture(ResourceManager::getInstance().getTexture(Catan::Textures::LOGO));
+		Catan::setOriginAtCenter(sprLogo);
 
-void IntroState::SkipIntro() {
-	requestStackPop();
-	requestStackPush(States::MAIN_MENU);
-}
+		// Big logo
+		sprBigLogo.setPosition(0, 0);
+		sprBigLogo.setTexture(ResourceManager::getInstance().getTexture(Catan::Textures::BIG_LOGO));
+		Catan::setOriginAtCenter(sprBigLogo);
 
-IntroState::IntroState( StateManager* _engine, State::Context _context) : State(_engine, _context)
-{
-	alpha = 0.f;
+		// Prompt
+		std::string lMsg = "Press any key to continue...";
+		txtPrompt.setString(lMsg);
+		txtPrompt.setPosition(0, 240);
+		txtPrompt.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::DEFAULT));
+		Catan::setOriginAtCenter(txtPrompt);
 
-	// Logo
-	sprLogo.setPosition(0,-300);
-	sprLogo.setTexture( ResourceManager::getInstance().getTexture(Catan::Textures::LOGO) );
-	Catan::setOriginAtCenter(sprLogo);
+		// Presents
+		lMsg = "PRESENTS";
+		txtPresents.setCharacterSize(30);
+		txtPresents.setString(lMsg);
+		txtPresents.setPosition(0, -150);
+		txtPresents.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::DEFAULT));
+		Catan::setOriginAtCenter(txtPresents);
 
-	// Big logo
-	sprBigLogo.setPosition(0, 0);
-	sprBigLogo.setTexture( ResourceManager::getInstance().getTexture(Catan::Textures::BIG_LOGO));
-	Catan::setOriginAtCenter(sprBigLogo);
+		// Set center view
+		sf::View lView = context.window->getView();
+		lView.setCenter(sf::Vector2f(0, 0));
 
-	// Prompt
-	std::string lMsg = "Press any key to continue...";
-	txtPrompt.setString(lMsg);
-	txtPrompt.setPosition(0, 240);
-	txtPrompt.setFont( ResourceManager::getInstance().getFont(Catan::Fonts::DEFAULT));
-	Catan::setOriginAtCenter(txtPrompt);
+		context.window->setView(lView);
+	}
 
-	// Presents
-	lMsg = "PRESENTS";
-	txtPresents.setCharacterSize(30);
-	txtPresents.setString(lMsg);
-	txtPresents.setPosition(0, -150);
-	txtPresents.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::DEFAULT));
-	Catan::setOriginAtCenter(txtPresents);
+	IntroState::~IntroState()
+	{
+	}
 
-	// Set center view
-	sf::View lView = context.window->getView();
-	lView.setCenter( sf::Vector2f(0,0));
-	
-	context.window->setView(lView);
-}
-
-IntroState::~IntroState()
-{
 }

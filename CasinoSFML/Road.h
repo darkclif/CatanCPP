@@ -6,24 +6,28 @@
 #include <iostream>
 #include "PlayerEntity.h"
 
-class Location;
+namespace Catan {
 
-class Road : public DrawableEntity, public SelectableMapItem, public PlayerEntity
-{
-public:
-	Road();
-	~Road();
+	class Location;
 
-	bool							addLocation(Location* _location);
-	const std::vector<Location*>&	getLocations();
+	class Road : public DrawableEntity, public SelectableMapItem, public PlayerEntity
+	{
+	public:
+		Road();
+		~Road();
 
-	sf::Texture&		getTexture();
-	void				draw( sf::RenderWindow& _window );
+		bool							addLocation(Location* _location);
+		const std::vector<Location*>&	getLocations();
 
-	bool				isNeighbourWithLocation(Player* _player, RoundType _round = RoundType::ANY);
-	bool				isBesidePlayerItem(Player* _player);
+		sf::Texture&		getTexture();
+		void				draw(sf::RenderWindow& _window);
 
-private:
+		bool				isNeighbourWithLocation(Player* _player, RoundType _round = RoundType::ANY);
+		bool				isBesidePlayerItem(Player* _player);
 
-	std::vector<Location*> arrLocations;
-};
+	private:
+
+		std::vector<Location*> arrLocations;
+	};
+
+}

@@ -9,82 +9,83 @@
 #include <stack>
 #include "AnimateEntity.h"
 
+namespace Catan {
 
-class Map;
+	class Map;
 
-class PlayerGUI
-{
-public:
-	PlayerGUI( sfg::SFGUI& _sfgui, sfg::Desktop& _desktop, Game* _game, Map* _map);
-	~PlayerGUI();
-
-	void		UpdateGUI( sf::Time _dt );
-	void		draw(sf::RenderWindow& _window);
-
-	void		acceptSelection(SelectableMapItem* _item);
-
-	bool		isMouseOverGUI();
-	void		resizeContent();
-
-private:
-	/* Action senders to Game */
-	void		requestThrowDice();
-	void		requestNextRound();
-
-	void		requestLocationBuild(Location*);
-	void		requestRoadBuild(Road*);
-	void		requestThiefSet(Tile*);
-
-	/* Map selection request */
-	void		requestVillageSelection();
-	void		requestCitySelection();
-	void		requestRoadSelection();
-	void		requestTileSelection();
-
-	void		requestSelectionCancel();
-
-private:
-	class Panel {
+	class PlayerGUI
+	{
 	public:
-		sfg::Box::Ptr	getBox();
-		virtual void	Refresh(Game*) = 0;
+		PlayerGUI(sfg::SFGUI& _sfgui, sfg::Desktop& _desktop, Game* _game, Map* _map);
+		~PlayerGUI();
 
-		// Show Widget with enum
-		template<typename W>
-		void ShowWidget(W _widget, bool show = true) {
-			if (mapWidgets.find((int)_widget) == mapWidgets.end()) {
-				Console::debug << "Given Widget does not exist in panel." << std::endl;
-				return;
+		void		UpdateGUI(sf::Time _dt);
+		void		draw(sf::RenderWindow& _window);
+
+		void		acceptSelection(SelectableMapItem* _item);
+
+		bool		isMouseOverGUI();
+		void		resizeContent();
+
+	private:
+		/* Action senders to Game */
+		void		requestThrowDice();
+		void		requestNextRound();
+
+		void		requestLocationBuild(Location*);
+		void		requestRoadBuild(Road*);
+		void		requestThiefSet(Tile*);
+
+		/* Map selection request */
+		void		requestVillageSelection();
+		void		requestCitySelection();
+		void		requestRoadSelection();
+		void		requestTileSelection();
+
+		void		requestSelectionCancel();
+
+	private:
+		class Panel {
+		public:
+			sfg::Box::Ptr	getBox();
+			virtual void	Refresh(Game*) = 0;
+
+			// Show Widget with enum
+			template<typename W>
+			void ShowWidget(W _widget, bool show = true) {
+				if (mapWidgets.find((int)_widget) == mapWidgets.end()) {
+					Console::debug << "Given Widget does not exist in panel." << std::endl;
+					return;
+				}
+
+				mapWidgets.at((int)_widget)->Show(show);
 			}
-			
-			mapWidgets.at((int)_widget)->Show(show);
-		}
 
-		// Return Widget with enum and cast to Type
-		template<typename W, typename Type>
-		std::shared_ptr<Type> getWidget(W _widget) {
-			if (mapWidgets.find((int)_widget) == mapWidgets.end()) {
-				Console::debug << "Given Widget does not exist in panel." << std::endl;
-				return nullptr;
+			// Return Widget with enum and cast to Type
+			template<typename W, typename Type>
+			std::shared_ptr<Type> getWidget(W _widget) {
+				if (mapWidgets.find((int)_widget) == mapWidgets.end()) {
+					Console::debug << "Given Widget does not exist in panel." << std::endl;
+					return nullptr;
+				}
+
+				return std::static_pointer_cast<Type>(mapWidgets.at((int)_widget));
 			}
 
-			return std::static_pointer_cast<Type>( mapWidgets.at((int)_widget) );
-		}
+			void ShowAllWidgets();
 
-		void ShowAllWidgets();
+			Panel();
 
-		Panel();
+		protected:
+			virtual void buildInterface() = 0;
 
-	protected:
-		virtual void buildInterface() = 0;
+			sfg::Box::Ptr boxWrapper;
 
-		sfg::Box::Ptr boxWrapper;
+			/* Elements which are changable */
+			std::map<int, sfg::Widget::Ptr>	mapWidgets;
+		};
 
-		/* Elements which are changable */
-		std::map<int, sfg::Widget::Ptr>	mapWidgets;
-	};
-
-	class MainMenuPanel : public Panel{
+		class MainMenuPanel : public Panel {
 		public:
 			enum class Widget : int {
 				/* MENU_MAIN */
@@ -121,7 +122,7 @@ private:
 				Menu		menu;
 
 				PendingMenuChange(Action _action, Menu _menu) : action{ _action }, menu{ _menu } {}
-				PendingMenuChange(Action _action ) : action{ _action }, menu{ /*not used*/ Menu::_SIZE } {}
+				PendingMenuChange(Action _action) : action{ _action }, menu{ /*not used*/ Menu::_SIZE } {}
 			};
 			/* END_Menu navigation stack */
 
@@ -139,7 +140,7 @@ private:
 
 		private:
 			void buildInterface();
-			
+
 			void applyPendingMenuChanges();
 			void RefreshMenusVisibility();
 
@@ -156,130 +157,131 @@ private:
 			std::vector<PendingMenuChange>	pendingChanges;
 
 			PlayerGUI* playerGUI;
-	};
-	
-	class PlayerInfoPanel: public Panel {
-	public:
-		enum class Widget : int{
-			IMG_AVATAR,
-			LAB_NAME,
-			LAB_WINPOINTS
 		};
 
-		void Refresh(Game* _game);
-
-		PlayerInfoPanel();
-	
-	private:
-		void buildInterface();
-	};
-
-	class InfoPanel: public Panel {
-	public:
-		enum class Widget {
-			LABEL_TILE,
-			LABEL_TURN_NUMBER,
-			LABEL_DICE,
-			LABEL_INFO
-		};
-
-		void	Refresh(Game* _game);
-
-		InfoPanel();
-
-	private:
-		void buildInterface();
-	};
-
-	class ResourcesPanel : public Panel {
-	public:
-		enum class Widget {
-			LAB_CITY,
-			LAB_VILLAGE,
-			LAB_ROAD
-		};
-
-		void Refresh(Game* _game);
-
-		template<typename W>
-		void ShowWidget(W _widget, bool _show = true) = delete;
-		void ShowAllWidgets() = delete;
-
-		ResourcesPanel();
-
-	private:
-		void buildInterface();
-
-		sfg::Box::Ptr buildPageResources();
-		sfg::Box::Ptr buildPageCosts();
-		sfg::Box::Ptr buildPageUnits();
-		sfg::Box::Ptr buildPageCards();
-
-		/* Elements which are changable */
-		std::vector<sfg::Label::Ptr>	labCountResources;
-	};
-
-	/*** MAIN WINDOW ***/
-	sfg::Window::Ptr	mainWindow;
-
-	PlayerInfoPanel		playerInfoPanel;
-	InfoPanel			infoPanel;
-	ResourcesPanel		resourcesPanel;
-	MainMenuPanel		mainMenuPanel;
-
-private:
-	void				setupGUI();
-
-	void				changeMouseOver(bool _state);
-
-private:
-	sfg::SFGUI&			sfg_sfgui;
-	sfg::Desktop&		sfg_desktop;
-
-	Game*				game;
-	Map*				map;
-
-	bool				isMouseOver;
-
-private:
-	/* Dices */
-	class DiceHolder : public DrawableEntity, public AnimateEntity {
-	public:
-		void draw(sf::RenderWindow& _window);
-		void update(sf::Time _dt);
-
-		void setDices(int _d1, int _d2);
-		void ResetAnimation();
-
-		DiceHolder(sf::Vector2f _start_pos, sf::Vector2f _end_pos);
-
-	private:
-		/* Single dice */
-		class Dice : public DrawableEntity{
+		class PlayerInfoPanel : public Panel {
 		public:
-			void draw(sf::RenderWindow& _window );
+			enum class Widget : int {
+				IMG_AVATAR,
+				LAB_NAME,
+				LAB_WINPOINTS
+			};
 
-			int getNumber();
-			void setNumber(int _number);
+			void Refresh(Game* _game);
 
-			Dice(sf::Vector2f _pos, int _number, DrawableEntity* _parent);
+			PlayerInfoPanel();
 
 		private:
-			static int const TEXTURE_SIZE = 150;
-			int	number;
-			sf::Texture& getTexture();
+			void buildInterface();
 		};
 
-		sf::Texture& getTexture();
+		class InfoPanel : public Panel {
+		public:
+			enum class Widget {
+				LABEL_TILE,
+				LABEL_TURN_NUMBER,
+				LABEL_DICE,
+				LABEL_INFO
+			};
 
-		std::vector<std::unique_ptr<Dice>> arrDices;
-		sf::Vector2f startPos;
-		sf::Vector2f endPos;
+			void	Refresh(Game* _game);
 
-		const sf::Time ANIMATION_TIME = sf::Time(sf::seconds(0.8f));
-		sf::Time time;
+			InfoPanel();
+
+		private:
+			void buildInterface();
+		};
+
+		class ResourcesPanel : public Panel {
+		public:
+			enum class Widget {
+				LAB_CITY,
+				LAB_VILLAGE,
+				LAB_ROAD
+			};
+
+			void Refresh(Game* _game);
+
+			template<typename W>
+			void ShowWidget(W _widget, bool _show = true) = delete;
+			void ShowAllWidgets() = delete;
+
+			ResourcesPanel();
+
+		private:
+			void buildInterface();
+
+			sfg::Box::Ptr buildPageResources();
+			sfg::Box::Ptr buildPageCosts();
+			sfg::Box::Ptr buildPageUnits();
+			sfg::Box::Ptr buildPageCards();
+
+			/* Elements which are changable */
+			std::vector<sfg::Label::Ptr>	labCountResources;
+		};
+
+		/*** MAIN WINDOW ***/
+		sfg::Window::Ptr	mainWindow;
+
+		PlayerInfoPanel		playerInfoPanel;
+		InfoPanel			infoPanel;
+		ResourcesPanel		resourcesPanel;
+		MainMenuPanel		mainMenuPanel;
+
+	private:
+		void				setupGUI();
+
+		void				changeMouseOver(bool _state);
+
+	private:
+		sfg::SFGUI&			sfg_sfgui;
+		sfg::Desktop&		sfg_desktop;
+
+		Game*				game;
+		Map*				map;
+
+		bool				isMouseOver;
+
+	private:
+		/* Dices */
+		class DiceHolder : public DrawableEntity, public AnimateEntity {
+		public:
+			void draw(sf::RenderWindow& _window);
+			void update(sf::Time _dt);
+
+			void setDices(int _d1, int _d2);
+			void ResetAnimation();
+
+			DiceHolder(sf::Vector2f _start_pos, sf::Vector2f _end_pos);
+
+		private:
+			/* Single dice */
+			class Dice : public DrawableEntity {
+			public:
+				void draw(sf::RenderWindow& _window);
+
+				int getNumber();
+				void setNumber(int _number);
+
+				Dice(sf::Vector2f _pos, int _number, DrawableEntity* _parent);
+
+			private:
+				static int const TEXTURE_SIZE = 150;
+				int	number;
+				sf::Texture& getTexture();
+			};
+
+			sf::Texture& getTexture();
+
+			std::vector<std::unique_ptr<Dice>> arrDices;
+			sf::Vector2f startPos;
+			sf::Vector2f endPos;
+
+			const sf::Time ANIMATION_TIME = sf::Time(sf::seconds(0.8f));
+			sf::Time time;
+		};
+
+		std::unique_ptr<DiceHolder> diceHolder;
 	};
 
-	std::unique_ptr<DiceHolder> diceHolder;
-};
-
+}

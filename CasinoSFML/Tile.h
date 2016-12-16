@@ -13,111 +13,113 @@
 #include "ResourceBag.h"
 #include "SelectableMapItem.h"
 
-//
-//	Dice number
-//
-class DiceNumber : public DrawableEntity {
-public:
-	void draw(sf::RenderWindow& _window);
+namespace Catan {
 
-	void setNumber(int _number);
+	//
+	//	Dice number
+	//
+	class DiceNumber : public DrawableEntity {
+	public:
+		void draw(sf::RenderWindow& _window);
 
-	DiceNumber(sf::Vector2f _position, DrawableEntity* _parent) : DrawableEntity(_position, 0, _parent), number{0} {}
-	DiceNumber() : DrawableEntity(), number{0} { }
-protected:
-	sf::Texture& getTexture();
+		void setNumber(int _number);
 
-	int number;
-	static const Catan::Textures::Name arrDiceToTexture[11];
+		DiceNumber(sf::Vector2f _position, DrawableEntity* _parent) : DrawableEntity(_position, 0, _parent), number{ 0 } {}
+		DiceNumber() : DrawableEntity(), number{ 0 } { }
+	protected:
+		sf::Texture& getTexture();
 
-};
+		int number;
+		static const Catan::Textures::Name arrDiceToTexture[11];
 
-//
-//	Thief
-//
-class Thief: public DrawableEntity {
-public:
-	void draw(sf::RenderWindow& _window);
-
-	Thief(): DrawableEntity() {}
-	Thief(sf::Vector2f _position, DrawableEntity* _parent) : DrawableEntity(_position, 0, _parent){}
-protected:
-	sf::Texture& getTexture();
-};
-
-//
-// Tile
-//
-class Tile : public DrawableEntity, public SelectableMapItem
-{
-public:
-	// Type of tiles
-	enum TileType : int {
-		WOOD = 1,
-		SHEEP = 1 << 1,
-		CLAY = 1 << 2,
-		IRON = 1 << 3,
-		WHEAT = 1 << 4,
-		DESERT = 1 << 5,
-		
-		BLANK = 1 << 6,		// Resource to assign 
-		NOT_USED = 1 << 7,
-
-		RESOURCE = WOOD | SHEEP | CLAY | IRON | WHEAT,
-
-		__ENUM_SIZE
 	};
 
-	Tile(TileType _type, unsigned int _number);
-	Tile();
+	//
+	//	Thief
+	//
+	class Thief : public DrawableEntity {
+	public:
+		void draw(sf::RenderWindow& _window);
 
-	~Tile();
+		Thief() : DrawableEntity() {}
+		Thief(sf::Vector2f _position, DrawableEntity* _parent) : DrawableEntity(_position, 0, _parent) {}
+	protected:
+		sf::Texture& getTexture();
+	};
 
-	bool				isThief();
-	void				setThief(bool _thief);
+	//
+	// Tile
+	//
+	class Tile : public DrawableEntity, public SelectableMapItem
+	{
+	public:
+		// Type of tiles
+		enum TileType : int {
+			WOOD = 1,
+			SHEEP = 1 << 1,
+			CLAY = 1 << 2,
+			IRON = 1 << 3,
+			WHEAT = 1 << 4,
+			DESERT = 1 << 5,
 
-	void				giveResourceToPlayers();
+			BLANK = 1 << 6,		// Resource to assign 
+			NOT_USED = 1 << 7,
 
-	TileType			getType();				
-	void				setType(TileType _type); 
+			RESOURCE = WOOD | SHEEP | CLAY | IRON | WHEAT,
 
-	int					getDiceNumber();
-	void				setDiceNumber(int _number);
+			__ENUM_SIZE
+		};
 
-	sf::Texture&		getTexture();
-	void				draw( sf::RenderWindow & _window );
+		Tile(TileType _type, unsigned int _number);
+		Tile();
 
-	// Access soroundings 
-	bool				addRoad(Road* _road, int _number);
-	Road*				getRoad(int _number);
+		~Tile();
 
-	bool				addLocation(Location* _location, int _number);
-	Location*			getLocation(int _number);
-	
-	bool				bindRoadsLocations();
+		bool				isThief();
+		void				setThief(bool _thief);
 
-	// For initialize circle-style map
-	int					getInitJump();
-	void				setInitJump( int _jump );
-private:
-	Resource			getResourceType();
+		void				giveResourceToPlayers();
 
-private:
-	TileType		type;				
-	unsigned int	diceNumber;	
-	bool			thief;
+		TileType			getType();
+		void				setType(TileType _type);
 
-	// For initialize circle-style map
-	int				initJump;
+		int					getDiceNumber();
+		void				setDiceNumber(int _number);
 
-	std::vector<Location*>						arrLocations;
-	std::vector<Road*>							arrRoads;
+		sf::Texture&		getTexture();
+		void				draw(sf::RenderWindow & _window);
 
-	std::unique_ptr<Thief>						thiefEntity;
-	std::unique_ptr<DiceNumber>					numberEntity;
+		// Access soroundings 
+		bool				addRoad(Road* _road, int _number);
+		Road*				getRoad(int _number);
 
-	static const std::map<TileType,Catan::Textures::Name>	mapTypeToTexture;
-	static const std::map<TileType,Resource>	mapTypeToResource;
-};
+		bool				addLocation(Location* _location, int _number);
+		Location*			getLocation(int _number);
 
+		bool				bindRoadsLocations();
 
+		// For initialize circle-style map
+		int					getInitJump();
+		void				setInitJump(int _jump);
+	private:
+		Resource			getResourceType();
+
+	private:
+		TileType		type;
+		unsigned int	diceNumber;
+		bool			thief;
+
+		// For initialize circle-style map
+		int				initJump;
+
+		std::vector<Location*>						arrLocations;
+		std::vector<Road*>							arrRoads;
+
+		std::unique_ptr<Thief>						thiefEntity;
+		std::unique_ptr<DiceNumber>					numberEntity;
+
+		static const std::map<TileType, Catan::Textures::Name>	mapTypeToTexture;
+		static const std::map<TileType, Resource>	mapTypeToResource;
+	};
+
+}

@@ -1,20 +1,24 @@
 #include "AnimateEntity.h"
 
-void AnimateEntity::Start()
-{
-	running = true;
-}
+namespace Catan {
 
-void AnimateEntity::Stop()
-{
-	running = false;
-}
+	void AnimateEntity::Start()
+	{
+		running = true;
+	}
 
-bool AnimateEntity::isRunning()
-{
-	return running;
-}
+	void AnimateEntity::Stop()
+	{
+		running = false;
+	}
 
-AnimateEntity::~AnimateEntity()
-{
+	bool AnimateEntity::isRunning()
+	{
+		return running;
+	}
+
+	AnimateEntity::~AnimateEntity()
+	{
+	}
+
 }

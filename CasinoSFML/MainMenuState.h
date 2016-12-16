@@ -9,30 +9,33 @@
 
 #include "AnimateSprite.h"
 
-class MainMenuState :
-	public State
-{
-public:
-	bool HandleEvents(sf::Event _event);
-	bool Update(sf::Time _dt);
-	void Draw(sf::RenderWindow& _window);
+namespace Catan {
 
-	void resizeContent();
+	class MainMenuState :
+		public State
+	{
+	public:
+		bool HandleEvents(sf::Event _event);
+		bool Update(sf::Time _dt);
+		void Draw(sf::RenderWindow& _window);
 
-	MainMenuState(StateManager* _engine, Context _context);
-	~MainMenuState();
+		void resizeContent();
 
-private:
-	void NewGame();
-	void Exit();
+		MainMenuState(StateManager* _engine, Context _context);
+		~MainMenuState();
 
-	void spawnGUI();
-	void spawnBackground();
+	private:
+		void NewGame();
+		void Exit();
 
-private:
-	std::unique_ptr<AnimateSprite> sprite;
+		void spawnGUI();
+		void spawnBackground();
 
-	sfg::SFGUI sfg_sfgui;
-	sfg::Desktop sfg_dektop;
-};
+	private:
+		std::unique_ptr<AnimateSprite> sprite;
 
+		sfg::SFGUI sfg_sfgui;
+		sfg::Desktop sfg_dektop;
+	};
+
+}

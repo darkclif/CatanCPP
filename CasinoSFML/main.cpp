@@ -3,6 +3,8 @@
 #include "App.h"
 #include <iostream>
 
+using namespace Catan;
+
 int main() {
 
 	App app;

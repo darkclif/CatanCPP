@@ -1,35 +1,39 @@
 #pragma once
 #include <vector>
 
-enum Resource : int {
-	WOOD,
-	SHEEP,
-	CLAY,
-	IRON,
-	WHEAT,
-	_SIZE
-};
+namespace Catan {
 
-class ResourceBag {
-public:
-	ResourceBag();
-	ResourceBag(int _wood, int _sheep, int _clay, int _iron, int _wheat);
-	ResourceBag(int _count, Resource _res);
-	~ResourceBag();
+	enum Resource : int {
+		WOOD,
+		SHEEP,
+		CLAY,
+		IRON,
+		WHEAT,
+		_SIZE
+	};
 
-	void			addResource(int _count, Resource _res);
-	int				operator[](int _el);
-	
-	ResourceBag&	operator=(const ResourceBag& _bag);
+	class ResourceBag {
+	public:
+		ResourceBag();
+		ResourceBag(int _wood, int _sheep, int _clay, int _iron, int _wheat);
+		ResourceBag(int _count, Resource _res);
+		~ResourceBag();
 
-	ResourceBag&	operator+=(const ResourceBag& _bag);
-	ResourceBag&	operator-=(const ResourceBag& _bag);
+		void			addResource(int _count, Resource _res);
+		int				operator[](int _el);
 
-	bool	operator<=(const ResourceBag& _bag) const;
-	bool	operator>=(const ResourceBag& _bag) const;
+		ResourceBag&	operator=(const ResourceBag& _bag);
 
-	std::string		print() const;
+		ResourceBag&	operator+=(const ResourceBag& _bag);
+		ResourceBag&	operator-=(const ResourceBag& _bag);
 
-private:
-	std::vector<int> resources;
-};
+		bool	operator<=(const ResourceBag& _bag) const;
+		bool	operator>=(const ResourceBag& _bag) const;
+
+		std::string		print() const;
+
+	private:
+		std::vector<int> resources;
+	};
+
+}
