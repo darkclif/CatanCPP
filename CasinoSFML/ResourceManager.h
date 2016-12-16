@@ -20,14 +20,14 @@ namespace Catan {
 		};
 
 		// Resource acccesors 
-		sf::Texture&	getTexture(Catan::Textures::Name _texName);
-		sf::Font&		getFont(Catan::Fonts::Name _fontName);
+		sf::Texture&	getTexture(Textures::Name _texName);
+		sf::Font&		getFont(Fonts::Name _fontName);
 
 	private:
 
 		// Resource conteners 
-		std::map< Catan::Textures::Name, std::unique_ptr<sf::Texture> > mTextureMap;
-		std::map< Catan::Fonts::Name, std::unique_ptr<sf::Font> > mFontMap;
+		std::map< Textures::Name, std::unique_ptr<sf::Texture> > mTextureMap;
+		std::map< Fonts::Name, std::unique_ptr<sf::Font> > mFontMap;
 
 		// Clear data
 		void Clear();

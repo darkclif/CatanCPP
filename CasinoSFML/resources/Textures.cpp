@@ -30,8 +30,8 @@ namespace Catan {
 		/* List below must contain all enums in Texture::Name */
 		
 		/** DEV **/
-		{ Catan::Textures::Name::TEXTURE_ERROR, "textures/texture_error.png" },
-		{ Catan::Textures::Name::TEXTURE_EMPTY, "textures/texture_empty.png" },
+		{ Textures::Name::TEXTURE_ERROR, "textures/texture_error.png" },
+		{ Textures::Name::TEXTURE_EMPTY, "textures/texture_empty.png" },
 		
 		/** MISC **/
 		{ Textures::LOGO,"textures/logo.png" },

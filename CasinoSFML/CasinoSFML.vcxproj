@@ -185,6 +185,7 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="Functions.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameEnums.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="IntroState.h" />
     <ClInclude Include="MainMenuState.h" />

@@ -5,7 +5,7 @@
 
 namespace Catan {
 
-	sf::Texture & ResourceManager::getTexture(Catan::Textures::Name _texName)
+	sf::Texture & ResourceManager::getTexture(Textures::Name _texName)
 	{
 		auto it = mTextureMap.find(_texName);
 
@@ -15,12 +15,12 @@ namespace Catan {
 		else {
 			// Load new texture
 			std::unique_ptr<sf::Texture> lTexture(new sf::Texture());
-			std::string lSrc = Catan::Textures::getPath(_texName);
+			std::string lSrc = Textures::getPath(_texName);
 
 			if (!lTexture->loadFromFile(lSrc)) {
 				Console::debug << "No texture file found in path: " + lSrc;
 
-				lSrc = Catan::Textures::getPath(Catan::Textures::Name::TEXTURE_ERROR);
+				lSrc = Textures::getPath(Textures::Name::TEXTURE_ERROR);
 
 				if (!lTexture->loadFromFile(lSrc))
 					throw std::logic_error("Cannot load Textures::Name::TEXTURE_ERROR");
@@ -34,7 +34,7 @@ namespace Catan {
 		}
 	}
 
-	sf::Font & ResourceManager::getFont(Catan::Fonts::Name _fontName)
+	sf::Font & ResourceManager::getFont(Fonts::Name _fontName)
 	{
 		auto it = mFontMap.find(_fontName);
 
@@ -44,12 +44,12 @@ namespace Catan {
 		else {
 			// Add new font
 			std::unique_ptr<sf::Font> lFont(new sf::Font());
-			std::string lSrc = Catan::Fonts::getPath(_fontName);
+			std::string lSrc = Fonts::getPath(_fontName);
 
 			if (!lFont->loadFromFile(lSrc)) {
 				Console::debug << "No font file found in path: " + lSrc;
 
-				lSrc = Catan::Fonts::getPath(Catan::Fonts::Name::DEFAULT);
+				lSrc = Fonts::getPath(Fonts::Name::DEFAULT);
 
 				if (!lFont->loadFromFile(lSrc))
 					throw std::logic_error("Cannot load Fonts::Name::DEFAULT");

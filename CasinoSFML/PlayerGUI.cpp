@@ -102,7 +102,7 @@ namespace Catan {
 	void PlayerGUI::requestLocationBuild(Location * _location)
 	{
 		Player* lPlayer = game->getCurrentPlayer();
-		Game::RoundType lRoundType = game->getRoundType();
+		RoundType lRoundType = game->getRoundType();
 
 		if (_location->isNeighbourLocation()) {
 			mainMenuPanel.ChangeBuildingMessage("You cannot build village one road away from another village!");
@@ -119,7 +119,7 @@ namespace Catan {
 		}
 		else {  /* LocationSelectionMode::VILLAGE */
 
-			if (!(_location->isNearPlayerRoad(lPlayer)) && (lRoundType & Game::RoundType::NORMAL)) {
+			if (!(_location->isNearPlayerRoad(lPlayer)) && (lRoundType & RoundType::NORMAL)) {
 				mainMenuPanel.ChangeBuildingMessage("You can only build village beside one of your road!");
 				return;
 			}
@@ -140,7 +140,7 @@ namespace Catan {
 			return;
 		}
 
-		if (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD) {
+		if (game->getRoundType() & RoundType::BEGINNING_BACKWARD) {
 
 			if (!(_road->isNeighbourWithLocation(lPlayer, Road::RoundType::BEGINNING_BACKWARD))) {
 				mainMenuPanel.ChangeBuildingMessage("Road must be places beside village placed in this turn!");
@@ -165,10 +165,10 @@ namespace Catan {
 	/* Map selections */
 	void PlayerGUI::requestCitySelection()
 	{
-		if (game->getRoundType() & Game::RoundType::BEGINNING)
+		if (game->getRoundType() & RoundType::BEGINNING)
 			mainMenuPanel.requestPushInfo("In this phase you cannot build a city.");
 
-		if (!(game->canPlayerAffordItem(Game::Item::CITY, game->getCurrentPlayer())))
+		if (!(game->canPlayerAffordItem(Item::CITY, game->getCurrentPlayer())))
 			mainMenuPanel.requestPushInfo("Not enough resources to build city.");
 
 		/* Succes */
@@ -180,21 +180,21 @@ namespace Catan {
 
 	void PlayerGUI::requestVillageSelection()
 	{
-		if (!(game->canPlayerAffordItem(Game::Item::VILLAGE, game->getCurrentPlayer()))) {
+		if (!(game->canPlayerAffordItem(Item::VILLAGE, game->getCurrentPlayer()))) {
 
 			mainMenuPanel.requestPushInfo("Not enough resources to build village.");
 			return;
 		}
 
-		if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).village
-			&& (game->getRoundType() & Game::RoundType::BEGINNING_FORWARD)) {
+		if (game->getCurrentPlayer()->getPhaseState(RoundType::BEGINNING_FORWARD).village
+			&& (game->getRoundType() & RoundType::BEGINNING_FORWARD)) {
 
 			mainMenuPanel.requestPushInfo("You have already build one village in this phase.");
 			return;
 		}
 
-		if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).village
-			&& (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD)) {
+		if (game->getCurrentPlayer()->getPhaseState(RoundType::BEGINNING_BACKWARD).village
+			&& (game->getRoundType() & RoundType::BEGINNING_BACKWARD)) {
 
 			mainMenuPanel.requestPushInfo("You have already build one village in this phase.");
 			return;
@@ -209,21 +209,21 @@ namespace Catan {
 
 	void PlayerGUI::requestRoadSelection()
 	{
-		if (!(game->canPlayerAffordItem(Game::Item::ROAD, game->getCurrentPlayer()))) {
+		if (!(game->canPlayerAffordItem(Item::ROAD, game->getCurrentPlayer()))) {
 
 			mainMenuPanel.requestPushInfo("Not enough resources to build road.");
 			return;
 		}
 
-		if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).road
-			&& (game->getRoundType() & Game::RoundType::BEGINNING_FORWARD)) {
+		if (game->getCurrentPlayer()->getPhaseState(RoundType::BEGINNING_FORWARD).road
+			&& (game->getRoundType() & RoundType::BEGINNING_FORWARD)) {
 
 			mainMenuPanel.requestPushInfo("You have already build one road in this phase.");
 			return;
 		}
 
-		if (game->getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).road
-			&& (game->getRoundType() & Game::RoundType::BEGINNING_BACKWARD)) {
+		if (game->getCurrentPlayer()->getPhaseState(RoundType::BEGINNING_BACKWARD).road
+			&& (game->getRoundType() & RoundType::BEGINNING_BACKWARD)) {
 
 			mainMenuPanel.requestPushInfo("You have already build one road in this phase.");
 			return;
@@ -337,18 +337,18 @@ namespace Catan {
 		if (!(lRoundInfo.isThiefAwaken))
 			ShowWidget(Widget::SET_THIEF, false);
 
-		if (lRoundInfo.roundType & Game::BEGINNING) {
+		if (lRoundInfo.roundType & RoundType::BEGINNING) {
 			ShowWidget(Widget::THROW_DICES, false);
 			ShowWidget(Widget::BUILD_CITY, false);
 
 
-			if (lRoundInfo.roundType & Game::BEGINNING_FORWARD) {
-				if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_FORWARD).Completed()))
+			if (lRoundInfo.roundType & RoundType::BEGINNING_FORWARD) {
+				if (!(lPlayer->getPhaseState(RoundType::BEGINNING_FORWARD).Completed()))
 					ShowWidget(Widget::END_ROUND, false);
 
 			}
 			else { /* Game::BEGINNING_BACKWARD */
-				if (!(lPlayer->getPhaseState(Player::Phase::BEGINNING_BACKWARD).Completed()))
+				if (!(lPlayer->getPhaseState(RoundType::BEGINNING_BACKWARD).Completed()))
 					ShowWidget(Widget::END_ROUND, false);
 
 			}
@@ -614,7 +614,7 @@ namespace Catan {
 		lDice[0] = lRoundInfo.dices[0];
 		lDice[1] = lRoundInfo.dices[1];
 
-		Game::RoundType lRoundType = lRoundInfo.roundType;
+		RoundType lRoundType = lRoundInfo.roundType;
 		int lTurnNumber = lRoundInfo.roundNumber;
 
 		// Turn number
@@ -622,7 +622,7 @@ namespace Catan {
 		getWidget<InfoPanel::Widget, sfg::Label>(Widget::LABEL_TURN_NUMBER)->SetText(lTurnNumberString);
 
 		// Dice 
-		if (lRoundType & Game::RoundType::NORMAL) {
+		if (lRoundType & RoundType::NORMAL) {
 			std::string lPrefix = "Dice: ";
 			std::string lDiceString = "";
 			int lDiceSum = lDice[0] + lDice[1];
@@ -645,13 +645,13 @@ namespace Catan {
 
 		// Info
 		switch (lRoundType) {
-		case Game::BEGINNING_FORWARD:
+		case RoundType::BEGINNING_FORWARD:
 			lInfo = "You must build one village and road baside this village for free. Then end the round.";
 			break;
-		case Game::BEGINNING_BACKWARD:
+		case RoundType::BEGINNING_BACKWARD:
 			lInfo = "You must build one village and road baside this village for free, turns will go opposite. Then end the round.";
 			break;
-		case Game::NORMAL:
+		case RoundType::NORMAL:
 			lInfo = "Throw dices and do some actions, then end the round.";
 			break;
 		default: break;
@@ -702,14 +702,15 @@ namespace Catan {
 		ResourceBag lPlayerResources = lPlayer->getResources();
 
 		/* Resources */
-		for (int i = 0; i < Resource::_SIZE; i++) {
-			labCountResources[i]->SetText(std::to_string(lPlayerResources[i]));
+		int i = 0;
+		for (auto it = lPlayerResources.begin(); it != lPlayerResources.end(); it++) {
+			labCountResources[i++]->SetText(std::to_string(*it));
 		}
 
 		/* Units */
-		std::string numVillage = std::to_string(lPlayer->getItem(Player::Item::VILLAGE));
-		std::string numCity = std::to_string(lPlayer->getItem(Player::Item::CITY));
-		std::string numRoad = std::to_string(lPlayer->getItem(Player::Item::ROAD));
+		std::string numVillage = std::to_string(lPlayer->getItem(Item::VILLAGE));
+		std::string numCity = std::to_string(lPlayer->getItem(Item::CITY));
+		std::string numRoad = std::to_string(lPlayer->getItem(Item::ROAD));
 
 		getWidget<Widget, sfg::Label>(Widget::LAB_VILLAGE)->SetText("Villages: " + numVillage + "/5");
 		getWidget<Widget, sfg::Label>(Widget::LAB_CITY)->SetText("Cities: " + numCity + "/4");
@@ -736,12 +737,12 @@ namespace Catan {
 
 		std::vector<std::string> names = { "Wood","Sheep","Clay","Iron","Wheat" };
 
-		std::vector<Catan::Textures::Name> textureNames = {
-			Catan::Textures::ICON_WOOD,
-			Catan::Textures::ICON_SHEEP,
-			Catan::Textures::ICON_CLAY,
-			Catan::Textures::ICON_IRON,
-			Catan::Textures::ICON_WHEAT
+		std::vector<Textures::Name> textureNames = {
+			Textures::ICON_WOOD,
+			Textures::ICON_SHEEP,
+			Textures::ICON_CLAY,
+			Textures::ICON_IRON,
+			Textures::ICON_WHEAT
 		};
 
 		labCountResources.resize(names.size());
@@ -776,11 +777,11 @@ namespace Catan {
 
 		std::vector<std::string> costNames = { "Road","Village","City","Dev card" };
 
-		std::vector<std::vector<Catan::Textures::Name>> costResourceList = {
-			{Catan::Textures::ICON_WOOD, Catan::Textures::ICON_CLAY },
-			{Catan::Textures::ICON_WOOD, Catan::Textures::ICON_CLAY,  Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_SHEEP },
-			{Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_IRON, Catan::Textures::ICON_IRON, Catan::Textures::ICON_IRON },
-			{Catan::Textures::ICON_WHEAT, Catan::Textures::ICON_SHEEP, Catan::Textures::ICON_IRON }
+		std::vector<std::vector<Textures::Name>> costResourceList = {
+			{Textures::ICON_WOOD, Textures::ICON_CLAY },
+			{Textures::ICON_WOOD, Textures::ICON_CLAY,  Textures::ICON_WHEAT, Textures::ICON_SHEEP },
+			{Textures::ICON_WHEAT, Textures::ICON_WHEAT, Textures::ICON_IRON, Textures::ICON_IRON, Textures::ICON_IRON },
+			{Textures::ICON_WHEAT, Textures::ICON_SHEEP, Textures::ICON_IRON }
 		};
 
 		for (sf::Uint32 i = 0; i < costNames.size(); i++) {
@@ -805,10 +806,10 @@ namespace Catan {
 	{
 		auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 2.f);
 
-		std::vector<std::pair<Catan::Textures::Name, Widget>> textureNames = {
-			{ Catan::Textures::ICON_VILLAGE, Widget::LAB_VILLAGE },
-			{ Catan::Textures::ICON_CITY, Widget::LAB_CITY },
-			{ Catan::Textures::ICON_ROAD, Widget::LAB_ROAD }
+		std::vector<std::pair<Textures::Name, Widget>> textureNames = {
+			{ Textures::ICON_VILLAGE, Widget::LAB_VILLAGE },
+			{ Textures::ICON_CITY, Widget::LAB_CITY },
+			{ Textures::ICON_ROAD, Widget::LAB_ROAD }
 		};
 
 		for (auto& lUnit : textureNames) {
@@ -883,7 +884,7 @@ namespace Catan {
 
 	sf::Texture & PlayerGUI::DiceHolder::getTexture()
 	{
-		return ResourceMgr.getTexture(Catan::Textures::TEXTURE_EMPTY);
+		return ResourceMgr.getTexture(Textures::TEXTURE_EMPTY);
 	}
 
 	void PlayerGUI::DiceHolder::Dice::draw(sf::RenderWindow & _window)
@@ -921,7 +922,7 @@ namespace Catan {
 
 	sf::Texture & PlayerGUI::DiceHolder::Dice::getTexture()
 	{
-		return ResourceMgr.getTexture(Catan::Textures::DICES);
+		return ResourceMgr.getTexture(Textures::DICES);
 	}
 
 }

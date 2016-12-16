@@ -178,7 +178,7 @@ namespace Catan {
 
 	void Map::ComputeRender() {
 		// Load deafault tile texture to compute intervals
-		sf::Texture& tmpTexture = ResourceManager::getInstance().getTexture(Catan::Textures::Name::TILE_BLANK);
+		sf::Texture& tmpTexture = ResourceManager::getInstance().getTexture(Textures::Name::TILE_BLANK);
 		float tileOverlap = 4.f;
 		float lTriangleA = (float)(tmpTexture.getSize().y) * 0.5f;	// Hex border 
 		float lTriangleH = (float)(tmpTexture.getSize().x / 2.f);	// Height of triangle in hex

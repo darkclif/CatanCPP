@@ -51,28 +51,28 @@ namespace Catan {
 
 		// Logo
 		sprLogo.setPosition(0, -300);
-		sprLogo.setTexture(ResourceManager::getInstance().getTexture(Catan::Textures::LOGO));
-		Catan::setOriginAtCenter(sprLogo);
+		sprLogo.setTexture(ResourceManager::getInstance().getTexture(Textures::LOGO));
+		setOriginAtCenter(sprLogo);
 
 		// Big logo
 		sprBigLogo.setPosition(0, 0);
-		sprBigLogo.setTexture(ResourceManager::getInstance().getTexture(Catan::Textures::BIG_LOGO));
-		Catan::setOriginAtCenter(sprBigLogo);
+		sprBigLogo.setTexture(ResourceManager::getInstance().getTexture(Textures::BIG_LOGO));
+		setOriginAtCenter(sprBigLogo);
 
 		// Prompt
 		std::string lMsg = "Press any key to continue...";
 		txtPrompt.setString(lMsg);
 		txtPrompt.setPosition(0, 240);
-		txtPrompt.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::DEFAULT));
-		Catan::setOriginAtCenter(txtPrompt);
+		txtPrompt.setFont(ResourceManager::getInstance().getFont(Fonts::DEFAULT));
+		setOriginAtCenter(txtPrompt);
 
 		// Presents
 		lMsg = "PRESENTS";
 		txtPresents.setCharacterSize(30);
 		txtPresents.setString(lMsg);
 		txtPresents.setPosition(0, -150);
-		txtPresents.setFont(ResourceManager::getInstance().getFont(Catan::Fonts::DEFAULT));
-		Catan::setOriginAtCenter(txtPresents);
+		txtPresents.setFont(ResourceManager::getInstance().getFont(Fonts::DEFAULT));
+		setOriginAtCenter(txtPresents);
 
 		// Set center view
 		sf::View lView = context.window->getView();

@@ -74,16 +74,16 @@ namespace Catan {
 
 		// Move screen
 		if (isActionKeyPressed(ActionKey::LEFT) && (boundView.left > boundTable.left))
-			Catan::moveView(context.window, sf::Vector2f(-MOVE_SPEED * _dt.asSeconds(), 0.f));
+			moveView(context.window, sf::Vector2f(-MOVE_SPEED * _dt.asSeconds(), 0.f));
 		if (isActionKeyPressed(ActionKey::RIGHT) && (boundView.right < boundTable.right))
-			Catan::moveView(context.window, sf::Vector2f(MOVE_SPEED * _dt.asSeconds(), 0.f));
+			moveView(context.window, sf::Vector2f(MOVE_SPEED * _dt.asSeconds(), 0.f));
 		if (isActionKeyPressed(ActionKey::UP) && (boundView.top > boundTable.top))
-			Catan::moveView(context.window, sf::Vector2f(0.f, -MOVE_SPEED * _dt.asSeconds()));
+			moveView(context.window, sf::Vector2f(0.f, -MOVE_SPEED * _dt.asSeconds()));
 		if (isActionKeyPressed(ActionKey::DOWN) && (boundView.down < boundTable.down))
-			Catan::moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
+			moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
 
-		if (isActionKeyPressed(ActionKey::ZOOM_IN)) Catan::zoomView(context.window, 1.2f);
-		if (isActionKeyPressed(ActionKey::ZOOM_OUT)) Catan::zoomView(context.window, 0.8f);
+		if (isActionKeyPressed(ActionKey::ZOOM_IN)) zoomView(context.window, 1.2f);
+		if (isActionKeyPressed(ActionKey::ZOOM_OUT)) zoomView(context.window, 0.8f);
 
 		return true;
 	}
@@ -122,7 +122,7 @@ namespace Catan {
 		game = std::make_unique<Game>(3, map.get());
 		playerGUI = std::make_unique<PlayerGUI>(sfg_sfgui, sfg_desktop, game.get(), map.get());
 
-		Catan::zoomView(context.window, 3.f);
+		zoomView(context.window, 3.f);
 
 		spawnGUI();
 	}
@@ -144,17 +144,18 @@ namespace Catan {
 	//
 	void GameState::TableEntity::draw(sf::RenderWindow & _window)
 	{
+		setTexture(getTexture());
+		setOriginAtCenter();
+
 		sf::Sprite tmpSprite(getSprite());
-		tmpSprite.setTexture(getTexture());
-
-		Catan::setOriginAtCenter(tmpSprite);
-
+		
+		
 		_window.draw(tmpSprite);
 	}
 
 	GameState::TableEntity::TableEntity()
 	{
-		setTexture(ResourceMgr.getTexture(Catan::Textures::Name::TABLE));
+		setTexture(ResourceMgr.getTexture(Textures::Name::TABLE));
 
 		setScale(6.f, 6.f);
 		setPosition(sf::Vector2f(610.f, -800.f));
@@ -162,7 +163,7 @@ namespace Catan {
 
 	sf::Texture & GameState::TableEntity::getTexture()
 	{
-		return ResourceMgr.getTexture(Catan::Textures::Name::TABLE);
+		return ResourceMgr.getTexture(Textures::Name::TABLE);
 	}
 
 }

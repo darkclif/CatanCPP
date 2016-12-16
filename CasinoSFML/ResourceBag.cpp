@@ -5,8 +5,10 @@ namespace Catan {
 
 	ResourceBag::ResourceBag()
 	{
-		resources.resize(_SIZE);
-		for (int i = 0; i < _SIZE; i++) {
+		int lResNumber = (int)Resource::_SIZE;
+		resources.resize(lResNumber);
+
+		for (int i = 0; i < lResNumber; i++) {
 			resources[i] = 0;
 		}
 	}
@@ -22,46 +24,62 @@ namespace Catan {
 
 	ResourceBag::ResourceBag(int _count, Resource _res) : ResourceBag()
 	{
-		resources[_res] += _count;
+		if ((int)_res < (int)Resource::_SIZE && (int)_res >= 0)
+			resources[(int)_res] += _count;
 	}
-
 
 	ResourceBag::~ResourceBag()
 	{
 	}
 
+	const std::vector<int>::iterator ResourceBag::begin()
+	{
+		return resources.begin();
+	}
+
+	const std::vector<int>::iterator ResourceBag::end()
+	{
+		return resources.end();
+	}
+
 	void ResourceBag::addResource(int _count, Resource _res)
 	{
-		resources[_res] += _count;
+		if ((int)_res < (int)Resource::_SIZE && (int)_res >= 0)
+			resources[(int)_res] += _count;
+		else
+			return;
 	}
 
 	int ResourceBag::operator[](int _res) {
-		return resources[_res];
+		if ((int)_res < (int)Resource::_SIZE && (int)_res >= 0)
+			return resources[(int)_res];
+		else
+			return 0;
 	}
 
 	ResourceBag&	ResourceBag::operator=(const ResourceBag& _bag) {
-		for (int i = 0; i < Resource::_SIZE; i++) {
+		for (int i = 0; i < (int)Resource::_SIZE; i++) {
 			this->resources[i] = _bag.resources[i];
 		}
 		return *this;
 	}
 
 	ResourceBag&	ResourceBag::operator+=(const ResourceBag& _bag) {
-		for (int i = 0; i < Resource::_SIZE; i++) {
+		for (int i = 0; i < (int)Resource::_SIZE; i++) {
 			this->resources[i] += _bag.resources[i];
 		}
 		return *this;
 	}
 
 	ResourceBag&	ResourceBag::operator-=(const ResourceBag& _bag) {
-		for (int i = 0; i < Resource::_SIZE; i++) {
+		for (int i = 0; i < (int)Resource::_SIZE; i++) {
 			this->resources[i] -= _bag.resources[i];
 		}
 		return *this;
 	}
 
 	bool	ResourceBag::operator<=(const ResourceBag& _bag) const {
-		for (int i = 0; i < Resource::_SIZE; i++) {
+		for (int i = 0; i < (int)Resource::_SIZE; i++) {
 			if (!(this->resources[i] <= _bag.resources[i]))
 				return false;
 		}
@@ -70,7 +88,7 @@ namespace Catan {
 	};
 
 	bool	ResourceBag::operator>=(const ResourceBag& _bag) const {
-		for (int i = 0; i < Resource::_SIZE; i++) {
+		for (int i = 0; i < (int)Resource::_SIZE; i++) {
 			if (!(this->resources[i] >= _bag.resources[i]))
 				return false;
 		}

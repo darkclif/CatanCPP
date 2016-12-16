@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Resourcebag.h"
+#include "GameEnums.h"
 
 namespace Catan {
 
@@ -12,27 +13,12 @@ namespace Catan {
 	class Game
 	{
 	public:
-		/* Types */
-		enum Item {
-			ROAD,
-			VILLAGE,
-			CITY
-		};
-
 		enum ContentChange : unsigned int {
 			PLAYER_RESOURCE = 1,
 			CURRENT_PLAYER = 1 << 1,
 			MENU_BUTTONS = 1 << 2,
 			DICE_THROW = 1 << 3,
 			ALL = PLAYER_RESOURCE | CURRENT_PLAYER | MENU_BUTTONS | DICE_THROW
-		};
-
-		enum RoundType : char {
-			BEGINNING_FORWARD = 1,
-			BEGINNING_BACKWARD = 1 << 1,
-			NORMAL = 1 << 2,
-			BEGINNING = BEGINNING_BACKWARD | BEGINNING_FORWARD,
-			ANY = NORMAL | BEGINNING_BACKWARD | BEGINNING_FORWARD
 		};
 
 		struct RoundInfo {
@@ -44,7 +30,7 @@ namespace Catan {
 			int			roundNumber;
 
 			RoundInfo() {
-				roundType = BEGINNING_FORWARD;
+				roundType = RoundType::BEGINNING_FORWARD;
 				roundNumber = 0;
 
 				isThiefAwaken = false;

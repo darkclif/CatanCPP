@@ -14,9 +14,9 @@ namespace Catan {
 		struct PlayerConfig {
 			std::string				name;
 			sf::Color				color;
-			Catan::Textures::Name	avatarTexture;
+			Textures::Name	avatarTexture;
 
-			PlayerConfig(std::string _name, sf::Color _color, Catan::Textures::Name _texName) {
+			PlayerConfig(std::string _name, sf::Color _color, Textures::Name _texName) {
 				name = _name;
 				color = _color;
 				avatarTexture = _texName;

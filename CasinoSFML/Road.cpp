@@ -36,7 +36,7 @@ namespace Catan {
 
 	sf::Texture & Road::getTexture()
 	{
-		auto lTextureName = Catan::Textures::Name::ROAD;
+		auto lTextureName = Textures::Name::ROAD;
 		return ResourceManager::getInstance().getTexture(lTextureName);
 	}
 

@@ -39,10 +39,16 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{fec5bfb8-b151-482d-a177-996cdd2cb000}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Game\MapItem">
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{86bd8325-587e-4af8-ada3-05c282ed8c69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{2239f18f-7b38-4924-bff2-5e5d495a6316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\MapItems">
       <UniqueIdentifier>{3d308693-66ea-41f5-92b8-abacdfb6aa7b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\MapItem">
+    <Filter Include="Source Files\Game\MapItems">
       <UniqueIdentifier>{66f96a6d-2527-47ca-9e0e-790518eb21a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -50,17 +56,11 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Resources\Textures.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\Fonts.cpp">
       <Filter>Source Files\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="Console.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawableEntity.cpp">
       <Filter>Source Files\Entities</Filter>
@@ -92,9 +92,6 @@
     <ClCompile Include="MainMenuState.cpp">
       <Filter>Source Files\States</Filter>
     </ClCompile>
-    <ClCompile Include="Functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AnimateSprite.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
@@ -110,34 +107,37 @@
     <ClCompile Include="PlayerGUI.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceBag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Road.cpp">
-      <Filter>Source Files\Game\MapItem</Filter>
+      <Filter>Source Files\Game\MapItems</Filter>
     </ClCompile>
     <ClCompile Include="Tile.cpp">
-      <Filter>Source Files\Game\MapItem</Filter>
+      <Filter>Source Files\Game\MapItems</Filter>
     </ClCompile>
     <ClCompile Include="Location.cpp">
-      <Filter>Source Files\Game\MapItem</Filter>
+      <Filter>Source Files\Game\MapItems</Filter>
     </ClCompile>
     <ClCompile Include="SelectableMapItem.cpp">
-      <Filter>Source Files\Game\MapItem</Filter>
+      <Filter>Source Files\Game\MapItems</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceBag.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Resources\Textures.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
     <ClInclude Include="resources\Fonts.h">
       <Filter>Header Files\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="Console.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DrawableEntity.h">
       <Filter>Header Files\Entities</Filter>
@@ -166,12 +166,6 @@
     <ClInclude Include="IntroState.h">
       <Filter>Header Files\States</Filter>
     </ClInclude>
-    <ClInclude Include="Functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="States.h">
-      <Filter>Header Files\States</Filter>
-    </ClInclude>
     <ClInclude Include="MainMenuState.h">
       <Filter>Header Files\States</Filter>
     </ClInclude>
@@ -190,20 +184,35 @@
     <ClInclude Include="PlayerGUI.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceBag.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Tile.h">
-      <Filter>Header Files\Game\MapItem</Filter>
+      <Filter>Header Files\Game\MapItems</Filter>
     </ClInclude>
     <ClInclude Include="Road.h">
-      <Filter>Header Files\Game\MapItem</Filter>
+      <Filter>Header Files\Game\MapItems</Filter>
     </ClInclude>
     <ClInclude Include="Location.h">
-      <Filter>Header Files\Game\MapItem</Filter>
+      <Filter>Header Files\Game\MapItems</Filter>
     </ClInclude>
     <ClInclude Include="SelectableMapItem.h">
-      <Filter>Header Files\Game\MapItem</Filter>
+      <Filter>Header Files\Game\MapItems</Filter>
+    </ClInclude>
+    <ClInclude Include="States.h">
+      <Filter>Header Files\StateManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceBag.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEnums.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

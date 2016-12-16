@@ -21,7 +21,7 @@ namespace Catan {
 		void						nextFrame();
 		void						nextDelay();
 
-		AnimateSprite(Catan::Textures::Name _texName) : AnimateEntity(), DrawableEntity() {
+		AnimateSprite(Textures::Name _texName) : AnimateEntity(), DrawableEntity() {
 			textureName = _texName;
 			currentFrameTime = sf::Time::Zero;
 			currentFrame = 0;
@@ -41,7 +41,7 @@ namespace Catan {
 		sf::Time					currentFrameTime;
 
 	private:
-		Catan::Textures::Name		textureName;
+		Textures::Name		textureName;
 	};
 
 }

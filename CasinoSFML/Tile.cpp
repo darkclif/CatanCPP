@@ -10,18 +10,18 @@ namespace Catan {
 	//
 	// Dice number
 	//
-	const Catan::Textures::Name DiceNumber::arrDiceToTexture[11] = {
-		Catan::Textures::Name::TILE_DICE_NUM_2,
-		Catan::Textures::Name::TILE_DICE_NUM_3,
-		Catan::Textures::Name::TILE_DICE_NUM_4,
-		Catan::Textures::Name::TILE_DICE_NUM_5,
-		Catan::Textures::Name::TILE_DICE_NUM_6,
-		Catan::Textures::Name::TEXTURE_EMPTY,
-		Catan::Textures::Name::TILE_DICE_NUM_8,
-		Catan::Textures::Name::TILE_DICE_NUM_9,
-		Catan::Textures::Name::TILE_DICE_NUM_10,
-		Catan::Textures::Name::TILE_DICE_NUM_11,
-		Catan::Textures::Name::TILE_DICE_NUM_12,
+	const Textures::Name DiceNumber::arrDiceToTexture[11] = {
+		Textures::Name::TILE_DICE_NUM_2,
+		Textures::Name::TILE_DICE_NUM_3,
+		Textures::Name::TILE_DICE_NUM_4,
+		Textures::Name::TILE_DICE_NUM_5,
+		Textures::Name::TILE_DICE_NUM_6,
+		Textures::Name::TEXTURE_EMPTY,
+		Textures::Name::TILE_DICE_NUM_8,
+		Textures::Name::TILE_DICE_NUM_9,
+		Textures::Name::TILE_DICE_NUM_10,
+		Textures::Name::TILE_DICE_NUM_11,
+		Textures::Name::TILE_DICE_NUM_12,
 	};
 
 	void DiceNumber::draw(sf::RenderWindow & _window)
@@ -47,11 +47,11 @@ namespace Catan {
 	sf::Texture & DiceNumber::getTexture()
 	{
 		if (number > 1 && number < 13) {
-			Catan::Textures::Name lTextureName = arrDiceToTexture[number - 2];
+			Textures::Name lTextureName = arrDiceToTexture[number - 2];
 			return ResourceManager::getInstance().getTexture(lTextureName);
 		}
 		else {
-			return ResourceManager::getInstance().getTexture(Catan::Textures::TEXTURE_EMPTY);
+			return ResourceManager::getInstance().getTexture(Textures::TEXTURE_EMPTY);
 		}
 	}
 
@@ -72,22 +72,22 @@ namespace Catan {
 
 	sf::Texture & Thief::getTexture()
 	{
-		Catan::Textures::Name lTextureName = Catan::Textures::THIEF;
+		Textures::Name lTextureName = Textures::THIEF;
 		return ResourceManager::getInstance().getTexture(lTextureName);
 	}
 
 	//
 	// Tile
 	//
-	const std::map<Tile::TileType, Catan::Textures::Name>	Tile::mapTypeToTexture = {
-		{ TileType::WOOD, Catan::Textures::Name::TILE_WOOD},
-		{ TileType::SHEEP, Catan::Textures::Name::TILE_SHEEP },
-		{ TileType::CLAY, Catan::Textures::Name::TILE_CLAY },
-		{ TileType::IRON, Catan::Textures::Name::TILE_IRON },
-		{ TileType::WHEAT, Catan::Textures::Name::TILE_WHEAT },
-		{ TileType::DESERT, Catan::Textures::Name::TILE_DESERT },
-		{ TileType::BLANK, Catan::Textures::Name::TILE_BLANK },
-		{ TileType::NOT_USED, Catan::Textures::Name::TILE_NOT_USED }
+	const std::map<Tile::TileType, Textures::Name>	Tile::mapTypeToTexture = {
+		{ TileType::WOOD, Textures::Name::TILE_WOOD},
+		{ TileType::SHEEP, Textures::Name::TILE_SHEEP },
+		{ TileType::CLAY, Textures::Name::TILE_CLAY },
+		{ TileType::IRON, Textures::Name::TILE_IRON },
+		{ TileType::WHEAT, Textures::Name::TILE_WHEAT },
+		{ TileType::DESERT, Textures::Name::TILE_DESERT },
+		{ TileType::BLANK, Textures::Name::TILE_BLANK },
+		{ TileType::NOT_USED, Textures::Name::TILE_NOT_USED }
 	};
 
 	const std::map<Tile::TileType, Resource> Tile::mapTypeToResource = {
@@ -181,7 +181,7 @@ namespace Catan {
 
 	sf::Texture& Tile::getTexture()
 	{
-		Catan::Textures::Name lTextureName = mapTypeToTexture.at(type);
+		Textures::Name lTextureName = mapTypeToTexture.at(type);
 		return ResourceManager::getInstance().getTexture(lTextureName);
 	}
 

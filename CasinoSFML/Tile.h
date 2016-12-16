@@ -30,7 +30,7 @@ namespace Catan {
 		sf::Texture& getTexture();
 
 		int number;
-		static const Catan::Textures::Name arrDiceToTexture[11];
+		static const Textures::Name arrDiceToTexture[11];
 
 	};
 
@@ -118,7 +118,7 @@ namespace Catan {
 		std::unique_ptr<Thief>						thiefEntity;
 		std::unique_ptr<DiceNumber>					numberEntity;
 
-		static const std::map<TileType, Catan::Textures::Name>	mapTypeToTexture;
+		static const std::map<TileType, Textures::Name>	mapTypeToTexture;
 		static const std::map<TileType, Resource>	mapTypeToResource;
 	};
 

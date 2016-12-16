@@ -3,33 +3,36 @@
 
 namespace Catan {
 
-	Player::Player(std::string _name, sf::Color _color, Catan::Textures::Name _avatar)
+	Player::Player(std::string _name, sf::Color _color, Textures::Name _avatar)
 	{
 		name = _name;
 		color = _color;
 		avatarTexture = _avatar;
 		winPoints = 0;
 
-		items.push_back(ItemCount(15)); // ROAD
-		items.push_back(ItemCount(4)); // CITY
-		items.push_back(ItemCount(5)); // VILLAGE
+		buildingsInRound.insert({ RoundType::BEGINNING_FORWARD, PhaseBuildings() });
+		buildingsInRound.insert({ RoundType::BEGINNING_BACKWARD, PhaseBuildings() });
+
+		items.insert({ Item::ROAD, ItemCount(15) }); // ROAD
+		items.insert({ Item::CITY, ItemCount(4) }); // CITY
+		items.insert({ Item::VILLAGE, ItemCount(5) }); // VILLAGE
 	}
 
 	Player::~Player()
 	{
 	}
 
-	Player::PhaseBuildings Player::getPhaseState(Phase _phase)
+	Player::PhaseBuildings Player::getPhaseState(RoundType _type)
 	{
-		return phaseBuilings[(int)(_phase)];
+		return buildingsInRound.at(_type);
 	}
 
-	void Player::setPhaseState(Phase _phase, Item _item)
+	void Player::setPhaseState(RoundType _type, Item _item)
 	{
 		if (_item == Item::ROAD)
-			phaseBuilings[(int)(_phase)].road = true;
+			buildingsInRound.at(_type).road = true;
 		if (_item == Item::VILLAGE)
-			phaseBuilings[(int)(_phase)].village = true;
+			buildingsInRound.at(_type).village = true;
 	}
 
 	void Player::giveResources(ResourceBag _bag)
@@ -55,17 +58,17 @@ namespace Catan {
 
 	int Player::getItem(Item _item) const
 	{
-		return items[(int)(_item)].count;
+		return items.at(_item).count;
 	}
 
 	void Player::takeItem(Item _item, int _count)
 	{
 		if (_count > getItem(_item)) {
 			Console::debug << "Trying to get more items (roads/cities/villages) than player already has!" << std::endl;
-			items[(int)(_item)].count = 0;
+			items.at(_item).count = 0;
 		}
 
-		items[(int)(_item)].count -= _count;
+		items.at(_item).count -= _count;
 
 		recalculateWinPoints();
 	}
@@ -75,10 +78,10 @@ namespace Catan {
 		if (_count <= 0)
 			return;
 
-		items[(int)(_item)].count += _count;
+		items.at(_item).count += _count;
 
-		if (items[(int)(_item)].count > items[(int)(_item)].MAX)
-			items[(int)(_item)].count = items[(int)(_item)].MAX;
+		if (items.at(_item).count > items.at(_item).MAX)
+			items.at(_item).count = items.at(_item).MAX;
 
 		recalculateWinPoints();
 	}
@@ -87,8 +90,8 @@ namespace Catan {
 	{
 		int lWP = 0;
 
-		lWP += 1 * (items[(int)Item::VILLAGE].MAX - items[(int)Item::VILLAGE].count);
-		lWP += 2 * (items[(int)Item::CITY].MAX - items[(int)Item::CITY].count);
+		lWP += 1 * (items.at(Item::VILLAGE).MAX - items.at(Item::VILLAGE).count);
+		lWP += 2 * (items.at(Item::CITY).MAX - items.at(Item::CITY).count);
 
 		winPoints = lWP;
 	}
@@ -108,7 +111,7 @@ namespace Catan {
 		return color;
 	}
 
-	Catan::Textures::Name Player::getAvatarTexture() const
+	Textures::Name Player::getAvatarTexture() const
 	{
 		return avatarTexture;
 	}

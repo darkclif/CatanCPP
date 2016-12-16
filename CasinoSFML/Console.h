@@ -11,8 +11,8 @@ namespace Catan {
 		// Save debug and info
 		class Log {
 		public:
-			std::vector<std::string> logDebug = { "" };
-			std::vector<std::string> logInfo = { "" };
+			std::vector<std::string>::iterator logDebugIt();
+			std::vector<std::string>::iterator logInfoIt();
 
 			void writeDebug(std::string _line);
 			void writeInfo(std::string _line);
@@ -20,6 +20,9 @@ namespace Catan {
 			Log() {};
 		private:
 			static const int MAX_LOG = 100;
+		
+			std::vector<std::string> logDebug = { "" };
+			std::vector<std::string> logInfo = { "" };
 		};
 		extern Log consoleLog;
 

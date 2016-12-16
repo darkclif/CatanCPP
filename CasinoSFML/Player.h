@@ -6,31 +6,19 @@
 
 #include "resources/Textures.h"
 #include "ResourceBag.h"
+#include "GameEnums.h"
 
 namespace Catan {
 
 	class Player
 	{
 	public:
-		enum class Item : int {
-			ROAD = 0,
-			CITY,
-			VILLAGE,
-			_SIZE
-		};
-
 		struct ItemCount {
 			int	count;
 			const int MAX;
 
 			ItemCount(int _max) : MAX{ _max }, count{ _max } {};
 			ItemCount(int _max, int _count) : MAX{ _max }, count{ _count } {};
-		};
-
-		enum class Phase : int {
-			BEGINNING_FORWARD,
-			BEGINNING_BACKWARD,
-			_SIZE
 		};
 
 		struct PhaseBuildings {
@@ -40,11 +28,11 @@ namespace Catan {
 			inline bool Completed() { return (road && village); }
 		};
 
-		Player(std::string _name, sf::Color _color, Catan::Textures::Name _avatar);
+		Player(std::string _name, sf::Color _color, Textures::Name _avatar);
 		~Player();
 
-		PhaseBuildings	getPhaseState(Phase);
-		void			setPhaseState(Phase, Item);
+		PhaseBuildings	getPhaseState(RoundType);
+		void			setPhaseState(RoundType, Item);
 
 		void			giveResources(ResourceBag _bag);
 		ResourceBag		getResources() const;
@@ -60,22 +48,23 @@ namespace Catan {
 
 		std::string		getName() const;
 		sf::Color		getColor() const;
-		Catan::Textures::Name getAvatarTexture() const;
+		Textures::Name getAvatarTexture() const;
 
 	private:
 		// Player info
-		Catan::Textures::Name	avatarTexture;
+		Textures::Name	avatarTexture;
 		std::string				name;
 		sf::Color				color;
 
 		// Player items
-		std::vector<ItemCount>	items;
+		std::map<Item, ItemCount> items;
 		ResourceBag				playerResources;
 
 		int						winPoints;
 
-		// Beginning phases states
-		PhaseBuildings			phaseBuilings[(int)(Phase::_SIZE)];
+		// Buildings in beginning rounds 
+		// (to prevent building more than road and village per round)
+		std::map<RoundType, PhaseBuildings>	buildingsInRound;
 	};
 
 }

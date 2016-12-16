@@ -62,13 +62,13 @@ namespace Catan {
 
 		winWindow->SetAllocation(sf::FloatRect(0, 0, 400, 200));
 		winWindow->SetStyle(sfg::Window::Style::BACKGROUND);
-		Catan::setWindowAtCenter(winWindow, context.window);
+		setWindowAtCenter(winWindow, context.window);
 
 		sfg_dektop.Add(winWindow);
 	}
 
 	void MainMenuState::spawnBackground() {
-		std::unique_ptr<AnimateSprite> tmpSprite(new AnimateSprite(Catan::Textures::Name::MENU_BG_2));
+		std::unique_ptr<AnimateSprite> tmpSprite(new AnimateSprite(Textures::Name::MENU_BG_2));
 		tmpSprite->addFrame(sf::IntRect(0, 0, 232, 666));
 		tmpSprite->addFrame(sf::IntRect(232, 0, 232, 666));
 
@@ -84,7 +84,7 @@ namespace Catan {
 
 	MainMenuState::MainMenuState(StateManager * _engine, Context _context) : State(_engine, _context)
 	{
-		Catan::setViewOrigin(context.window, sf::Vector2f(0.f, 0.f));
+		setViewOrigin(context.window, sf::Vector2f(0.f, 0.f));
 
 		spawnGUI();
 		spawnBackground();

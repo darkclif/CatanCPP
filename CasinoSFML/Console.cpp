@@ -9,6 +9,16 @@ namespace Catan {
 
 		Log consoleLog;
 
+		std::vector<std::string>::iterator Log::logDebugIt()
+		{
+			return logDebug.begin();
+		}
+
+		std::vector<std::string>::iterator Log::logInfoIt()
+		{
+			return logDebug.begin();
+		}
+
 		//
 		// Log		
 		//

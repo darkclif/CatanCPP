@@ -67,12 +67,12 @@ namespace Catan {
 
 	sf::Texture & Location::getTexture()
 	{
-		Catan::Textures::Name lTextureName;
+		Textures::Name lTextureName;
 
 		switch (type) {
-		case Type::CITY:	lTextureName = Catan::Textures::Name::CITY; break;
-		case Type::VILLAGE: lTextureName = Catan::Textures::Name::VILLAGE; break;
-		default:			lTextureName = Catan::Textures::Name::VILLAGE; break;
+		case Type::CITY:	lTextureName = Textures::Name::CITY; break;
+		case Type::VILLAGE: lTextureName = Textures::Name::VILLAGE; break;
+		default:			lTextureName = Textures::Name::VILLAGE; break;
 		}
 
 		return ResourceMgr.getTexture(lTextureName);
@@ -102,7 +102,7 @@ namespace Catan {
 			tmpSprite.setColor(tmpColor);
 
 			if (getType() == Type::VILLAGE)
-				tmpSprite.setTexture(ResourceMgr.getTexture(Catan::Textures::CITY));
+				tmpSprite.setTexture(ResourceMgr.getTexture(Textures::CITY));
 		}
 
 		if (getParent() != nullptr)
@@ -119,6 +119,16 @@ namespace Catan {
 	Location::Type Location::getType()
 	{
 		return type;
+	}
+
+	void Location::setBonus(Bonus _bonus)
+	{
+		bonus = _bonus;
+	}
+
+	Location::Bonus Location::getBonus()
+	{
+		return bonus;
 	}
 
 	void Location::Build(Type _type, Player * _player, RoundType _round)

@@ -4,10 +4,10 @@
 
 namespace Catan {
 
-	const std::map<Game::Item, ResourceBag> Game::buildingsCosts = {
-		std::make_pair<Game::Item, ResourceBag>(Game::Item::ROAD, ResourceBag(1,0,1,0,0)),
-		std::make_pair<Game::Item, ResourceBag>(Game::Item::VILLAGE, ResourceBag(1,1,1,0,1)),
-		std::make_pair<Game::Item, ResourceBag>(Game::Item::CITY, ResourceBag(0,0,0,3,2))
+	const std::map<Item, ResourceBag> Game::buildingsCosts = {
+		std::make_pair<Item, ResourceBag>(Item::ROAD, ResourceBag(1,0,1,0,0)),
+		std::make_pair<Item, ResourceBag>(Item::VILLAGE, ResourceBag(1,1,1,0,1)),
+		std::make_pair<Item, ResourceBag>(Item::CITY, ResourceBag(0,0,0,3,2))
 	};
 
 	bool Game::canPlayerAffordItem(Item _item, Player * _player)
@@ -42,12 +42,12 @@ namespace Catan {
 		numCurrentPlayer = 0;
 
 		/*TEST*/
+		int a = 100;
 		for (auto& lPlayer : arrPlayers) {
-			int a = 100;
 			lPlayer.giveResources(ResourceBag(a, a, a, a, a));
 		}
 
-		setRoundType(Game::RoundType::NORMAL);
+		//setRoundType(Game::RoundType::NORMAL);
 		/*END_TEST*/
 	}
 
@@ -77,21 +77,21 @@ namespace Catan {
 			if (_location->isNeighbourLocation())
 				return false;
 
-			if (_player->getPhaseState(Player::Phase::BEGINNING_FORWARD).village)
+			if (_player->getPhaseState(RoundType::BEGINNING_FORWARD).village)
 				return false;
 
 			_location->Build(Location::Type::VILLAGE, _player, Location::RoundType::BEGINNING_FORWARD);
-			_player->setPhaseState(Player::Phase::BEGINNING_FORWARD, Player::Item::VILLAGE);
+			_player->setPhaseState(RoundType::BEGINNING_FORWARD, Item::VILLAGE);
 		}
 		else if (getRoundType() == RoundType::BEGINNING_BACKWARD) {
 			if (_location->isNeighbourLocation())
 				return false;
 
-			if (_player->getPhaseState(Player::Phase::BEGINNING_BACKWARD).village)
+			if (_player->getPhaseState(RoundType::BEGINNING_BACKWARD).village)
 				return false;
 
 			_location->Build(Location::Type::VILLAGE, _player, Location::RoundType::BEGINNING_BACKWARD);
-			_player->setPhaseState(Player::Phase::BEGINNING_BACKWARD, Player::Item::VILLAGE);
+			_player->setPhaseState(RoundType::BEGINNING_BACKWARD, Item::VILLAGE);
 		}
 		else { /* NORMAL ROUND */
 			if (!canPlayerAffordItem(Item::VILLAGE, _player))
@@ -103,14 +103,14 @@ namespace Catan {
 			if (!(_location->isNearPlayerRoad(_player)))
 				return false;
 
-			if (_player->getItem(Player::Item::VILLAGE) <= 0)
+			if (_player->getItem(Item::VILLAGE) <= 0)
 				return false;
 
 			_player->takeResources(buildingsCosts.at(Item::VILLAGE));
 			_location->Build(Location::Type::VILLAGE, _player);
 		}
 
-		_player->takeItem(Player::Item::VILLAGE, 1);
+		_player->takeItem(Item::VILLAGE, 1);
 		addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 		return true;
 	}
@@ -124,7 +124,7 @@ namespace Catan {
 			if (!(canPlayerAffordItem(Item::CITY, _player)))
 				return false;
 
-			if (_player->getItem(Player::Item::CITY) <= 0)
+			if (_player->getItem(Item::CITY) <= 0)
 				return false;
 
 			_player->takeResources(buildingsCosts.at(Item::CITY));
@@ -134,8 +134,8 @@ namespace Catan {
 			return false;
 		}
 
-		_player->takeItem(Player::Item::CITY, 1);
-		_player->giveItem(Player::Item::VILLAGE, 1);
+		_player->takeItem(Item::CITY, 1);
+		_player->giveItem(Item::VILLAGE, 1);
 		addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 		return true;
 	}
@@ -149,21 +149,21 @@ namespace Catan {
 			if (!(_road->isNeighbourWithLocation(_player, Road::RoundType::BEGINNING_FORWARD)))
 				return false;
 
-			if (_player->getPhaseState(Player::Phase::BEGINNING_FORWARD).road)
+			if (_player->getPhaseState(RoundType::BEGINNING_FORWARD).road)
 				return false;
 
 			_road->setOwner(_player);
-			_player->setPhaseState(Player::Phase::BEGINNING_FORWARD, Player::Item::ROAD);
+			_player->setPhaseState(RoundType::BEGINNING_FORWARD, Item::ROAD);
 		}
 		else if (getRoundType() == RoundType::BEGINNING_BACKWARD) {
 			if (!(_road->isNeighbourWithLocation(_player, Road::RoundType::BEGINNING_BACKWARD)))
 				return false;
 
-			if (_player->getPhaseState(Player::Phase::BEGINNING_BACKWARD).road)
+			if (_player->getPhaseState(RoundType::BEGINNING_BACKWARD).road)
 				return false;
 
 			_road->setOwner(_player);
-			_player->setPhaseState(Player::Phase::BEGINNING_BACKWARD, Player::Item::ROAD);
+			_player->setPhaseState(RoundType::BEGINNING_BACKWARD, Item::ROAD);
 		}
 		else { /* NORMAL ROUND */
 			if (!(canPlayerAffordItem(Item::ROAD, _player)))
@@ -172,14 +172,14 @@ namespace Catan {
 			if (!(_road->isBesidePlayerItem(_player)))
 				return false;
 
-			if (_player->getItem(Player::Item::ROAD) <= 0)
+			if (_player->getItem(Item::ROAD) <= 0)
 				return false;
 
 			_player->takeResources(buildingsCosts.at(Item::ROAD));
 			_road->setOwner(_player);
 		}
 
-		_player->takeItem(Player::Item::ROAD, 1);
+		_player->takeItem(Item::ROAD, 1);
 		addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 		return true;
 	}
@@ -210,7 +210,7 @@ namespace Catan {
 			numCurrentPlayer %= numPlayers;
 			break;
 		case RoundType::BEGINNING_FORWARD:
-			if (!(getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_FORWARD).Completed()))
+			if (!(getCurrentPlayer()->getPhaseState(RoundType::BEGINNING_FORWARD).Completed()))
 				return false;
 
 			numCurrentPlayer++;
@@ -220,7 +220,7 @@ namespace Catan {
 			}
 			break;
 		case RoundType::BEGINNING_BACKWARD:
-			if (!(getCurrentPlayer()->getPhaseState(Player::Phase::BEGINNING_BACKWARD).Completed()))
+			if (!(getCurrentPlayer()->getPhaseState(RoundType::BEGINNING_BACKWARD).Completed()))
 				return false;
 
 			numCurrentPlayer--;
@@ -276,7 +276,7 @@ namespace Catan {
 		return true;
 	}
 
-	Game::RoundType Game::getRoundType() const
+	RoundType Game::getRoundType() const
 	{
 		return roundInfo.roundType;
 	}

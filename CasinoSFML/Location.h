@@ -28,9 +28,6 @@ namespace Catan {
 			NONE
 		};
 
-		Location();
-		~Location();
-
 		bool						addRoad(Road* _road);
 		const std::vector<Road*>&	getRoads();
 
@@ -43,8 +40,13 @@ namespace Catan {
 		void					setType(Type _type);
 		Type					getType();
 
+		void					setBonus(Bonus _type);
+		Bonus					getBonus();
+
 		void					Build(Type _type, Player* _player, RoundType _round = RoundType::NORMAL);
 
+		Location();
+		~Location();
 	private:
 		std::vector<Road*>		arrRoads;
 
