@@ -44,6 +44,8 @@ Game::Game(int _players, Map* _map) : gameMap{ _map }, numPlayers{ _players }, c
 		int a = 100;
 		lPlayer.giveResources(ResourceBag(a,a,a,a,a));
 	}
+
+	setRoundType(Game::RoundType::NORMAL);
 	/*END_TEST*/
 }
 
@@ -99,10 +101,14 @@ bool Game::buildVillage(Player * _player, Location * _location)
 		if (!(_location->isNearPlayerRoad(_player)))
 			return false;
 
+		if (_player->getItem(Player::Item::VILLAGE) <= 0)
+			return false;
+
 		_player->takeResources(buildingsCosts.at(Item::VILLAGE));
 		_location->Build(Location::Type::VILLAGE, _player);	
 	}
 	
+	_player->takeItem(Player::Item::VILLAGE, 1);
 	addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 	return true;
 }
@@ -116,6 +122,9 @@ bool Game::buildCity(Player * _player, Location * _location)
 		if (!(canPlayerAffordItem(Item::CITY, _player)))
 			return false;
 
+		if (_player->getItem(Player::Item::CITY) <= 0)
+			return false;
+
 		_player->takeResources(buildingsCosts.at(Item::CITY));
 		_location->Build(Location::Type::CITY, _player);
 	}
@@ -123,6 +132,8 @@ bool Game::buildCity(Player * _player, Location * _location)
 		return false;
 	}
 
+	_player->takeItem(Player::Item::CITY, 1);
+	_player->giveItem(Player::Item::VILLAGE, 1);
 	addContentChange(ContentChange::PLAYER_RESOURCE | ContentChange::MENU_BUTTONS);
 	return true;
 }
@@ -159,10 +170,14 @@ bool Game::buildRoad(Player * _player, Road * _road)
 		if (!(_road->isBesidePlayerItem(_player)))
 			return false;
 
+		if (_player->getItem(Player::Item::ROAD) <= 0)
+			return false;
+
 		_player->takeResources(buildingsCosts.at(Item::ROAD));
 		_road->setOwner(_player);
 	}
 
+	_player->takeItem(Player::Item::ROAD, 1);
 	addContentChange(ContentChange::PLAYER_RESOURCE|ContentChange::MENU_BUTTONS);
 	return true;
 }

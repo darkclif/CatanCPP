@@ -7,6 +7,8 @@
 #include "Game.h"
 #include "Console.h"
 #include <stack>
+#include "AnimateEntity.h"
+
 
 class Map;
 
@@ -17,6 +19,7 @@ public:
 	~PlayerGUI();
 
 	void		UpdateGUI( sf::Time _dt );
+	void		draw(sf::RenderWindow& _window);
 
 	void		acceptSelection(SelectableMapItem* _item);
 
@@ -159,7 +162,8 @@ private:
 	public:
 		enum class Widget : int{
 			IMG_AVATAR,
-			LAB_NAME
+			LAB_NAME,
+			LAB_WINPOINTS
 		};
 
 		void Refresh(Game* _game);
@@ -191,7 +195,8 @@ private:
 	public:
 		enum class Widget {
 			LAB_CITY,
-			LAB_VILLAGE
+			LAB_VILLAGE,
+			LAB_ROAD
 		};
 
 		void Refresh(Game* _game);
@@ -208,6 +213,7 @@ private:
 		sfg::Box::Ptr buildPageResources();
 		sfg::Box::Ptr buildPageCosts();
 		sfg::Box::Ptr buildPageUnits();
+		sfg::Box::Ptr buildPageCards();
 
 		/* Elements which are changable */
 		std::vector<sfg::Label::Ptr>	labCountResources;
@@ -234,5 +240,46 @@ private:
 	Map*				map;
 
 	bool				isMouseOver;
+
+private:
+	/* Dices */
+	class DiceHolder : public DrawableEntity, public AnimateEntity {
+	public:
+		void draw(sf::RenderWindow& _window);
+		void update(sf::Time _dt);
+
+		void setDices(int _d1, int _d2);
+		void ResetAnimation();
+
+		DiceHolder(sf::Vector2f _start_pos, sf::Vector2f _end_pos);
+
+	private:
+		/* Single dice */
+		class Dice : public DrawableEntity{
+		public:
+			void draw(sf::RenderWindow& _window );
+
+			int getNumber();
+			void setNumber(int _number);
+
+			Dice(sf::Vector2f _pos, int _number, DrawableEntity* _parent);
+
+		private:
+			static int const TEXTURE_SIZE = 150;
+			int	number;
+			sf::Texture& getTexture();
+		};
+
+		sf::Texture& getTexture();
+
+		std::vector<std::unique_ptr<Dice>> arrDices;
+		sf::Vector2f startPos;
+		sf::Vector2f endPos;
+
+		const sf::Time ANIMATION_TIME = sf::Time(sf::seconds(0.8f));
+		sf::Time time;
+	};
+
+	std::unique_ptr<DiceHolder> diceHolder;
 };
 

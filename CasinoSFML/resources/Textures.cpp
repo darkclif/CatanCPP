@@ -38,6 +38,7 @@ namespace Catan {
 		{ Textures::BIG_LOGO,"textures/big_logo.png" },
 		{ Textures::MENU_BG_2,"textures/menu_bg_2.png" },
 		{ Textures::TABLE,"textures/table.png" },
+		{ Textures::DICES,"textures/dices.png" },
 
 		/** PLAYER_AVATARS **/
 		{ Textures::AVATAR_1,"textures/avatars/avatar_1.png" },
@@ -55,6 +56,7 @@ namespace Catan {
 		{ Textures::ICON_IRON, "textures/icons/iron_icon.png" },
 		{ Textures::ICON_CITY, "textures/icons/city_icon.png" },
 		{ Textures::ICON_VILLAGE, "textures/icons/village_icon.png" },
+		{ Textures::ICON_ROAD, "textures/icons/road_icon.png" },
 
 		/** MAP **/
 		/* Hex */

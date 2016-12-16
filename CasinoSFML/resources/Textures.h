@@ -15,6 +15,7 @@ namespace Catan {
 			LOGO,
 			MENU_BG_2,
 			TABLE,
+			DICES,
 
 			/* Avatars */
 			AVATAR_1,
@@ -30,8 +31,10 @@ namespace Catan {
 			ICON_SHEEP,
 			ICON_CLAY,
 			ICON_IRON,
+
 			ICON_CITY,
 			ICON_VILLAGE,
+			ICON_ROAD,
 
 			/* Map */
 			TEXTURE_ERROR,

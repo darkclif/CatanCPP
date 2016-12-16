@@ -1,4 +1,5 @@
 #include "DrawableEntity.h"
+#include "Functions.h"
 
 DrawableEntity::~DrawableEntity()
 {
@@ -73,6 +74,11 @@ void DrawableEntity::setTexture(sf::Texture & _texture)
 	lOrigin.width /= 2;
 
 	sprite.setOrigin((float)lOrigin.width, (float)lOrigin.height);
+}
+
+void DrawableEntity::setOriginAtCenter()
+{
+	Catan::setOriginAtCenter(sprite);
 }
 
 const sf::Sprite DrawableEntity::getSprite()

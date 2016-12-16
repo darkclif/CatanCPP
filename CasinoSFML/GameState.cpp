@@ -18,6 +18,8 @@ bool GameState::HandleEvents(sf::Event _event)
 			case sf::Keyboard::Right: changeActionKeyState(ActionKey::RIGHT, true); break;
 			case sf::Keyboard::Up: changeActionKeyState(ActionKey::UP, true);  break;
 			case sf::Keyboard::Down: changeActionKeyState(ActionKey::DOWN, true);  break;
+			case sf::Keyboard::Q: changeActionKeyState(ActionKey::ZOOM_OUT, true);  break;
+			case sf::Keyboard::A: changeActionKeyState(ActionKey::ZOOM_IN, true);  break;
 			default:break;
 		}
 	}
@@ -29,6 +31,8 @@ bool GameState::HandleEvents(sf::Event _event)
 			case sf::Keyboard::Right: changeActionKeyState(ActionKey::RIGHT, false); break;
 			case sf::Keyboard::Up: changeActionKeyState(ActionKey::UP, false);  break;
 			case sf::Keyboard::Down: changeActionKeyState(ActionKey::DOWN, false);  break;
+			case sf::Keyboard::Q: changeActionKeyState(ActionKey::ZOOM_OUT, false);  break;
+			case sf::Keyboard::A: changeActionKeyState(ActionKey::ZOOM_IN, false);  break;
 			default:break;
 		}
 	}
@@ -76,6 +80,9 @@ bool GameState::Update(sf::Time _dt)
 	if(isActionKeyPressed(ActionKey::DOWN) && (boundView.down < boundTable.down))
 		Catan::moveView(context.window, sf::Vector2f(0.f, MOVE_SPEED * _dt.asSeconds()));
 
+	if (isActionKeyPressed(ActionKey::ZOOM_IN)) Catan::zoomView(context.window, 1.2f);
+	if (isActionKeyPressed(ActionKey::ZOOM_OUT)) Catan::zoomView(context.window, 0.8f);
+
 	return true;
 }
 
@@ -83,6 +90,7 @@ void GameState::Draw(sf::RenderWindow & _window)
 {
 	tableEntity.draw(_window);
 	map->Draw(_window);
+	playerGUI->draw(_window);
 	sfg_sfgui.Display(_window);
 }
 
@@ -146,7 +154,7 @@ GameState::TableEntity::TableEntity()
 {
 	setTexture(ResourceMgr.getTexture(Catan::Textures::Name::TABLE));
 
-	setScale(8.f,8.f);
+	setScale(6.f,6.f);
 	setPosition(sf::Vector2f(610.f,-800.f));
 }
 

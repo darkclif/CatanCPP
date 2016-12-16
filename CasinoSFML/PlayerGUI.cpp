@@ -1,11 +1,14 @@
 #include "PlayerGUI.h"
 #include "Map.h"
 #include "Settings.h"
+#include "Functions.h"
 
 PlayerGUI::PlayerGUI(sfg::SFGUI & _sfgui, sfg::Desktop & _desktop, Game * _game, Map * _map)
 	: sfg_sfgui{ _sfgui }, sfg_desktop{ _desktop }, game{ _game }, map{ _map },
 	mainMenuPanel(this), playerInfoPanel(), resourcesPanel()
 {	
+	diceHolder = std::make_unique<DiceHolder>(sf::Vector2f(-800.f, 300.f),sf::Vector2f(-450.f, 100.f));
+
 	setupGUI();
 	UpdateGUI(sf::Time());
 
@@ -26,6 +29,7 @@ PlayerGUI::~PlayerGUI()
 void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 	if (game->getContentChange(Game::ContentChange::PLAYER_RESOURCE)) {
 		resourcesPanel.Refresh(game);
+		playerInfoPanel.Refresh(game);
 	}
 
 	if (game->getContentChange(Game::ContentChange::CURRENT_PLAYER)) {
@@ -36,6 +40,9 @@ void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 
 	if (game->getContentChange(Game::ContentChange::DICE_THROW)) {
 		infoPanel.Refresh(game);
+
+		diceHolder->setDices(game->getRoundInfo().dices[0], game->getRoundInfo().dices[1]);
+		diceHolder->ResetAnimation();
 	}
 
 	if (game->getContentChange(Game::ContentChange::MENU_BUTTONS)) {
@@ -43,6 +50,12 @@ void PlayerGUI::UpdateGUI( sf::Time _dt ) {
 	}
 
 	mainMenuPanel.Update();
+	diceHolder->update(_dt);
+}
+
+void PlayerGUI::draw(sf::RenderWindow & _window)
+{
+	diceHolder->draw(_window);
 }
 
 void PlayerGUI::acceptSelection(SelectableMapItem * _item)
@@ -548,6 +561,10 @@ void PlayerGUI::PlayerInfoPanel::Refresh(Game* _game)
 
 	sfg::Context::Get().GetEngine().SetProperty("Label#playerName","Color",lPlayer->getColor());
 	getWidget<Widget, sfg::Label>(Widget::LAB_NAME)->SetId("playerName");
+
+	// Change win points
+	std::string stringWinPoints = "WP: " + std::to_string(lPlayer->getWinPoints());
+	getWidget<Widget, sfg::Label>(Widget::LAB_WINPOINTS)->SetText(stringWinPoints);
 }
 
 void PlayerGUI::PlayerInfoPanel::buildInterface()
@@ -565,13 +582,18 @@ void PlayerGUI::PlayerInfoPanel::buildInterface()
 	boxSecondRow->Pack(imgAvatar, false);
 	boxSecondRow->Pack(labPlayerName, true);
 
+	/* 3 row */
+	auto labWinPoints = sfg::Label::Create();
+
 	mapWidgets.insert({ (int)Widget::IMG_AVATAR, imgAvatar });
 	mapWidgets.insert({ (int)Widget::LAB_NAME, labPlayerName });
+	mapWidgets.insert({ (int)Widget::LAB_WINPOINTS, labWinPoints });
 
 	// Box
 	boxWrapper = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
 	boxWrapper->Pack(labTitle);
 	boxWrapper->Pack(boxSecondRow);
+	boxWrapper->Pack(labWinPoints);
 }
 
 //
@@ -677,9 +699,19 @@ void PlayerGUI::ResourcesPanel::Refresh(Game* _game)
 	Player* lPlayer = _game->getCurrentPlayer();
 	ResourceBag lPlayerResources = lPlayer->getResources();
 
+	/* Resources */
 	for (int i = 0; i < Resource::_SIZE; i++) {
 		labCountResources[i]->SetText(std::to_string(lPlayerResources[i]));
 	}
+
+	/* Units */
+	std::string numVillage = std::to_string(lPlayer->getItem(Player::Item::VILLAGE));
+	std::string numCity = std::to_string(lPlayer->getItem(Player::Item::CITY));
+	std::string numRoad = std::to_string(lPlayer->getItem(Player::Item::ROAD));
+
+	getWidget<Widget, sfg::Label>(Widget::LAB_VILLAGE)->SetText("Villages: " + numVillage + "/5");
+	getWidget<Widget, sfg::Label>(Widget::LAB_CITY)->SetText("Cities: " + numCity + "/4");
+	getWidget<Widget, sfg::Label>(Widget::LAB_ROAD)->SetText("Roads: " + numRoad + "/15");
 }
 
 void PlayerGUI::ResourcesPanel::buildInterface()
@@ -771,19 +803,121 @@ sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageUnits()
 {
 	auto lBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 2.f);
 
-	std::vector<Catan::Textures::Name> textureNames = {
-		Catan::Textures::ICON_VILLAGE,
-		Catan::Textures::ICON_CITY
+	std::vector<std::pair<Catan::Textures::Name, Widget>> textureNames = {
+		{ Catan::Textures::ICON_VILLAGE, Widget::LAB_VILLAGE },
+		{ Catan::Textures::ICON_CITY, Widget::LAB_CITY },
+		{ Catan::Textures::ICON_ROAD, Widget::LAB_ROAD }
 	};
 
-	for ( auto& lUnit : textureNames ) {
+	for (auto& lUnit : textureNames) {
 		auto lBoxRow = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 2.f);
 
-		auto imgUnit = sfg::Image::Create(ResourceMgr.getTexture(lUnit).copyToImage());
+		auto imgUnit = sfg::Image::Create(ResourceMgr.getTexture(lUnit.first).copyToImage());
 		lBoxRow->Pack(imgUnit, false);
-	
-		// TODO
+
+		auto labText = sfg::Label::Create("[Status text]");
+		mapWidgets.insert({ (int)lUnit.second, labText });
+		lBoxRow->Pack(labText, false);
+
+		lBox->Pack(lBoxRow);
 	}
 
 	return lBox;
+}
+
+sfg::Box::Ptr PlayerGUI::ResourcesPanel::buildPageCards()
+{
+	auto lBox = sfg::Box::Create();
+	
+
+	
+	return lBox;
+}
+
+/* Dices */
+void PlayerGUI::DiceHolder::draw(sf::RenderWindow & _window)
+{
+	for (auto& lDice : arrDices) {
+		lDice->draw(_window);
+	}
+}
+
+void PlayerGUI::DiceHolder::update(sf::Time _dt)
+{
+	time += _dt;
+
+	if ( time < ANIMATION_TIME) {
+		/* Update postion */
+
+		float step = time / ANIMATION_TIME;
+		sf::Vector2f result = startPos + step * (endPos - startPos);
+
+		setPosition(result);
+		
+		for(auto& lDice : arrDices )
+			lDice->setRotation(lDice->getRotation() + 400.f * step);
+	}
+}
+
+void PlayerGUI::DiceHolder::setDices(int _d1, int _d2)
+{
+	arrDices[0]->setNumber(_d1);
+	arrDices[1]->setNumber(_d2);
+}
+
+void PlayerGUI::DiceHolder::ResetAnimation()
+{
+	time = sf::seconds(0.f);
+}
+
+PlayerGUI::DiceHolder::DiceHolder(sf::Vector2f _start_pos, sf::Vector2f _end_pos): DrawableEntity(_start_pos, 0.f, nullptr)
+{
+	startPos = _start_pos;
+	endPos = _end_pos;
+
+	arrDices.push_back(std::make_unique<Dice>(sf::Vector2f(-100,-100), 1, this));
+	arrDices.push_back(std::make_unique<Dice>(sf::Vector2f(100,100), 1, this));
+}
+
+sf::Texture & PlayerGUI::DiceHolder::getTexture()
+{
+	return ResourceMgr.getTexture(Catan::Textures::TEXTURE_EMPTY);
+}
+
+void PlayerGUI::DiceHolder::Dice::draw(sf::RenderWindow & _window)
+{
+	if (number < 1 || number > 6)
+		return;
+
+	sf::Sprite tmpSprite(getSprite());
+	tmpSprite.setTexture(getTexture());
+	tmpSprite.setPosition(getAbsolutePosition());
+
+	tmpSprite.setTextureRect(sf::IntRect(TEXTURE_SIZE*(number - 1),0, TEXTURE_SIZE, TEXTURE_SIZE));
+
+	_window.draw(tmpSprite);
+}
+
+/* Single dice */
+int PlayerGUI::DiceHolder::Dice::getNumber()
+{
+	return number;
+}
+
+void PlayerGUI::DiceHolder::Dice::setNumber(int _number)
+{
+	number = _number;
+}
+
+PlayerGUI::DiceHolder::Dice::Dice(sf::Vector2f _pos, int _number, DrawableEntity* _parent) : 
+	DrawableEntity(_pos,0.f,_parent), number{_number}
+{
+	setTexture(getTexture());
+	setTextureRect(sf::IntRect(0,0, TEXTURE_SIZE, TEXTURE_SIZE));
+	setOriginAtCenter();
+}
+
+sf::Texture & PlayerGUI::DiceHolder::Dice::getTexture()
+{
+	return ResourceMgr.getTexture(Catan::Textures::DICES);
 }

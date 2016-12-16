@@ -17,6 +17,14 @@ public:
 		_SIZE
 	};
 
+	struct ItemCount {
+		int	count;
+		const int MAX;
+
+		ItemCount(int _max) : MAX{ _max }, count{_max} {};
+		ItemCount(int _max, int _count) : MAX{ _max }, count{ _count } {};
+	};
+
 	enum class Phase : int {
 		BEGINNING_FORWARD,
 		BEGINNING_BACKWARD,
@@ -45,6 +53,9 @@ public:
 	void			takeItem(Item _item, int _count);
 	void			giveItem(Item _item, int _count);
 
+	void			recalculateWinPoints();
+	int				getWinPoints() const;
+
 	std::string		getName() const;
 	sf::Color		getColor() const;
 	Catan::Textures::Name getAvatarTexture() const;
@@ -56,8 +67,10 @@ private:
 	sf::Color				color;
 
 	// Player items
-	std::vector<int>		items;
+	std::vector<ItemCount>	items;
 	ResourceBag				playerResources;
+
+	int						winPoints;
 
 	// Beginning phases states
 	PhaseBuildings			phaseBuilings[(int)(Phase::_SIZE)];

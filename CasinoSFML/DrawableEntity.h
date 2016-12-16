@@ -22,6 +22,8 @@ public:
 	sf::Vector2f		getAbsolutePosition();
 	void				setTexture(sf::Texture& _texture);
 
+	void				setOriginAtCenter();
+
 	const sf::Sprite	getSprite();
 	sf::FloatRect		getSpriteGlobalBounds();
 
