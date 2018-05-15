@@ -11,7 +11,7 @@ To run project you need a texture pack which is not provided in this repo.
 
 ## Screenshots
 
-![Screenshot 1](https://github.com/darkclif/CatanCPP/blob/master/media/screenshot_1.png)
+![Screenshot 1](https://github.com/darkclif/CatanCPP/blob/master/media/screenshot_2.png)
 
 ## Tools
 
